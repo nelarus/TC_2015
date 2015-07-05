@@ -12,13 +12,7 @@
 
 //TESTE
 
-unsigned char ordem = 0;//usada para compararar uma sequência de dados recebidos com uma string.
-unsigned char etapa=0;
-unsigned char dado_recebido = 0;
 
-char senha[16];
-char nova_senha[16];
-unsigned char nivel_acesso;
 
 struct Data{
 	char dia;
@@ -29,14 +23,26 @@ struct Data{
 	char segundo;
 		}data_atual;
 
-unsigned char tamanho_senha=10;
+unsigned char tamanho_senha=0;
 unsigned char funcao=0;//utilizada para determinar qual função o PIC vai executar (abrir porta, fornecer histórico, fornecer status atual)
 unsigned char conta=0;
 unsigned char ultima_conta=0;
 unsigned char FLAGS_1=0;
+unsigned char ordem = 0;//usada para compararar uma sequência de dados recebidos com uma string.
+unsigned char etapa=0;
+unsigned char dado_recebido = 0;
+unsigned char nivel_acesso=0;
+
+char qtd_max_dias[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+char senha[16];
+char nova_senha[16]; //Para evitar corrompimento da senha no caso de algum erro de comunicação, só se vai repassar a nova senha quando se terminar  de a enviar
+
 
 bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 
+
+#define INICIALIZAR '*' //Se o sistema está inicializando isso significa que sua data está desincronizada. Esse caractere indica a central ou ao
+						//dispositivo do usuário no caso de acesso direto que é necessário enviar a data correta ao PIC
 
 #define PROXIMA_ETAPA '>' //TRANSIÇÃO ENTRE ETAPAS
 
@@ -51,13 +57,14 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define FRAME_ERROR 'F'  //CARACTERES PARA INDICAR ERRO NA COMUNICAÇÃO SERIAL
 
 
-#define ABERTURA_PORTA '0'
-#define REQUERIMENTO_HISTORICO '1'
-#define REQUERIMENTO_STATUS_ATUAL '2'
-#define RECONFIGURAR_CONTA '3' //FUNÇÕES DO SISTEMA
-#define RECONFIGURAR_FECHADURA '4'
-#define RECONFIGURAR_MODULO '5'
-#define MUDAR_SENHA '6'			
+#define ABERTURA_PORTA 'a'
+#define REQUERIMENTO_HISTORICO 'b'
+#define REQUERIMENTO_STATUS_ATUAL 'c'
+#define RECONFIGURAR_CONTA 'd'      //FUNÇÕES DO SISTEMA
+#define RECONFIGURAR_FECHADURA 'e'
+#define RECONFIGURAR_MODULO 'f'
+#define CONFIGURAR_DATA 'g'
+#define MUDAR_SENHA 'h'
 
 
 #define proxima_etapa() resetar_bit(FLAGS_1,TRANSICAO_ETAPA);etapa++;ordem=0 //PREPARAÇÃO PARA A PROXIMA ETAPA
@@ -71,7 +78,7 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 
 
 #define QTD_MAX_CONTAS 16		//PARAMETROS DE CONFIGURAÇÃO
-#define TAMANHO_SENHA 16
+#define TAMANHO_MAX_SENHA 16
 
 
 
@@ -86,14 +93,17 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define PERMISSAO_MUDAR_SENHA_PROPRIA 7
 
 
-#define ERRO_SENHA 0
-#define ERRO_PROTOCOLO 1
-#define ERRO_IDENTIF_CONTA 2
+
+#define TROCA_SENHA 0
+#define TRANSICAO_ETAPA 1
+#define ERRO_SENHA 2
 #define ERRO_NIVEL_DE_ACESSO 3
-#define ERRO_COMUNICACAO 4  //FLAGS DE ERRO
+#define ERRO_COMUNICACAO 4  //FLAGS_1
 #define ERRO_DESCONHECIDO 5
-#define TRANSICAO_ETAPA 6
-#define TROCA_SENHA 7
+#define ERRO_PROTOCOLO 6
+#define ERRO_IDENTIF_CONTA 7
+
+
 
 
 
@@ -120,10 +130,6 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 //Transição
 //Fim da comunicação
 
-char dias_do_mes(char mes, char ano){
-			if( mes == 2 && (!((ano+4)%4))  ) return 29;
-			else return (28+ ((mes + mes/8)%2) + (2%mes)+ (1/mes));
-		}
 
 
 void  interrupt aux(void)
@@ -133,7 +139,31 @@ void  interrupt aux(void)
 		RABIF=0;}
 
 	if(TMR1IE==1 && TMR1IF ==1){
-			}
+					if(++data_atual.segundo>59){
+								data_atual.segundo=0; 
+
+								if(++data_atual.minuto>59){
+
+										data_atual.minuto=0;
+
+											if(++data_atual.hora>23){ 
+
+													data_atual.hora=0;
+
+														if(++data_atual.dia > qtd_max_dias[data_atual.mes]) {
+																data_atual.dia=0;
+
+																	if(++data_atual.mes>12) {
+																			data_atual.ano++;
+																				if(!(data_atual.ano+3 %4))	qtd_max_dias[data_atual.mes]=29;
+																				else qtd_max_dias[data_atual.mes]=28;}	
+
+															}  
+
+ }	}}
+
+
+					TMR1+=32768;}
 	
 	if(RCIF==1 && RCIE==1){
 
@@ -164,7 +194,7 @@ void  interrupt aux(void)
 					//Fim retorno
 	
 	
-					if(FLAGS_1) { 
+					if(FLAGS_1 > 3) { //Bits de erro vão de 2 a 7. Se um deles estiver setado, FLAGS_1 vai estar com valor acima de 3.
 									resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 									etapa = etapa_inicial;
 									enviar=1;}
@@ -191,16 +221,21 @@ void  interrupt aux(void)
 								else{
 										setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 										conta = (dado_recebido - '0');
-												if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
+
+												if(!(conta<QTD_MAX_CONTAS)) { //A conta que se está tentando conectar não existe
+													setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);}
 
 												else{
-													if(conta != ultima_conta){
-														TXREG = PAUSAR;
-														while(!TRMT){}
-														RCIE=0;}
 
-													else setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													}
+														if(conta != ultima_conta){ //A conta que se está tentando conectar não foi a última acessada(não tem sua senha carregada na memória)
+															TXREG = PAUSAR;
+															while(!TRMT){}
+															RCIE=0;}
+
+														else {
+															if(!(testar_bit(nivel_acesso,funcao))) setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
+															else  	setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+														}
 									}
 								
 								ordem++;}
@@ -213,8 +248,7 @@ void  interrupt aux(void)
 								while(!TRMT){}
 								TXREG = senha[ordem];
 								if(senha[ordem] != dado_recebido){ 
-												if(senha[ordem+1] == NULL) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-												else setar_bit(FLAGS_1,ERRO_SENHA);
+										 setar_bit(FLAGS_1,ERRO_SENHA);
 								}
 								ordem++;
 	
@@ -290,12 +324,18 @@ void main(void)
 	TX9=0;		//transmitir 8 bits
 	TXEN=1;		//habilita a transmissão
 	TXIE=0;
-	RCIE=1;		//habilita a interrupção serial por recepção
+	RCIE=0;		//desabilita inicialmente a interrupção por recepção para carregar a senha na memória
 	PEIE=1;		//habilita interrupção dos periféricos
 	RX9=0;      //receber 8 bits
 	CREN=1; 	//habilita a recepção serial
 
-	TXREG = 'B';
+	data_atual.ano = 0;
+	data_atual.mes = 1;
+	data_atual.dia = 1;
+	data_atual.segundo = 0;
+	data_atual.minuto = 0;
+	data_atual.hora = 0;
+	TXREG = INICIALIZAR;
 	while(!TRMT){}
 	while(1){
 
@@ -338,12 +378,16 @@ void main(void)
 					char i = 0;
 					tamanho_senha=0;
 
-							while( senha[i] && i<TAMANHO_SENHA){
-								senha[i] = eeprom_read((conta*TAMANHO_SENHA) + i);
+					do{
+					
+								senha[i] = eeprom_read((conta*TAMANHO_MAX_SENHA) + i);
 								TXREG= senha[i];
 								while(!TRMT);
-								i++;}
-					nivel_acesso = eeprom_read((conta*TAMANHO_SENHA)+ (TAMANHO_SENHA-1));
+								i++; tamanho_senha++;
+
+					}while(senha[i-1] && i<(TAMANHO_MAX_SENHA-1));
+
+					nivel_acesso = eeprom_read((conta*TAMANHO_MAX_SENHA)+ i);
 					RCIE=1;
 					TXREG= CONTINUAR;
 					while(!TRMT);
@@ -354,7 +398,7 @@ void main(void)
 					resetar_bit(FLAGS_1,TROCA_SENHA);
 					char i=0;
 					tamanho_senha=0;		
-							while(nova_senha[i]  && i<TAMANHO_SENHA){
+							while(nova_senha[i]  && i<(TAMANHO_MAX_SENHA-1)){
 								senha[i] = nova_senha[i];
 								eeprom_write(((conta*16) + i),senha[i]);
 								while(WR){}

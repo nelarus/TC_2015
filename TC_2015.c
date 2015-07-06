@@ -14,7 +14,8 @@
 
 
 
-struct Data{
+struct Data_completa{
+	char dia_da_semana;
 	char dia;
 	char mes;
 	char ano;
@@ -36,9 +37,14 @@ unsigned char nivel_acesso=0;
 char qtd_max_dias[] = {31,28,31,30,31,30,31,31,30,31,30,31};
 char senha[16];
 char nova_senha[16]; //Para evitar corrompimento da senha no caso de algum erro de comunicação, só se vai repassar a nova senha quando se terminar  de a enviar
-
-
 bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
+bit leitura_eeprom_interna=0;
+bit escrita_eeprom_interna=0;
+bit escrita_eeprom_externa=0;
+bit leitura_eeprom_externa=0;
+
+int endereco_inicial;
+int endereco_final;
 
 
 #define INICIALIZAR '*' //Se o sistema está inicializando isso significa que sua data está desincronizada. Esse caractere indica a central ou ao
@@ -66,7 +72,7 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define CONFIGURAR_DATA 'g'
 #define MUDAR_SENHA 'h'
 
-
+#define IGNORAR 'X'
 #define proxima_etapa() resetar_bit(FLAGS_1,TRANSICAO_ETAPA);etapa++;ordem=0 //PREPARAÇÃO PARA A PROXIMA ETAPA
 
 
@@ -98,7 +104,7 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define TRANSICAO_ETAPA 1
 #define ERRO_SENHA 2
 #define ERRO_NIVEL_DE_ACESSO 3
-#define ERRO_COMUNICACAO 4  //FLAGS_1
+#define ERRO_COMUNICACAO 4  //FLAGS_1 ERRO
 #define ERRO_DESCONHECIDO 5
 #define ERRO_PROTOCOLO 6
 #define ERRO_IDENTIF_CONTA 7
@@ -124,13 +130,11 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 		// se é a propria conta +
 			//Se sim : senha nova
 			//se não: conta + senha nova
-//Pedido de acesso ao histórico: data de início e fim
+//Pedido de acesso ao histórico: ano e mes inicial + ano e mes final. Caso se queira verificar um único mes, envia-se o caractere 'X' como ano final.
 //Pedido de status atual: não precisa
 //Abertura de porta: não precisa
 //Transição
 //Fim da comunicação
-
-
 
 void  interrupt aux(void)
 {	
@@ -149,7 +153,7 @@ void  interrupt aux(void)
 											if(++data_atual.hora>23){ 
 
 													data_atual.hora=0;
-
+														if(++data_atual.dia_da_semana >6) data_atual.dia_da_semana=0;
 														if(++data_atual.dia > qtd_max_dias[data_atual.mes]) {
 																data_atual.dia=0;
 
@@ -163,7 +167,8 @@ void  interrupt aux(void)
  }	}}
 
 
-					TMR1+=32768;}
+					TMR1+=32768;
+					TMR1IF=0;}
 	
 	if(RCIF==1 && RCIE==1){
 
@@ -189,17 +194,13 @@ void  interrupt aux(void)
 					while(!TRMT){}
 					TXREG = ('0' + ordem);
 					while(!TRMT){}
-					TXREG = ('0' + TRANSICAO_ETAPA);
+					TXREG = ('0' + testar_bit(FLAGS_1,TRANSICAO_ETAPA));
 					while(!TRMT){}
 					//Fim retorno
 	
 	
-					if(FLAGS_1 > 3) { //Bits de erro vão de 2 a 7. Se um deles estiver setado, FLAGS_1 vai estar com valor acima de 3.
-									resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-									etapa = etapa_inicial;
-									enviar=1;}
 	
-					else if(TRANSICAO_ETAPA){
+					if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
 							if(dado_recebido != PROXIMA_ETAPA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
 							resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
@@ -229,11 +230,12 @@ void  interrupt aux(void)
 
 														if(conta != ultima_conta){ //A conta que se está tentando conectar não foi a última acessada(não tem sua senha carregada na memória)
 															TXREG = PAUSAR;
+															leitura_eeprom_interna=1;
 															while(!TRMT){}
 															RCIE=0;}
 
 														else {
-															if(!(testar_bit(nivel_acesso,funcao))) setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
+															if(!(testar_bit(nivel_acesso,(funcao - '0')))) setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
 															else  	setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
 														}
 									}
@@ -257,29 +259,54 @@ void  interrupt aux(void)
 
 	
 					else if(etapa == etapa_detalha_funcao){
+
 								if(funcao == ABERTURA_PORTA){
-									if(ordem == 2) {
-											setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-											}
-	
-									if( dado_recebido != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
-									ordem++;
-									}
-					}
+
+											if(ordem == 2) { setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+			
+											if( dado_recebido != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+											ordem++;}
+															}
+
+
 								else if(funcao == REQUERIMENTO_HISTORICO){
-																	
-																	setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+
+											dado_recebido-= 'A'; //Apenas para fins de teste,pois  o software de teste para android só envia caracteres;
+											
+											if(ordem == 0) { 
+															endereco_inicial = 1794 + (dado_recebido*26);//Espera-se que dado_recebido = ano inicial
+															TXREG = PAUSAR;
+															leitura_eeprom_externa=1;
+															}
+
+
+											else if(ordem == 1){
+														endereco_inicial +=  (dado_recebido *2);  //Espera-se que dado_recebido = mes inicial
+												}
+
+
+											else if(ordem == 2) {
+														if(dado_recebido == IGNORAR) 	setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+														else endereco_final = 1794 + (dado_recebido*26);} //Espera-se que dado_recebido = ano final
+
+											else if(ordem == 3){
+														endereco_final +=(dado_recebido *2);//Espera-se que dado_recebido = mes final
+														TXREG = PAUSAR;
+														setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+
+											ordem++;
+																	}
 	
-								else if(funcao == REQUERIMENTO_STATUS_ATUAL)setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+								else if(funcao == REQUERIMENTO_STATUS_ATUAL) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 
 								else if(funcao == MUDAR_SENHA){
 										
-										if(dado_recebido == NULL) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+										if(dado_recebido == 'A' && ordem>0) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 	
 										else{
 											nova_senha[ordem] = dado_recebido;
 											ordem++;
-												if(ordem == 14) { setar_bit(FLAGS_1,TRANSICAO_ETAPA);  setar_bit(FLAGS_1,TROCA_SENHA);		}
+												if(ordem == 14) { setar_bit(FLAGS_1,TRANSICAO_ETAPA);  setar_bit(FLAGS_1,TROCA_SENHA);}
 															}	
 					
 															}
@@ -288,9 +315,15 @@ void  interrupt aux(void)
 								if(dado_recebido != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 								enviar=1;
 								etapa = etapa_inicial;}
+
+					
+					if(FLAGS_1 > 3) { //Bits de erro vão de 2 a 7. Se um deles estiver setado, FLAGS_1 vai estar com valor acima de 3.
+									resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
+									etapa = etapa_inicial;
+									enviar=1;}
 	
 	
-				}
+					}
 			RCIF=0;}
 							
 }
@@ -335,6 +368,7 @@ void main(void)
 	data_atual.segundo = 0;
 	data_atual.minuto = 0;
 	data_atual.hora = 0;
+	data_atual.dia_da_semana=0;
 	TXREG = INICIALIZAR;
 	while(!TRMT){}
 	while(1){
@@ -374,7 +408,12 @@ void main(void)
 				
 					}
 
-			else if(RCIE==0){
+			else if(leitura_eeprom_externa){
+				if(endereco_inicial && endereco_final){TXREG= ',';}}
+
+			else if(leitura_eeprom_interna){
+
+				if(etapa == etapa_login){
 					char i = 0;
 					tamanho_senha=0;
 
@@ -394,7 +433,7 @@ void main(void)
 
 				}
 
-			else if( testar_bit(FLAGS_1,TROCA_SENHA)){
+				else if( testar_bit(FLAGS_1,TROCA_SENHA)){
 					resetar_bit(FLAGS_1,TROCA_SENHA);
 					char i=0;
 					tamanho_senha=0;		
@@ -406,5 +445,6 @@ void main(void)
 
 								}
 			
-}		
+								}		
+}
 }

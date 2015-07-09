@@ -12,15 +12,13 @@
 
 //TESTE
 
-unsigned char ordem = 0;//usada para compararar uma sequência de dados recebidos com uma string.
-unsigned char etapa=0;
-unsigned char dado_recebido = 0;
-
+char qtd_max_dias[] = {31,28,31,30,31,30,31,31,30,31,30,31};
 char senha[16];
 char nova_senha[16];
-unsigned char nivel_acesso;
+
 
 struct Data{
+	char dia_da_semana;
 	char dia;
 	char mes;
 	char ano;
@@ -29,13 +27,20 @@ struct Data{
 	char segundo;
 		}data_atual;
 
-unsigned char tamanho_senha=10;
+
+unsigned char ordem = 0;//usada para compararar uma sequência de dados recebidos com uma string.
+unsigned char etapa=0;
+unsigned char dado_recebido = 0;
+unsigned char nivel_acesso;
+unsigned char tamanho_senha=0;
 unsigned char funcao=0;//utilizada para determinar qual função o PIC vai executar (abrir porta, fornecer histórico, fornecer status atual)
 unsigned char conta=0;
-unsigned char ultima_conta=0;
+unsigned char ultima_conta=1;
 unsigned char FLAGS_1=0;
+unsigned char temp;
 
 bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
+bit exibir=0;
 
 
 #define PROXIMA_ETAPA '>' //TRANSIÇÃO ENTRE ETAPAS
@@ -86,14 +91,16 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define PERMISSAO_MUDAR_SENHA_PROPRIA 7
 
 
-#define ERRO_SENHA 0
-#define ERRO_PROTOCOLO 1
+#define ERRO_SENHA 6
+#define ERRO_PROTOCOLO 7
 #define ERRO_IDENTIF_CONTA 2
 #define ERRO_NIVEL_DE_ACESSO 3
 #define ERRO_COMUNICACAO 4  //FLAGS DE ERRO
 #define ERRO_DESCONHECIDO 5
-#define TRANSICAO_ETAPA 6
-#define TROCA_SENHA 7
+#define TRANSICAO_ETAPA 0
+#define TROCA_SENHA 1
+
+#define LED RC5
 
 
 
@@ -120,11 +127,8 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 //Transição
 //Fim da comunicação
 
-char dias_do_mes(char mes, char ano){
-			if( mes == 2 && (!((ano+4)%4))  ) return 29;
-			else return (28+ ((mes + mes/8)%2) + (2%mes)+ (1/mes));
-		}
 
+void config_serial(void){}
 
 void  interrupt aux(void)
 {	
@@ -133,7 +137,35 @@ void  interrupt aux(void)
 		RABIF=0;}
 
 	if(TMR1IE==1 && TMR1IF ==1){
-			}
+					LED=!LED;
+					if(++data_atual.segundo>59){
+								exibir=1;
+								data_atual.segundo=0; 
+
+								if(++data_atual.minuto>59){
+
+										data_atual.minuto=0;
+
+											if(++data_atual.hora>23){ 
+
+													data_atual.hora=0;
+														if(++data_atual.dia_da_semana >6) data_atual.dia_da_semana=0;
+														if(++data_atual.dia > qtd_max_dias[data_atual.mes]) {
+																data_atual.dia=0;
+
+																	if(++data_atual.mes>12) {
+																			data_atual.ano++;
+																				if(!(data_atual.ano+3 %4))	qtd_max_dias[2]=29;
+																				else qtd_max_dias[data_atual.mes]=28;}	
+
+															}  
+
+ }	}}
+
+
+					TMR1+=32768;
+					TMR1IF=0;}
+			
 	
 	if(RCIF==1 && RCIE==1){
 
@@ -159,17 +191,21 @@ void  interrupt aux(void)
 					while(!TRMT){}
 					TXREG = ('0' + ordem);
 					while(!TRMT){}
-					TXREG = ('0' + TRANSICAO_ETAPA);
+					TXREG = ('0' + testar_bit(FLAGS_1,TRANSICAO_ETAPA));
+					if(etapa ==3) TXREG=funcao;
 					while(!TRMT){}
 					//Fim retorno
 	
-	
-					if(FLAGS_1) { 
-									resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-									etapa = etapa_inicial;
-									enviar=1;}
-	
-					else if(TRANSICAO_ETAPA){
+					etapa = etapa_final;
+
+					if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
+							TXREG = ('X');
+							while(!TRMT){}
+							TXREG = ('0' + etapa);
+							while(!TRMT){}
+							TXREG = ('>');
+							while(!TRMT){}
+
 							if(dado_recebido != PROXIMA_ETAPA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
 							resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
@@ -212,48 +248,63 @@ void  interrupt aux(void)
 								TXREG = 'J';
 								while(!TRMT){}
 								TXREG = senha[ordem];
+								while(!TRMT){}
+
 								if(senha[ordem] != dado_recebido){ 
-												if(senha[ordem+1] == NULL) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+												if(senha[ordem+1] == 0) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 												else setar_bit(FLAGS_1,ERRO_SENHA);
 								}
 								ordem++;
 	
 								if(ordem == tamanho_senha) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-				}	
+								}	
 
 	
 					else if(etapa == etapa_detalha_funcao){
 								if(funcao == ABERTURA_PORTA){
+									while(!TRMT){}
+
 									if(ordem == 2) {
 											setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 											}
 	
-									if( dado_recebido != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+									else if(dado_recebido != ('N'+(ordem))) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+
 									ordem++;
 									}
-					}
+					
 								else if(funcao == REQUERIMENTO_HISTORICO){
 																	
 																	setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
 	
-								else if(funcao == REQUERIMENTO_STATUS_ATUAL)setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+								else if(funcao == REQUERIMENTO_STATUS_ATUAL) {setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
 
 								else if(funcao == MUDAR_SENHA){
 										
-										if(dado_recebido == NULL) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+										if(dado_recebido == 0) setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 	
 										else{
 											nova_senha[ordem] = dado_recebido;
 											ordem++;
 												if(ordem == 14) { setar_bit(FLAGS_1,TRANSICAO_ETAPA);  setar_bit(FLAGS_1,TROCA_SENHA);		}
-															}	
+											}	
 					
 															}
+					}
 	
 					else if(etapa == etapa_final){//Fim da comunicação
+								while(!TRMT){}
+
 								if(dado_recebido != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 								enviar=1;
 								etapa = etapa_inicial;}
+
+					
+					
+					if(FLAGS_1>3) { 
+									resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
+									etapa = etapa_inicial;
+									enviar=1;}
 	
 	
 				}
@@ -295,14 +346,51 @@ void main(void)
 	RX9=0;      //receber 8 bits
 	CREN=1; 	//habilita a recepção serial
 
+	data_atual.dia_da_semana=0;
+	data_atual.dia=0;
+	data_atual.mes=0;
+	data_atual.ano=0;
+	data_atual.hora=0;
+	data_atual.minuto=0;
+	data_atual.segundo=0;
+	exibir=1;
+
 	TXREG = 'B';
 	while(!TRMT){}
 	while(1){
+		if(exibir){
+			TXREG= '\n';
+			while(!TRMT){}
+			exibir=0;
+			temp = (data_atual.hora/10);
+			TXREG = (temp + '0');
+			while(!TRMT){}
+			TXREG = ('0'+ (data_atual.hora - (temp*10)));
+			while(!TRMT){}
+			TXREG = ':';
+			while(!TRMT){}
 
-			
+			temp = (data_atual.minuto/10);
+			TXREG = (temp + '0');
+			while(!TRMT){}
+			TXREG = ('0'+(data_atual.minuto - (temp*10)));
+			while(!TRMT){}
+			TXREG = ':';
+			while(!TRMT){}
+
+			temp = (data_atual.segundo/10);
+			TXREG = (temp + '0');
+			while(!TRMT){}
+			TXREG = ('0'+ (data_atual.segundo - (temp*10)));
+			while(!TRMT){}
+			TXREG = '\n';
+			while(!TRMT){}
+
+}
+		
 		if(enviar==1){
 			enviar=0;
-			if(	testar_bit(FLAGS_1,ERRO_SENHA) == 0 && 	testar_bit(FLAGS_1,ERRO_PROTOCOLO) ==0){
+			if(FLAGS_1<4){
 							TXREG = 'O';
 							while(!TRMT){}
 							TXREG = 'K';
@@ -336,16 +424,19 @@ void main(void)
 
 			else if(RCIE==0){
 					char i = 0;
-					tamanho_senha=0;
+					tamanho_senha=255;
 
-							while( senha[i] && i<TAMANHO_SENHA){
+							do{
 								senha[i] = eeprom_read((conta*TAMANHO_SENHA) + i);
 								TXREG= senha[i];
 								while(!TRMT);
-								i++;}
+								tamanho_senha++;
+								i++;} while( senha[i-1] && i<(TAMANHO_SENHA-1));
+
 					nivel_acesso = eeprom_read((conta*TAMANHO_SENHA)+ (TAMANHO_SENHA-1));
 					RCIE=1;
-					TXREG= CONTINUAR;
+					
+					TXREG = CONTINUAR;
 					while(!TRMT);
 
 				}

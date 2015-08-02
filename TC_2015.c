@@ -1,6 +1,5 @@
 #include <htc.h>
 #include <stdio.h>
-#include "ext_eeprom.h"
 
 
  __CONFIG(FOSC_INTRCIO & WDTE_OFF & PWRTE_ON & MCLRE_ON & CP_OFF & CPD_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF);
@@ -13,7 +12,7 @@
 
 //TESTE
 
-char qtd_max_dias[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+char qtd_max_dias =31;
 char senha[16];
 char nova_senha[16];
 
@@ -35,13 +34,13 @@ unsigned char dado_recebido = 0;
 unsigned char nivel_acesso;
 unsigned char funcao=0;//utilizada para determinar qual função o PIC vai executar (abrir porta, fornecer histórico, fornecer status atual)
 unsigned char conta=0;
+unsigned char conta_a_ser_alterada=0;
 unsigned char ultima_conta=0;
 unsigned char FLAGS_1=0;
 unsigned char qtd_total_contas=0;
-unsigned char etapa_erro=0;
-
-int endereco_inic_eeprom;
-int endereco_final_eeprom;
+unsigned int cont=0;
+unsigned int endereco_inic_eeprom=5;
+unsigned int endereco_final_eeprom=5;
 
 bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 
@@ -57,15 +56,7 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define OVERRUN 'O'
 #define FRAME_ERROR 'F'  //CARACTERES PARA INDICAR ERRO NA COMUNICAÇÃO SERIAL
 
-
-#define ABERTURA_PORTA '0'
-#define REQUERIMENTO_HISTORICO '1'
-#define REQUERIMENTO_STATUS_ATUAL '2'
-#define RECONFIGURAR_CONTA '3' //FUNÇÕES DO SISTEMA
-#define RECONFIGURAR_FECHADURA '4'
-#define RECONFIGURAR_MODULO '5'
-#define MODO_DEBUG '6'
-#define MUDAR_SENHA '7'			
+#define MODO_DEBUG '^'	//Se o caracter recebido for esse o programa irá ignorar o protocolo e entrar em modo de debug(a ser implementado)	
 
 #define Domingo 0
 #define Segunda 1
@@ -99,28 +90,37 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 #define TAMANHO_SENHA 16
 
 
+#define ABERTURA_PORTA '0'
+#define REQUERIMENTO_HISTORICO '1'
+#define REQUERIMENTO_STATUS_ATUAL '2'
+#define RECONFIGURAR_CONTA '3' //FUNÇÕES DO SISTEMA
+#define RECONFIGURAR_FECHADURA '4'
+#define RECONFIGURAR_MODULO '5'
+#define MUDAR_SENHA '7'	
+
 #define PERMISSAO_ABRIR_PORTA 0
 #define PERMISSAO_REQUERIMENTO_HISTORICO 1
 #define PERMISSAO_REQUERIMENTO_STATUS_ATUAL 2
-#define PERMISSAO_RECONFIGURAR_CONTA 3
+#define PERMISSAO_RECONFIGURAR_PROPRIA_CONTA 3
 #define PERMISSAO_RECONFIGURAR_FECHADURA 4  //FLAGS NIVEL DE ACESSO 
 #define PERMISSAO_RECONFIGURAR_MODULO 5
-#define PERMISSAO_MUDAR_SENHA_OUTRAS 6
-#define PERMISSAO_MUDAR_SENHA_PROPRIA 7
+#define PERMISSAO_RECONFIGURAR_OUTRAS_CONTAS 6
+#define PERMISSAO_MUDAR_PROPRIA_SENHA 7
 
+#define conta_admin 0
 
 #define ERRO_SENHA 6
 #define ERRO_PROTOCOLO 7
 #define ERRO_IDENTIF_CONTA 2
 #define ERRO_NIVEL_DE_ACESSO 3
-#define ERRO_COMUNICACAO 4  //FLAGS DE ERRO
+#define ERRO_COMUNICACAO 4  //FLAGS DE ERRO E GERAIS_1
 #define ERRO_DESCONHECIDO 5
 #define TRANSICAO_ETAPA 0
 #define TROCA_SENHA 1
 
-#define LED RC5
-#define SENSOR_FECHADURA RA0
-#define FECHADURA RC0
+#define LED RC5			//Mostra que a contagem de horas está funcionando
+#define FECHADURA RC0    //Destravamento ou não da fechadura
+#define SENSOR_ABERTURA_FECHADURA RA0 //Sensor magnético(reed switch)
 
 
 
@@ -147,21 +147,31 @@ bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
 //Transição
 //Fim da comunicação
 void leitura_eeprom_externa(int endereco){ //Não implementado.
+		endereco++;
 		TXREG = 'l';
 		while(!TRMT){} }
 void escrita_eeprom_externa(int endereco){ //Não implementado.
+		endereco++;
 		TXREG = 'e';
 		while(!TRMT){}
 	}
 
 void numero_para_ascii(char numero){
-	char temp;
+	char temp1;
+	char temp2;
 
-	temp = numero/10;
-	TXREG = '0'+ temp;
+	TXREG = '+';
 	while(!TRMT){}
 
-	TXREG = '0'+ (numero - (temp*10));
+	temp1 = numero/100;
+	TXREG = '0'+ temp1;
+	while(!TRMT){}
+
+	temp2 = ((numero - temp1*100)/10);
+	TXREG = '0'+ temp2;
+	while(!TRMT){}
+
+	TXREG = '0'+ (numero - (temp2*10) - (temp1*100));
 	while(!TRMT){}
 
 	TXREG = '+';
@@ -197,6 +207,8 @@ void config_serial(void){
 }
 
 void carregar_senha(void){
+					TXREG = '\n';
+					while(!TRMT);
 					char i = 0;
 
 							do{
@@ -206,8 +218,7 @@ void carregar_senha(void){
 								i++;} while( senha[i-1] && i<(TAMANHO_SENHA-1));
 
 					nivel_acesso = eeprom_read((conta*TAMANHO_SENHA)+ (TAMANHO_SENHA-1));
-					TXREG = nivel_acesso;
-					while(!TRMT);
+					ultima_conta=conta;
 					RCIE=1;
 					
 
@@ -215,6 +226,14 @@ void carregar_senha(void){
 
 void interrupt aux(void)
 {	
+	
+	if(T0IE==1 && T0IF == 1){
+			T0IF=0;
+			TMR0+=131;
+			cont++;
+				
+	}
+	
 	
 	if(RABIF==1 && RABIE==1){
 		RABIF=0;}
@@ -224,22 +243,47 @@ void interrupt aux(void)
 					if(++data_atual.segundo>59){
 								data_atual.segundo=0; 
 
-								if(++data_atual.minuto>59){
+									if(++data_atual.minuto>59){
 
 
-										data_atual.minuto=0;
+									data_atual.minuto=0;
 
 											if(++data_atual.hora>23){ 
 
-													data_atual.hora=0;
-														if(++data_atual.dia_da_semana > Sabado) data_atual.dia_da_semana = Segunda;
-														if(++data_atual.dia > qtd_max_dias[data_atual.mes]) {
-																data_atual.dia=0;
+											data_atual.hora=0;
+											if(++data_atual.dia_da_semana > Sabado) data_atual.dia_da_semana = Segunda;
+															
+											if(++data_atual.dia > qtd_max_dias) {
+													data_atual.dia=0;
 
-																	if(++data_atual.mes> Dezembro) {
-																			data_atual.ano++;
-																				if(!((data_atual.ano+3)%4))	qtd_max_dias[Fevereiro]=29;
-																				else qtd_max_dias[Fevereiro]=28;}	
+													switch(++data_atual.mes){
+														case Janeiro:
+														case Marco:
+														case Maio:
+														case Julho:
+														case Agosto:
+														case Outubro:
+														case Dezembro:
+															qtd_max_dias=31;
+															break;
+
+														case Fevereiro:
+															if(!((data_atual.ano+3)%4))	qtd_max_dias=29;
+															else qtd_max_dias=28;
+															break;
+
+														case Abril:
+														case Junho:
+														case Setembro:
+														case Novembro:
+															qtd_max_dias=30;
+															break;
+
+														default:
+															data_atual.ano++;					
+													
+
+													}
 
 															}  
 
@@ -282,6 +326,7 @@ void interrupt aux(void)
 					if(etapa ==3) { TXREG=funcao;while(!TRMT){}}
 					while(!TRMT){}
 					//Fim retorno
+					
 
 					if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
 							TXREG = ('X');
@@ -308,7 +353,8 @@ void interrupt aux(void)
 					else if(etapa == etapa_recebe_funcao){
 								if(ordem==0){
 							    	funcao = dado_recebido;
-										if(funcao<ABERTURA_PORTA && funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}}
+										if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+										}
 	
 								else{
 										conta = (dado_recebido - '0');
@@ -347,7 +393,7 @@ void interrupt aux(void)
 	
 					else if(etapa == etapa_detalha_funcao){
 								if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
-
+									
 									if(ordem == 2) {
 											setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 											}
@@ -367,18 +413,28 @@ void interrupt aux(void)
 //Não implementado
 
 								else if(funcao == MUDAR_SENHA){
-										//Para testes o fim da string será dado como '<' em vez de null
+										//Para testes o fim da string será dado como '<' em vez de null	
+
 										
-												if(dado_recebido == '<') {
+										if(ordem==0){
+												conta_a_ser_alterada = dado_recebido;
+
+													if(conta_a_ser_alterada != conta){
+														if(!(testar_bit(nivel_acesso,PERMISSAO_RECONFIGURAR_OUTRAS_CONTAS))){
+																	setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);}
+															}
+													}
+										
+										else if(dado_recebido == '<') {
 													if(ordem<5) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 
 													else setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 													}
 	
 										else{
-											nova_senha[ordem] = dado_recebido;
+											nova_senha[ordem-1] = dado_recebido;
 											ordem++;
-												if(ordem == 14) {setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+												if(ordem == (TAMANHO_SENHA-1)) {setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
 											}	
 					
 															}
@@ -416,14 +472,14 @@ void main(void)
 	TRISB=0b01110000;
 	TRISC=0;
 	PORTC=0;
-	PORTB =0b00000000;
 
 	//CONFIGURAÇÃO DAS INTERRUPÇÕES
 	INTCON=0b11001000;//GIE=1;PEIE=1;RABIE=1;
-	OPTION_REG=0b00000000;
+	OPTION_REG=0b00000011;
 	T1CON=0b00001111;
 	TMR1=32768;
 	PIE1=1;
+	WPUA0=1;
 	
 	config_serial();
 
@@ -437,12 +493,13 @@ void main(void)
 
 	verificar_num_contas();
 	carregar_senha();
-	write_i2c_device(2010,'A');
-	__delay_ms(500);
-	TXREG = read_i2c_device(2010);
+	TXREG= INICIALIZAR;
+	while(!TRMT){}
+//	leitura_eeprom_externa(endereco_final_eeprom);
+//	escrita_eeprom_externa(endereco_final_eeprom);
 
 	while(1){
-		
+
 		if(enviar==1){//O que será enviado pela serial dependerá da etapa em que o envio foi solicitado pelo programa.
 					  //Se for na etapa final, por exemplo, significa que é necessário enviar de volta se o acesso foi bem sucedido ou não.
 			enviar=0;
@@ -466,7 +523,8 @@ void main(void)
 														numero_para_ascii(data_atual.minuto);
 														numero_para_ascii(data_atual.segundo);
 														numero_para_ascii(qtd_total_contas);
-														numero_para_ascii(QTD_MAX_CONTAS);}
+														numero_para_ascii(QTD_MAX_CONTAS);
+														numero_para_ascii(SENSOR_ABERTURA_FECHADURA);}
 
 
 												else if(funcao == MUDAR_SENHA){
@@ -478,7 +536,15 @@ void main(void)
 															i++;} while(nova_senha[i-1]  && i<TAMANHO_SENHA);
 														}
 							
-
+												else if(funcao == ABERTURA_PORTA){
+														while(SENSOR_ABERTURA_FECHADURA == 0){
+															cont++; //quantidade de vezes que se tentou destravar a fechadura
+															FECHADURA=1;
+															__delay_ms(325);
+															FECHADURA=0;
+																if(SENSOR_ABERTURA_FECHADURA == 0) __delay_ms(100);
+															}
+												}
 
 										}
 						
@@ -518,7 +584,7 @@ void main(void)
 											while(!TRMT){}
 											TXREG = 'I'; 
 											while(!TRMT){} 
-											resetar_bit(FLAGS_1,ERRO_SENHA);}
+											resetar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);}
 								}
 															
 
@@ -531,9 +597,17 @@ void main(void)
 			else if(RCIE==0){
 							if(etapa == etapa_recebe_funcao){
 									carregar_senha();
-									TXREG = CONTINUAR;
-									while(!TRMT){}
-									setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+
+										if(testar_bit(nivel_acesso,(funcao - '0'))){
+											TXREG = CONTINUAR;
+											while(!TRMT){}
+											setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+
+										else{
+											setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);}
+										
+
+							}
 					}
 
 			

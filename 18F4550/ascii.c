@@ -1,11 +1,7 @@
 #include <xc.h>
 #include <delays.h>
 #include "ascii.h"
-
-
-#ifndef _XTAL_FREQ
-#define _XTAL_FREQ 16000000
-#endif
+#include "main.h"
 
 char teclado_matricial(char coluna, char linha){
 

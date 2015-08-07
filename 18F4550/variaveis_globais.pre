@@ -1,0 +1,8 @@
+
+# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\variaveis_globais.c"
+
+# 2 "D:\Dropbox\Micros\2015\TC_2015\18F4550\variaveis_globais.h"
+extern char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+1];
+
+# 5 "D:\Dropbox\Micros\2015\TC_2015\18F4550\variaveis_globais.c"
+char senha[16][16+1];

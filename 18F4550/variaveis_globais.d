@@ -1,0 +1,1 @@
+ variaveis_globais.d  variaveis_globais.p1:  D:/Dropbox/Micros/2015/TC_2015/18F4550/variaveis_globais.c D:/Dropbox/Micros/2015/TC_2015/18F4550/variaveis_globais.h D:/Dropbox/Micros/2015/TC_2015/18F4550/main.h

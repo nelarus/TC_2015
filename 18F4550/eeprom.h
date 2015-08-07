@@ -1,0 +1,1 @@
+extern char verificar_num_contas(void);

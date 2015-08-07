@@ -1,0 +1,37 @@
+
+	//TESTE CRIPTOGRAFIA
+	char message[41],
+
+	initCipher();
+	strcpy(message, "abcdefghijklmnopqrstuvxwyz01234567890"); // This is the 40 character messege
+
+	TXREG = '\n';
+	
+	unsigned char i;
+	for(i=0;i<16;i++){
+		char temp;
+		temp= senha[0][i];
+		chave_criptografia[i] = temp;
+		numero_para_ascii(temp);
+		while(!TRMT){}}
+	TXREG = '\n';
+
+	ascii_encrypt128(message,chave_criptografia,texto_critografado);		//after encryption ascCipherText contains 80 character
+										//encrypted message
+												
+	ascii_decrypt128(texto_critografado,chave_criptografia,texto_descriptografado);//after decryption plainText contains 40 character
+										//decrypted message
+	char i;
+//	for(i=0;i<40;i++){
+//		TXREG = texto_descriptografado[i];
+//		while(!TRMT){}
+//	}
+	TXREG = '\n';
+	while(!TRMT){}
+	TXREG = '\n';
+//	for(i=0;i<80;i++){
+//		TXREG = texto_critografado[i];
+//		while(!TRMT){}
+//	}
+	numero_para_ascii(i);
+	//TESTE CRIPTOGRAFIA FIM

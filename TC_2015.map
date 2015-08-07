@@ -1,0 +1,523 @@
+HI-TECH Software C Compiler 
+
+Linker command line:
+
+--edf=C:\Program Files (x86)\HI-TECH Software\PICC\9.83\dat\en_msgs.txt -cs \
+  -h+TC_2015.sym -z -Q16F690 -ol.obj -MTC_2015.map -E1 -ACONST=00h-0FFhx16 \
+  -ACODE=00h-07FFhx2 -ASTRCODE=00h-0FFFh -AENTRY=00h-0FFhx16 \
+  -ASTRING=00h-0FFhx16 -ABANK0=020h-06Fh -ABANK1=0A0h-0EFh \
+  -ABANK2=0120h-016Fh -ARAM=020h-06Fh,0A0h-0EFh,0120h-016Fh \
+  -AABS1=020h-07Fh,0A0h-0EFh,0120h-016Fh -ACOMMON=070h-07Fh -ASFR0=00h-01Fh \
+  -ASFR1=080h-09Fh -ASFR2=0100h-011Fh -ASFR3=0180h-01EFh \
+  -preset_vec=00h,intentry=04h,init,end_init -ppowerup=CODE -pfunctab=CODE \
+  -ACONFIG=02007h-02007h -pconfig=CONFIG -DCONFIG=2 -AIDLOC=02000h-02003h \
+  -pidloc=IDLOC -DIDLOC=2 -AEEDATA=00h-0FFh/02100h -peeprom_data=EEDATA \
+  -DEEDATA=2 -DCODE=2 -DSTRCODE=2 -DSTRING=2 -DCONST=2 -DENTRY=2 -k \
+  C:\Users\Nelarus\AppData\Local\Temp\s4bs.obj TC_2015.obj 
+
+Object code version is 3.10
+
+Machine type is 16F690
+
+
+
+                Name                               Link     Load   Length Selector   Space Scale
+C:\Users\Nelarus\AppData\Local\Temp\s4bs.obj
+                end_init                              D        D        2        8       0
+                reset_vec                             0        0        2        0       0
+TC_2015.obj     intentry                              4        4        9        8       0
+                config                             2007     2007        1     400E       0
+                swtext1                             442      442       18      884       0
+                text290                               F        F      198        8       0
+                text288                             45A      45A       12      8B4       0
+                text287                             423      423       1F        8       0
+                text282                             2F3      2F3       D3        8       0
+                text281                             3C6      3C6       5D        8       0
+                maintext                            1A7      1A7      14C        8       0
+                cstackBANK0                          4F       4F       17       20       1
+                cstackCOMMON                         70       70        B       70       1
+                clrtext                             47A      47A        8      8B4       0
+                dataBANK0                            66       66        1       20       1
+                bssBANK0                             20       20       2F       20       1
+                bssCOMMON                            7B       7B        2       70       1
+                bitbssCOMMON                        3E8       7D        1       70       1     8
+                cinit                               46C      46C        E      8B4       0
+
+TOTAL           Name                               Link     Load   Length     Space
+        CLASS   CONST          
+                swtext1                             442      442       18         0
+
+        CLASS   CODE           
+                end_init                              D        D        2         0
+                intentry                              4        4        9         0
+                reset_vec                             0        0        2         0
+                text290                               F        F      198         0
+                text288                             45A      45A       12         0
+                text287                             423      423       1F         0
+                text282                             2F3      2F3       D3         0
+                text281                             3C6      3C6       5D         0
+                maintext                            1A7      1A7      14C         0
+                clrtext                             47A      47A        8         0
+                cinit                               46C      46C        E         0
+
+        CLASS   STRCODE        
+
+        CLASS   ENTRY          
+
+        CLASS   STRING         
+
+        CLASS   BANK0          
+                cstackBANK0                          4F       4F       17         1
+                dataBANK0                            66       66        1         1
+                bssBANK0                             20       20       2F         1
+
+        CLASS   BANK1          
+
+        CLASS   BANK2          
+
+        CLASS   RAM            
+
+        CLASS   ABS1           
+                abs_s1                               7E       7E        2         1
+
+        CLASS   COMMON         
+                cstackCOMMON                         70       70        B         1
+                bssCOMMON                            7B       7B        2         1
+                bitbssCOMMON                        3E8       7D        1         1
+
+        CLASS   SFR0           
+
+        CLASS   SFR1           
+
+        CLASS   SFR2           
+
+        CLASS   SFR3           
+
+        CLASS   CONFIG         
+                config                             2007     2007        1         0
+
+        CLASS   IDLOC          
+
+        CLASS   EEDATA         
+
+        CLASS   BANK3          
+
+
+
+SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
+
+                reset_vec                      000000  000002  000002         0       0  CODE        2
+                intentry                       000004  00043E  000442         8       0  CODE        2
+                bssBANK0                       000020  000047  000067        20       1  BANK0       1
+                cstackCOMMON                   000070  00000E  00007E        70       1  COMMON      1
+                swtext1                        000442  000018  00045A       884       0  CONST       2
+                text288                        00045A  000028  000482       8B4       0  CODE        2
+                config                         002007  000001  002008      400E       0  CONFIG      2
+
+
+UNUSED ADDRESS RANGES
+
+        Name                Unused          Largest block    Delta
+        BANK0            0067-006F              9           1
+        BANK1            00A0-00EF             50           1
+        BANK2            0120-016F             50           1
+        CODE             0002-0003              2           2
+                         0482-0FFF            37E
+        CONST            0002-0003              2           2
+                         0482-0FFF            100
+        EEDATA           2100-21FF            100           2
+        ENTRY            0002-0003              2           2
+                         0482-0FFF            100
+        IDLOC            2000-2003              4           2
+        RAM              0067-006F              9           1
+                         00A0-00EF             50
+                         0120-016F             50
+        SFR0             0000-001F             20           1
+        SFR1             0080-009F             20           1
+        SFR2             0100-011F             20           1
+        SFR3             0180-01EF             70           1
+        STRCODE          0002-0003              2           2
+                         0482-0FFF            B7E
+        STRING           0002-0003              2           2
+                         0482-0FFF            100
+
+                                  Symbol Table
+
+??___awdiv                     cstackBANK0  0059
+??___bmul                      cstackBANK0  0050
+??___lbdiv                     cstackBANK0  0050
+??___wmul                      cstackBANK0  0053
+??_aux                         cstackCOMMON 0076
+??_carregar_senha              cstackBANK0  0050
+??_config_serial               cstackBANK0  004F
+??_eeprom_read                 cstackBANK0  004F
+??_eeprom_write                cstackBANK0  0050
+??_main                        cstackBANK0  0062
+??_numero_para_ascii           cstackBANK0  005D
+??_verificar_num_contas        cstackBANK0  0050
+??i1___wmul                    cstackCOMMON 0074
+?___awdiv                      cstackBANK0  0055
+?___bmul                       cstackBANK0  004F
+?___lbdiv                      cstackBANK0  004F
+?___wmul                       cstackBANK0  004F
+?_aux                          cstackCOMMON 0070
+?_carregar_senha               cstackCOMMON 0070
+?_config_serial                cstackCOMMON 0070
+?_eeprom_read                  cstackCOMMON 0070
+?_eeprom_write                 cstackBANK0  004F
+?_main                         cstackCOMMON 0070
+?_numero_para_ascii            cstackCOMMON 0070
+?_verificar_num_contas         cstackCOMMON 0070
+?i1___wmul                     cstackCOMMON 0070
+_ANSEL                         (abs)        011E
+_ANSELH                        (abs)        011F
+_BRG16                         (abs)        04DB
+_BRGH                          (abs)        04C2
+_CARRY                         (abs)        0018
+_CREN                          (abs)        00C4
+_EEADR                         (abs)        010D
+_EECON1                        (abs)        018C
+_EECON2                        (abs)        018D
+_EEDATA                        (abs)        010C
+_FERR                          (abs)        00C2
+_FLAGS_1                       bssBANK0     0047
+_GIE                           (abs)        005F
+_INTCON                        (abs)        000B
+_OERR                          (abs)        00C1
+_OPTION_REG                    (abs)        0081
+_OSCCON                        (abs)        008F
+_PEIE                          (abs)        005E
+_PIE1                          (abs)        008C
+_PORTC                         (abs)        0007
+_RA0                           (abs)        0028
+_RABIE                         (abs)        005B
+_RABIF                         (abs)        0058
+_RC0                           (abs)        0038
+_RC5                           (abs)        003D
+_RCIE                          (abs)        0465
+_RCIF                          (abs)        0065
+_RCREG                         (abs)        001A
+_RD                            (abs)        0C60
+_RX9                           (abs)        00C6
+_SPBRG                         (abs)        0099
+_SPBRGH                        (abs)        009A
+_SPEN                          (abs)        00C7
+_SYNC                          (abs)        04C4
+_T0IE                          (abs)        005D
+_T0IF                          (abs)        005A
+_T1CON                         (abs)        0010
+_TMR0                          (abs)        0001
+_TMR1                          (abs)        000E
+_TMR1IE                        (abs)        0460
+_TMR1IF                        (abs)        0060
+_TRISA                         (abs)        0085
+_TRISB                         (abs)        0086
+_TRISC                         (abs)        0087
+_TRMT                          (abs)        04C1
+_TX9                           (abs)        04C6
+_TXEN                          (abs)        04C5
+_TXIE                          (abs)        0464
+_TXREG                         (abs)        0019
+_WPUA0                         (abs)        04A8
+_WR                            (abs)        0C61
+_WREN                          (abs)        0C62
+__Habs1                        abs1         0000
+__Hbank0                       bank0        0000
+__Hbank1                       bank1        0000
+__Hbank2                       bank2        0000
+__Hbank3                       bank3        0000
+__HbitbssCOMMON                bitbssCOMMON 0000
+__HbssBANK0                    bssBANK0     0000
+__HbssCOMMON                   bssCOMMON    0000
+__Hcinit                       cinit        0000
+__Hclrtext                     clrtext      0000
+__Hcode                        code         0000
+__Hcommon                      common       0000
+__Hconfig                      config       2008
+__HcstackBANK0                 cstackBANK0  0000
+__HcstackCOMMON                cstackCOMMON 0000
+__HdataBANK0                   dataBANK0    0000
+__Heeprom_data                 eeprom_data  0000
+__Hend_init                    end_init     000F
+__Hfunctab                     functab      0000
+__HidataBANK0                  idataBANK0   0000
+__Hidloc                       idloc        0000
+__Hinit                        init         000D
+__Hintentry                    intentry     000D
+__Hmaintext                    maintext     0000
+__Hpa_nodes                    pa_nodes     0000
+__Hpowerup                     powerup      0000
+__Hram                         ram          0000
+__Hreset_vec                   reset_vec    0002
+__Hsfr0                        sfr0         0000
+__Hsfr1                        sfr1         0000
+__Hsfr2                        sfr2         0000
+__Hsfr3                        sfr3         0000
+__Hstrings                     strings      0000
+__Htext                        text         0000
+__Labs1                        abs1         0000
+__Lbank0                       bank0        0000
+__Lbank1                       bank1        0000
+__Lbank2                       bank2        0000
+__Lbank3                       bank3        0000
+__LbitbssCOMMON                bitbssCOMMON 0000
+__LbssBANK0                    bssBANK0     0000
+__LbssCOMMON                   bssCOMMON    0000
+__Lcinit                       cinit        0000
+__Lclrtext                     clrtext      0000
+__Lcode                        code         0000
+__Lcommon                      common       0000
+__Lconfig                      config       2007
+__LcstackBANK0                 cstackBANK0  0000
+__LcstackCOMMON                cstackCOMMON 0000
+__LdataBANK0                   dataBANK0    0000
+__Leeprom_data                 eeprom_data  0000
+__Lend_init                    end_init     000D
+__Lfunctab                     functab      0000
+__LidataBANK0                  idataBANK0   0000
+__Lidloc                       idloc        0000
+__Linit                        init         000D
+__Lintentry                    intentry     0004
+__Lmaintext                    maintext     0000
+__Lpa_nodes                    pa_nodes     0000
+__Lpowerup                     powerup      0000
+__Lram                         ram          0000
+__Lreset_vec                   reset_vec    0000
+__Lsfr0                        sfr0         0000
+__Lsfr1                        sfr1         0000
+__Lsfr2                        sfr2         0000
+__Lsfr3                        sfr3         0000
+__Lstrings                     strings      0000
+__Ltext                        text         0000
+__S0                           (abs)        2008
+__S1                           (abs)        007E
+__S2                           (abs)        0000
+___awdiv                       text282      0381
+___awdiv@counter               cstackBANK0  0059
+___awdiv@dividend              cstackBANK0  0057
+___awdiv@divisor               cstackBANK0  0055
+___awdiv@quotient              cstackBANK0  005B
+___awdiv@sign                  cstackBANK0  005A
+___bmul                        text282      033F
+___bmul@multiplicand           cstackBANK0  004F
+___bmul@multiplier             cstackBANK0  0051
+___bmul@product                cstackBANK0  0050
+___lbdiv                       text282      0366
+___lbdiv@counter               cstackBANK0  0051
+___lbdiv@dividend              cstackBANK0  0050
+___lbdiv@divisor               cstackBANK0  004F
+___lbdiv@quotient              cstackBANK0  0052
+___wmul                        text282      034D
+___wmul@multiplicand           cstackBANK0  0051
+___wmul@multiplier             cstackBANK0  004F
+___wmul@product                cstackBANK0  0053
+__end_of___awdiv               text282      03C6
+__end_of___bmul                text282      034D
+__end_of___lbdiv               text282      0381
+__end_of___wmul                text282      0366
+__end_of_aux                   text290      018E
+__end_of_carregar_senha        text281      040C
+__end_of_config_serial         text288      046C
+__end_of_eeprom_read           text281      0423
+__end_of_eeprom_write          text287      0442
+__end_of_main                  maintext     02F3
+__end_of_numero_para_ascii     text282      033F
+__end_of_verificar_num_contas  text281      03D6
+__end_ofi1___wmul              text290      01A7
+__pbitbssCOMMON                bitbssCOMMON 03E8
+__pbssBANK0                    bssBANK0     0020
+__pbssCOMMON                   bssCOMMON    007B
+__pcstackBANK0                 cstackBANK0  004F
+__pcstackCOMMON                cstackCOMMON 0070
+__pdataBANK0                   dataBANK0    0066
+__pidataBANK0                  idataBANK0   0000
+__pintentry                    intentry     0004
+__pmaintext                    maintext     01A7
+__pswtext1                     swtext1      0442
+__ptext280                     text281      03D6
+__ptext281                     text281      03C6
+__ptext282                     text282      02F3
+__ptext283                     text282      0381
+__ptext284                     text282      0366
+__ptext285                     text282      034D
+__ptext286                     text282      033F
+__ptext287                     text287      0423
+__ptext288                     text288      045A
+__ptext289                     text281      040C
+__ptext290                     text290      000F
+__ptext291                     text290      018E
+__ptext292                     text292      0000
+__size_of___awdiv              (abs)        0000
+__size_of___bmul               (abs)        0000
+__size_of___lbdiv              (abs)        0000
+__size_of___wmul               (abs)        0000
+__size_of_aux                  (abs)        0000
+__size_of_carregar_senha       (abs)        0000
+__size_of_config_serial        (abs)        0000
+__size_of_eeprom_read          (abs)        0000
+__size_of_eeprom_write         (abs)        0000
+__size_of_main                 (abs)        0000
+__size_of_numero_para_ascii    (abs)        0000
+__size_of_verificar_num_contas (abs)        0000
+__size_ofi1___wmul             (abs)        0000
+_aux                           text290      000F
+_carregar_senha                text281      03D6
+_config_serial                 text288      045A
+_conta                         bssBANK0     0048
+_conta_a_ser_alterada          bssBANK0     0049
+_dado_recebido                 bssCOMMON    007B
+_data_atual                    bssBANK0     0040
+_eeprom_read                   text281      040C
+_eeprom_write                  text287      0423
+_enviar                        bitbssCOMMON 03E8
+_etapa                         bssBANK0     004A
+_exit                          init         000D
+_funcao                        bssBANK0     004B
+_main                          maintext     01A7
+_nivel_acesso                  bssBANK0     004C
+_nova_senha                    bssBANK0     0020
+_numero_para_ascii             text282      02F3
+_ordem                         bssCOMMON    007C
+_qtd_max_dias                  dataBANK0    0066
+_qtd_total_contas              bssBANK0     004D
+_senha                         bssBANK0     0030
+_ultima_conta                  bssBANK0     004E
+_verificar_num_contas          text281      03C6
+btemp                          (abs)        007E
+carregar_senha@i               cstackBANK0  0051
+clear_ram                      clrtext      047A
+eeprom_read@addr               cstackBANK0  004F
+eeprom_write@addr              cstackBANK0  0050
+eeprom_write@value             cstackBANK0  004F
+end_of_initialization          cinit        0477
+i1___wmul                      text290      018E
+i1___wmul@multiplicand         cstackCOMMON 0072
+i1___wmul@multiplier           cstackCOMMON 0070
+i1___wmul@product              cstackCOMMON 0074
+i1l3636                                         
+i1l4697                                         
+i1l4703                                         
+i1l4715                                         
+i1l4719                                         
+i1l4723                                         
+i1l4727                                         
+i1l4751                                         
+i1l4761                                         
+i1l4765                                         
+i1l4767                                         
+i1l4777                                         
+i1l4787                                         
+i1l4789                                         
+i1l4799                                         
+i1l4807                                         
+i1l4829                                         
+i1l4875                                         
+i1l4877                                         
+i1l4887                                         
+i1l4893                                         
+i1l4897                                         
+i1l5027                                         
+i1l5035                                         
+i1l5037                                         
+interrupt_function             intentry     0004
+intlevel0                      functab      0000
+intlevel1                      functab      0000
+intlevel2                      functab      0000
+intlevel3                      functab      0000
+intlevel4                      functab      0000
+intlevel5                      functab      0000
+l1976                                           
+l2767                                           
+l3630                                           
+l3636                                           
+l3666                                           
+l3783                                           
+l4675                                           
+l4677                                           
+l4679                                           
+l4681                                           
+l4683                                           
+l4685                                           
+l4687                                           
+l4689                                           
+l4691                                           
+l4693                                           
+l4695                                           
+l4909                                           
+l4911                                           
+l4913                                           
+l4917                                           
+l4919                                           
+l4921                                           
+l4923                                           
+l4927                                           
+l4935                                           
+l4937                                           
+l4943                                           
+l4951                                           
+l4953                                           
+l4959                                           
+l4961                                           
+l4963                                           
+l4969                                           
+l4973                                           
+l4977                                           
+l4983                                           
+l4985                                           
+l4989                                           
+l4995                                           
+l4999                                           
+l5009                                           
+l5013                                           
+l5017                                           
+l5021                                           
+l5043                                           
+l5047                                           
+l5051                                           
+l5057                                           
+l5067                                           
+l5069                                           
+l5075                                           
+l5079                                           
+l5085                                           
+l5087                                           
+l5089                                           
+l5091                                           
+l5093                                           
+l5095                                           
+l5097                                           
+l5099                                           
+l5101                                           
+l5103                                           
+l5105                                           
+l5107                                           
+l5109                                           
+l5111                                           
+l5113                                           
+l5115                                           
+l5117                                           
+l5119                                           
+l5121                                           
+l5125                                           
+l5133                                           
+l5147                                           
+l5151                                           
+l5159                                           
+l5161                                           
+l5163                                           
+l5171                                           
+l5199                                           
+l958                                            
+l964                                            
+l967                                            
+l980                                            
+main@i                         cstackBANK0  0065
+numero_para_ascii@numero       cstackBANK0  0060
+numero_para_ascii@temp1        cstackBANK0  0061
+numero_para_ascii@temp2        cstackBANK0  005F
+reset_vec                      reset_vec    0000
+saved_w                        (abs)        007E
+start                          init         000D
+start_initialization           cinit        046C
+verificar_num_contas@i         cstackBANK0  0050
+wtemp0                         (abs)        007E

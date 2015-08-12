@@ -1,0 +1,1 @@
+extern char dia_da_semana(char dia, char mes, unsigned char ano);

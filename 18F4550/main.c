@@ -9,10 +9,6 @@
 #include "main.h"
 #include "serial.h"
 
-#ifndef _XTAL_FREQ
-#define _XTAL_FREQ 16000000
-#endif
-
 
 
 #pragma config FOSC =  XTPLL_XT
@@ -79,6 +75,7 @@ struct Data{
 unsigned char caractere_recebido = 0; //Caractere recebido pelo teclado matricial
 unsigned char FLAGS_1=0;
 unsigned char FLAGS_2=0;
+unsigned char FLAGS_3=0;
 unsigned char PORTB_SR;
 unsigned char num_interrupt_timer1=0;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
@@ -118,13 +115,13 @@ void interrupt aux(void){
 				if(MODO_BLUETOOTH){//O dispostivo iniciou comunicação com o PIC mas ficou mais de 500ms sem terminá-la
 						qtd_caracteres_recebidos_serial=0;
 						setar_bit(FLAGS_1,ERRO_PROTOCOLO);
-						enviar=1;
+						setar_bit(FLAGS_2,ENVIAR);
 						TMR1ON=0;
 						}
 
 
 				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==10){//Passou-se 5s após a primeira vez que o botão foi apertado.
-					receber=1;
+					setar_bit(FLAGS_2,RECEBER);
 					TMR1ON=0;
 					num_interrupt_timer1=0;}
 							
@@ -244,7 +241,8 @@ void interrupt aux(void){
 
 						
 									if(caractere_recebido == MODO_T9_ON_OFF){
-											inverter_bit(FLAGS_2,MODO_T9);}
+											inverter_bit(FLAGS_2,MODO_T9);
+											}
 
 									else if(caractere_recebido == MAIUSCULA_MINUSCULA){
 											inverter_bit(FLAGS_2,MAIUSCULA);}
@@ -301,7 +299,7 @@ void interrupt aux(void){
 							TMR1ON=1;
 							LATDbits.LD0^=1;
 							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
-									receber=1;
+									setar_bit(FLAGS_2,RECEBER);
 									TMR1ON=0;
 									TMR1L=0;
 									TMR1H=0xC0;}
@@ -382,10 +380,10 @@ int main(void){
 
 	while(1){
 
-		if(receber == 1){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
+		if(testar_bit(FLAGS_2,RECEBER)){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
 																																	//CASO DE DÚVIDAS
 			
-			receber=0;
+			resetar_bit(FLAGS_2,RECEBER);
 			if(MODO_BLUETOOTH){
 
 				enviar_caractere_serial(NOVA_LINHA);
@@ -528,50 +526,59 @@ int main(void){
 									
 									if(FLAGS_1>3) {
 													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													enviar_caractere_serial( '0' + etapa);
 													etapa = etapa_inicial;	
-													enviar=1;
-													receber=qtd_caracteres_recebidos_serial=0;}
+													setar_bit(FLAGS_2,ENVIAR);
+													qtd_caracteres_recebidos_serial=0;}
 		
 																			}		
 					}
 
 				else if(MODO_TECLADO_MATRICIAL){
+							
 
 							if(testar_bit(FLAGS_2,MODO_T9)){
-
-								enviar_caractere_serial(NOVA_LINHA);
-
-								numero_para_ascii(ultimo_caractere_recebido);
-								numero_para_ascii(qtd_vezes_mesma_tecla_pressionada);
-
-								buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = (caractere_recebido + (48*TMR1ON) + qtd_vezes_mesma_tecla_pressionada);
-								qtd_vezes_mesma_tecla_pressionada=0;
 								TMR1ON=0;
 								TMR1H=0xC0;
-								TMR1L=0;}
+								TMR1L=0;
+								enviar_caractere_serial(NOVA_LINHA);
+
+								numero_para_ascii(qtd_vezes_mesma_tecla_pressionada);
+
+								
+
+								if(qtd_vezes_mesma_tecla_pressionada>0){
+											buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]= ('a' -1) + qtd_vezes_mesma_tecla_pressionada + (( caractere_recebido - '1') * Letras_por_tecla) ;
+											}
+								else{
+										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido; }
+								qtd_vezes_mesma_tecla_pressionada=0;
+								}
 
 								
 							
 
-
-							else{ buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;}
-
-								enviar_caractere_serial( buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] );
+							else{
+									buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;}
 								
+							
+							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
+										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
+										enviar_string_serial(buffer_teclado_matricial);
 
-							if(	buffer_serial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado<TAMANHO_BUFFER_TECLADO_MATRICIAL){
-
-										conta = ((buffer_teclado_matricial[0]*10) + buffer_teclado_matricial[1]);
+										conta = ( ((buffer_teclado_matricial[0]-'0')*10)  + (buffer_teclado_matricial[1]-'0') );
 										cont=2;
 										
-										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != NULL){
+										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != 0){
 
 											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
+												enviar_caractere_serial(buffer_teclado_matricial[cont]);
+												enviar_caractere_serial(senha[conta][cont-2]);
 												setar_bit(FLAGS_1,ERRO_SENHA);}
 
 											cont++;
 										}
+										if(FLAGS_1<4) {
+												}
 							}				
 										
 
@@ -580,20 +587,18 @@ int main(void){
 			}
 
 		
-		if(enviar==1){
+		if(testar_bit(FLAGS_2,ENVIAR)){
 			enviar=0;
+			resetar_bit(FLAGS_2,ENVIAR);
 			qtd_caracteres_recebidos_serial=0;
 			etapa = etapa_inicial;
 			cont=0;
-			enviar_caractere_serial(NOVA_LINHA);
-			enviar_caractere_serial(INICIO);
+			enviar_string_serial("\nI");
 
-						if(FLAGS_1<4 && etapa == etapa_final){ //Não houve erros
+						if(FLAGS_1<4){ //Não houve erros
 										etapa = etapa_inicial;
 										LATDbits.LD2^=1;
-
-										char OK[] = {"OK"};
-										enviar_string_serial(OK);
+										enviar_string_serial("OK");
 
 												if(funcao == REQUERIMENTO_STATUS_ATUAL){
 														numero_para_ascii(data_atual.ano);
@@ -618,11 +623,9 @@ int main(void){
 														}
 							
 												else if(funcao == ABERTURA_PORTA){
-														while(SENSOR_ABERTURA_FECHADURA == 0){
-															//cont++; //quantidade de vezes que se tentou destravar a fechadura
-															FECHADURA=1;
-															delay_ms(325);
-															FECHADURA=0;
+														while(FECHADURA_TRAVADA){
+															if(++cont == 6){ break;}
+															DESTRAVAR_FECHADURA(325)
 																if(SENSOR_ABERTURA_FECHADURA == 0) delay_ms(100);
 															}
 												}
@@ -631,40 +634,30 @@ int main(void){
 						
 						else{
 						
-						LATDbits.LD3^=1;
 
 							if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){
 
-												char EN[] = {"EN"};
-												enviar_string_serial(EN); 
+												enviar_string_serial("EN");
 												resetar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);}
 
 							if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)){ 
 
-												char EP[] = {"EP"};
-												enviar_string_serial(EP);
-													if(funcao == MUDAR_SENHA){
-																TXREG = 'S'; //indica que a nova senha tem menos que 6 caracteres;
-																while(!TRMT){} 
-														} 
-												
+													
+												enviar_string_serial("EP");
 												resetar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
 							if(testar_bit(FLAGS_1,ERRO_COMUNICACAO)){
-											
-											char EC[] = {"EC"};
-											enviar_string_serial(EC);
+
+											enviar_string_serial("EC");
 											resetar_bit(FLAGS_1,ERRO_COMUNICACAO);}
 						
 				
 							if(testar_bit(FLAGS_1,ERRO_SENHA)){
-											char ES[] = {"ES"};
-											enviar_string_serial(ES);
+											enviar_string_serial("ES");
 											resetar_bit(FLAGS_1,ERRO_SENHA);}
 				
 							if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ 
-											char EI[] = {"EI"};
-											enviar_string_serial(EI);
+											enviar_string_serial("EI");
 											resetar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);}
 								}
 															
@@ -680,35 +673,34 @@ int main(void){
 																			//(existem situações em que RBIE=0 e não se quer fazer tratamento de debounce
 					delay_ms(60);
 
-						if(!(testar_bit(FLAGS_2,MODO_T9))){//Modo_t9 desativado, o caractere_recebido é armazenado diretamente
-								receber=1;
+					
+						if(caractere_recebido == MODO_T9_ON_OFF ||caractere_recebido == MAIUSCULA_MINUSCULA){//Caracteres não são armazenados
+									NOP();
+									ultimo_caractere_recebido = caractere_recebido; //atualiza ultimo caractere recebido
 							}
 
-						else if(caractere_recebido == MODO_T9_ON_OFF ||caractere_recebido == MAIUSCULA_MINUSCULA){//Caracteres não são armazenadas
-									NOP();}
+						else{
+								if(testar_bit(FLAGS_2,MODO_T9)){
+									if(ultimo_caractere_recebido == caractere_recebido){
 
+											if(++qtd_vezes_mesma_tecla_pressionada == Letras_por_tecla || ((qtd_vezes_mesma_tecla_pressionada==2) && caractere_recebido == '9')) 
+												setar_bit(FLAGS_2,RECEBER);}
 
-						else if(caractere_recebido == ultimo_caractere_recebido){
-
-								if(++qtd_vezes_mesma_tecla_pressionada > Letras_por_tecla || ( (qtd_vezes_mesma_tecla_pressionada>Letras_por_tecla-1) && caractere_recebido == '9')){
-									TMR1ON=0;
-									TMR1H=0xC0;
-									qtd_vezes_mesma_tecla_pressionada=0;}
-
-								else  ultimo_caractere_recebido= caractere_recebido; //atualiza ultimo caractere recebido
+									else {
+										if(qtd_vezes_mesma_tecla_pressionada) setar_bit(FLAGS_2,RECEBER);
+										
+										else ultimo_caractere_recebido = caractere_recebido;}
 
 								}
-							
+
+								else{ 
+									setar_bit(FLAGS_2,RECEBER);}
+						}
+
 						
 
-						else if(testar_bit(FLAGS_2,MODO_T9)){ //caractere_recebido != do ultimo caractere recebido e modo t9 ativado
 
-								if(qtd_vezes_mesma_tecla_pressionada>0) receber=1; 
-
-								ultimo_caractere_recebido= caractere_recebido;//atualiza ultimo caractere recebido
-								 
-								
-						}
+						
 					
 
 					PORTB_SR=PORTB;//leitura do PORTB antes de ativar a interrupção para evitar uma interrupção não desejada.
@@ -716,7 +708,7 @@ int main(void){
 					debounce=0;
 		}
 
-			if(receber==0 && enviar==0 && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
+			if( (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
 				SLEEP();
 				NOP();}
 

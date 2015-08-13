@@ -18,7 +18,14 @@
 #define TAMANHO_BUFFER_SERIAL 80
 //
 
+//PARAMETRO PARA BUFFER TECLADO MATRICIAL
+
+#define TAMANHO_BUFFER_TECLADO_MATRICIAL 40
+
+
 //CORRESPONDÊNCIA DE CARACTERES NA COMUNICAÇÃO SERIAL E RECEBIMENTO POR TECLADO MATRICIAL
+
+	
 
 	//FUNÇÕES DO SISTEMA
 	#define ABERTURA_PORTA '0'
@@ -42,11 +49,14 @@
 														//No modo teclado matricial usa-se para auxiliar na inserção de letras quando modo_t9=1;
 														//Ex: Para inserir a letra 'a' se aperta '1' duas vezes e por fim '#'(que aqui corresponderá a 'F')
 	
-	#define MODO_DEBUG_ON_OFF '^'	//Se o caracter recebido for esse o programa irá ignorar o protocolo e entrar em modo de debug(a ser implementado)
+
+	#define NOVA_LINHA '\n'
+
 
 	//TECLADO MATRICIAL
-	#define MAIUSCULA_MINUSCULA 'M'
+	#define MAIUSCULA_MINUSCULA '*'
 	#define MODO_T9_ON_OFF 'A'
+	#define MODO_DEBUG_ON_OFF '^'	//Se o caracter recebido for esse o programa irá ignorar o protocolo e entrar em modo de debug(a ser implementado)
 
 
 //FLAGS NIVEL DE ACESSO
@@ -78,6 +88,9 @@
 #define MODO_T9 4
 #define MAIUSCULA 5
 #define MODO_DEBUG_ON 6
+
+//FLAGS_3 CORRESPONDENCIA DE BITS
+#define SESSAO_EXPIRADA 0
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
 #define LED PORTCbits.RC5			//Mostra que a contagem de horas está funcionando
@@ -118,6 +131,7 @@
 #define Outubro 10
 #define Novembro 11
 #define Dezembro 12
+//
 
 //VALOR DECIMAL DE CADA ETAPA E ORDEM DAS ETAPAS
 #define etapa_inicial 0
@@ -125,7 +139,7 @@
 #define etapa_login 2					
 #define etapa_detalha_funcao 3
 #define etapa_final 4
-
+//
 
 //MODOS DE RECEPÇÃO DE DADOS
 
@@ -133,12 +147,21 @@
 #define MODO_BLUETOOTH modo_bluetooth_teclado==0
 #define modo_teclado_matricial() modo_bluetooth_teclado=1;
 #define modo_bluetooth() modo_bluetooth_teclado=0;
+//
 
 // OPERAÇÕES DE BIT
 #define setar_bit(ADDRESS,BIT) (ADDRESS |= (1<<BIT))
 #define resetar_bit(ADDRESS,BIT) (ADDRESS &= ~(1<<BIT)) 
 #define testar_bit(ADDRESS,BIT) (ADDRESS & (1<<BIT))
 #define inverter_bit(ADDRESS,BIT) (ADDRESS ^= (1<<BIT))
+//
 
-
+//Strings
 #define ZERAR(STRING) memset(STRING,0,(strlen(STRING)))
+
+//etc.
+#define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0
+
+#define DESTRAVAR_FECHADURA(TEMPO) FECHADURA=1;delay_ms(TEMPO);FECHADURA=0;
+
+

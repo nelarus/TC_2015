@@ -1,6 +1,14 @@
 #include <xc.h>
 #include "main.h"
 
+
+void delay_ms(unsigned int delay_total){
+    unsigned int temp = 0;
+    while(temp < delay_total){
+        __delay_ms(1);
+        temp++;}
+}
+
 char dia_da_semana(unsigned int ano,char mes, char dia){
 
 	char tabela_mes[]= {0,3,3,6,1,4,6,2,5,0,3,5};

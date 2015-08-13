@@ -24,11 +24,12 @@ void enviar_caractere_serial(char carater_a_enviar){
 		while(!TRMT){}
 }
 
-void enviar_string_serial(char *string_a_enviar){
-			while(*string_a_enviar != NULL){
-				TXREG = *string_a_enviar;
+void enviar_string_serial(const char string_a_enviar[]){
+			char i=0;
+			while(string_a_enviar[i] != NULL){
+				TXREG = string_a_enviar[i];
 				while(!TRMT){}
-				string_a_enviar++;}
+				i++;}
 
 
 }

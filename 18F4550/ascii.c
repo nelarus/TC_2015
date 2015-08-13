@@ -10,7 +10,7 @@ char teclado_matricial(char coluna, char linha){
 
 		switch(temp){
 					case 1:
-						caractere = 'M';
+						caractere = '*';
 						break;	
 
 					case 2:
@@ -76,12 +76,6 @@ char teclado_matricial(char coluna, char linha){
 			return caractere;
 }
 
-void delay_ms(unsigned int delay_total){
-    unsigned int temp = 0;
-    while(temp < delay_total){
-        __delay_ms(1);
-        temp++;}
-}
 
 void numero_para_ascii(char numero){
 	int temp1;

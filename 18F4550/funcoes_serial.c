@@ -18,12 +18,13 @@ void configurar_serial(char valor_baud){
       TX9 = 0;
             }
 
-void enviar_string_serial(char *string_a_enviar){
+void enviar_string_serial(char string_a_enviar[]){
+	char cont=0;
 
-	while(*string_a_enviar != NULL){
+	while(string_a_enviar[cont] != NULL){
 
-		TXREG = *string_a_enviar;
-		string_a_enviar++;
+		TXREG = string_a_enviar[cont];
+		cont++;
 		while(!TRMT){}}
 
 	}

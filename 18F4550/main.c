@@ -237,10 +237,10 @@ void interrupt aux(void){
 							else{linha=0;}//Houve algum problema na detecção de qual linha está a tecla pressionada
 
 							if(linha && coluna){//Não faz nada se houve algum erro na detecção da linha ou da linha
-								TXREG = '\n';
-								while(!TRMT){}
+
+								enviar_caractere_serial(NOVA_LINHA);
 								caractere_recebido = teclado_matricial(coluna,linha);
-								TXREG = caractere_recebido;
+								enviar_caractere_serial(caractere_recebido);
 								numero_para_ascii(linha);
 								numero_para_ascii(coluna);
 
@@ -298,12 +298,15 @@ void interrupt aux(void){
 								receber=0;}
 					
 					else{	
-							TMR1ON=0;
+						//	TMR1ON=0;
 							buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
-							TMR1ON=1;
-							LATDbits.LD0^=1;
+							TXREG = buffer_serial[qtd_caracteres_recebidos_serial];
+							while(!TRMT){}
+						//	TMR1ON=1;
+							
 							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
 									receber=1;
+									LATDbits.LD0^=1;
 									TMR1ON=0;
 									TMR1L=0;
 									TMR1H=0xC0;}
@@ -385,205 +388,159 @@ int main(void){
 
 	while(1){
 
-		if(receber == 1){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
-																																	//CASO DE DÚVIDAS
-			
-			receber=0;
-			if(MODO_BLUETOOTH){
+		if(receber == 1){
+         receber=0;
+         numero_para_ascii(qtd_total_contas);
+         TXREG = '\n';
+         while(!TRMT){}
+         char j;
+            for(j=0;j<qtd_caracteres_recebidos_serial;j++){
+               TXREG = buffer_serial[j];
+               while(!TRMT){}
+                  }
+         
+         TXREG = '\n';
+         while(!TRMT){}
+   
+            for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
 
-				enviar_caractere_serial(NOVA_LINHA);
+   
+               if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
+   
+                              if(buffer_serial[cont] != PROXIMA_ETAPA) {
+                                                setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+   
+                              resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                              ordem=0;
+                              etapa++;}
+                        
+                        else if(etapa == etapa_inicial){//Inicio da comunicação
+                                 
+            
+                                 if(buffer_serial[cont] != INICIO) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+         
+                              setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                                 }
+            
+                        else if(etapa == etapa_recebe_funcao){
 
-				enviar_string_serial(buffer_serial);
+                                     funcao = buffer_serial[cont++];
+                                       if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
-				enviar_caractere_serial(NOVA_LINHA);
-		
-					for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
-	
-		
-									if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
-		
-											if(buffer_serial[cont] != PROXIMA_ETAPA) {
-																	setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-		
-											resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-											ordem=0;
-											etapa++;}
-									
-									else if(etapa == etapa_inicial){//Inicio da comunicação
-												
-					
-												if(buffer_serial[cont] != INICIO) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-				
-												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-												}
-					
-									else if(etapa == etapa_recebe_funcao){
-	
-											    	funcao = buffer_serial[cont++];
-														if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-	
-													conta = ((buffer_serial[cont]) - '0');
-																
-														if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
-		
-													setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-																	
-													}
-				
-									
-					
-									else if(etapa == etapa_login){//executa funcao
-				
-											for(ordem=0;senha[conta][ordem]!= 0;ordem++){
+                                    conta = ((buffer_serial[cont]) - '0');
+                                             
+                                       if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
+   
+                                    setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                                                
+                                    }
+         
+                        
+            
+                        else if(etapa == etapa_login){//executa funcao
+         
+                              for(ordem=0;senha[conta][ordem]!= 0;ordem++){
+                                    if(senha[conta][ordem] != buffer_serial[cont++]) {
+                                                setar_bit(FLAGS_1,ERRO_SENHA);
+                                                TXREG = senha[conta][ordem]; while(!TRMT){}
+                                                TXREG = buffer_serial[--cont]; while(!TRMT){}
+                                                                              }
+                                       }
+                              cont--;
+                              setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                                    
+                                 }   
+         
+            
+                        else if(etapa == etapa_detalha_funcao){
+                                 if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
 
-													if(senha[conta][ordem] != buffer_serial[cont++]) {
-																	setar_bit(FLAGS_1,ERRO_SENHA);
-													}
+                                    for(ordem=0;ordem<2;ordem++){
+                                       if( buffer_serial[cont++] != ('N'+(ordem))) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+                                          }
+         
+                                       setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                                    }
+                        
+                                 else if(funcao == REQUERIMENTO_HISTORICO){
+                                             if(ordem==0){
+                                                   endereco_inic_eeprom = (1794 + (buffer_serial[cont] *26));
+                                                
+                                             ordem++;
+                                                }
+         }
+         //Não implementado
+   
+                                 else if(funcao == RECONFIGURAR_PIC){
+                                       //ordem 0 ajuste de ano
+                                       //ordem 1 ajuste de mes
+                                       //ordem 2 ajuste de dia
+                                       //ordem 3 ajuste de hora
+                                       //ordem 4 ajuste de minuto
+                                       //ordem 5 ajuste de segundo
+                                       //ordem 6 ajuste de dia_da_semana(não pode ser ignorado se o dia for alterado também)
 
-											}
-											cont--;
-											setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													
-												}	
-				
-					
-									else if(etapa == etapa_detalha_funcao){
-												if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
-	
-													for(ordem=0;ordem<2;ordem++){
-														if( buffer_serial[cont++] != ('N'+(ordem))) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-															}
-				
-														setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													}
-									
-												else if(funcao == REQUERIMENTO_HISTORICO){
-																if(ordem==0){
-																		endereco_inic_eeprom = (1794 + (buffer_serial[cont] *26));
-																	
-																ordem++;
-																	}
-				}
-				//Não implementado
-		
-												else if(funcao == RECONFIGURAR_PIC){
-														//ordem 0 ajuste de ano
-														//ordem 1 ajuste de mes
-														//ordem 2 ajuste de dia
-														//ordem 3 ajuste de hora
-														//ordem 4 ajuste de minuto
-														//ordem 5 ajuste de segundo
-					
-	
-														ptr_data= &data_atual.ano;
-	
-														for(ordem=0;ordem<6;ordem++){
-																if(buffer_serial[cont] == IGNORAR) {//Pula para o próximo ajuste
-																				ordem++;
-																				cont+=2;} 
-															
-															*(ptr_data+ordem) = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
-															char temp = *(ptr_data+ordem);
-															numero_para_ascii(temp);
-															numero_para_ascii(ordem);
-															cont+=2;}
-	
-															data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
-															setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-															cont--;
-																	}
-		
-												else if(funcao == MUDAR_SENHA){
-	
-														conta_a_ser_alterada = (buffer_serial[cont] - '0');
-				
-														if(	conta_a_ser_alterada != conta && (!(testar_bit(nivel_acesso,PERMISSAO_RECONFIGURAR_OUTRAS_CONTAS)))	){
-																			setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
-																						}
-														
-														for(ordem=0;ordem<(TAMANHO_SENHA-1);ordem++){
-															cont++;
-	
-																if(buffer_serial[cont] == '<') {
-																			if(ordem<5) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
-						
-																			else {
-																				if(ordem<TAMANHO_SENHA-2) eeprom_write( ((conta_a_ser_alterada*16)+ordem) , 0);
-																				break;}
-																}
-																						
-	
-																else{
-																		
-																	senha[conta_a_ser_alterada][ordem] = buffer_serial[cont];
-																	eeprom_write( ((conta_a_ser_alterada*16)+ordem) ,buffer_serial[cont]);}
-	
-																	}	
-									
-															setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
-							}
-					
-									else if(etapa == etapa_final){//Fim da comunicação
-												if(buffer_serial[cont] != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-												enviar=1; receber=qtd_caracteres_recebidos_serial=0;}
-				
-									
-									
-									if(FLAGS_1>3) {
-													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													enviar_caractere_serial( '0' + etapa);
-													etapa = etapa_inicial;	
-													enviar=1;
-													receber=qtd_caracteres_recebidos_serial=0;}
-		
-																			}		
-					}
+                                       ptr_data= &data_atual.ano;
 
-				else if(MODO_TECLADO_MATRICIAL){
+                                       for(ordem=0;ordem<7;ordem++){
+                                             if(buffer_serial[cont] == IGNORAR) {//Pula para o próximo ajuste
+                                                         ordem++;
+                                                         cont+=2;} 
 
-							if(testar_bit(FLAGS_2,MODO_T9)){
+                                          *ptr_data = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
+                                          cont+=2;}
+                                          cont--;
+                                                }
+   
+                                 else if(funcao == MUDAR_SENHA){
 
-								enviar_caractere_serial(NOVA_LINHA);
+                                       conta_a_ser_alterada = (buffer_serial[cont] - '0');
+         
+                                       if(   conta_a_ser_alterada != conta && (!(testar_bit(nivel_acesso,PERMISSAO_RECONFIGURAR_OUTRAS_CONTAS)))   ){
+                                                      setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
+                                                               }
+                                       
+                                       for(ordem=0;ordem<(TAMANHO_SENHA-1);ordem++){
+                                          cont++;
 
-								numero_para_ascii(ultimo_caractere_recebido);
-								numero_para_ascii(qtd_vezes_mesma_tecla_pressionada);
+                                             if(buffer_serial[cont] == '<') {
+                                                      if(ordem<5) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+               
+                                                      else {
+                                                         if(ordem<TAMANHO_SENHA-2) eeprom_write( ((conta_a_ser_alterada*16)+ordem) , 0);
+                                                         break;}
+                                             }
+                                                               
 
-								buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = (caractere_recebido + (48*TMR1ON) + qtd_vezes_mesma_tecla_pressionada);
-								qtd_vezes_mesma_tecla_pressionada=0;
-								TMR1ON=0;
-								TMR1H=0xC0;
-								TMR1L=0;}
+                                             else{
+                                                   
+                                                senha[conta_a_ser_alterada][ordem] = buffer_serial[cont];
+                                                eeprom_write( ((conta_a_ser_alterada*16)+ordem) ,buffer_serial[cont]);}
 
-								
-							
-
-
-							else{ buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;}
-
-								enviar_caractere_serial( buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] );
-								
-
-							if(	buffer_serial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado<TAMANHO_BUFFER_TECLADO_MATRICIAL){
-
-										conta = ((buffer_teclado_matricial[0]*10) + buffer_teclado_matricial[1]);
-										cont=2;
-										
-										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != NULL){
-
-											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
-												setar_bit(FLAGS_1,ERRO_SENHA);}
-
-											cont++;
-										}
-							}				
-										
-
-				}
-
-			}
-
+                                                }   
+                        
+                                          setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
+                  }
+            
+                        else if(etapa == etapa_final){//Fim da comunicação
+                                 if(buffer_serial[cont] != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+                                 enviar=1; receber=qtd_caracteres_recebidos_serial=0;}
+         
+                        
+                        
+                        if(FLAGS_1>3 ) {
+                                    resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
+                                    TXREG = '0' + etapa;
+                                    etapa = etapa_inicial;   
+                                    enviar=1;
+                                    receber=qtd_caracteres_recebidos_serial=0;}
+   
+                  }
+      
+         numero_para_ascii(qtd_total_contas);}
 		
 		if(enviar==1){
+
 			enviar=0;
 			qtd_caracteres_recebidos_serial=0;
 			etapa = etapa_inicial;
@@ -719,9 +676,6 @@ int main(void){
 					debounce=0;
 		}
 
-			if(receber==0 && enviar==0 && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
-				SLEEP();
-				NOP();}
 
 }
 }

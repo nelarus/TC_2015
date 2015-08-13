@@ -1,0 +1,709 @@
+Version 3.2 HI-TECH Software Intermediate Code
+[; ;string.h: 4: typedef int ptrdiff_t;
+[; ;string.h: 5: typedef unsigned size_t;
+[; ;string.h: 6: typedef unsigned short wchar_t;
+[; ;string.h: 9: extern int errno;
+[; ;string.h: 22: extern void * memcpy(void *, const void *, size_t);
+[; ;string.h: 23: extern void * memmove(void *, const void *, size_t);
+[; ;string.h: 24: extern void * memset(void *, int, size_t);
+[; ;string.h: 42: extern char * strcat(char *, const char *);
+[; ;string.h: 43: extern char * strcpy(char *, const char *);
+[; ;string.h: 44: extern char * strncat(char *, const char *, size_t);
+[; ;string.h: 45: extern char * strncpy(char *, const char *, size_t);
+[; ;string.h: 46: extern char * strdup(const char *);
+[; ;string.h: 47: extern char * strtok(char *, const char *);
+[; ;string.h: 50: extern int memcmp(const void *, const void *, size_t);
+[; ;string.h: 51: extern int strcmp(const char *, const char *);
+[; ;string.h: 52: extern int stricmp(const char *, const char *);
+[; ;string.h: 53: extern int strncmp(const char *, const char *, size_t);
+[; ;string.h: 54: extern int strnicmp(const char *, const char *, size_t);
+[; ;string.h: 55: extern void * memchr(const void *, int, size_t);
+[; ;string.h: 56: extern size_t strcspn(const char *, const char *);
+[; ;string.h: 57: extern char * strpbrk(const char *, const char *);
+[; ;string.h: 58: extern size_t strspn(const char *, const char *);
+[; ;string.h: 59: extern char * strstr(const char *, const char *);
+[; ;string.h: 60: extern char * stristr(const char *, const char *);
+[; ;string.h: 61: extern char * strerror(int);
+[; ;string.h: 62: extern size_t strlen(const char *);
+[; ;string.h: 63: extern char * strchr(const char *, int);
+[; ;string.h: 64: extern char * strichr(const char *, int);
+[; ;string.h: 65: extern char * strrchr(const char *, int);
+[; ;string.h: 66: extern char * strrichr(const char *, int);
+[; ;encrypt.h: 22: void clearCypher(void);
+[; ;encrypt.h: 23: void encodeCypher(void);
+[; ;encrypt.h: 24: void assembleCypher(void);
+[; ;encrypt.h: 26: void ascii_encrypt128(char *in, char *key,char ascCipherText[]);
+[; ;encrypt.h: 27: void ascii_decrypt128(char *in, char *key,char ascCipherText[]);
+[; ;encrypt.h: 30: void initCipher(void);
+"25 D:\Dropbox\Micros\2015\TC_2015\18F4550\encrypt.c
+[v _pkax `us ~T0 @X0 1 e ]
+[v _pkbx `us ~T0 @X0 1 e ]
+[v _pkcx `us ~T0 @X0 1 e ]
+[v _pkdx `us ~T0 @X0 1 e ]
+[v _pksi `us ~T0 @X0 1 e ]
+[v _pktmp `us ~T0 @X0 1 e ]
+[v _x1a2 `us ~T0 @X0 1 e ]
+[; ;encrypt.c: 25: unsigned short pkax,pkbx,pkcx,pkdx,pksi,pktmp,x1a2;
+"26
+[v _pkres `us ~T0 @X0 1 e ]
+[v _pki `us ~T0 @X0 1 e ]
+[v _inter `us ~T0 @X0 1 e ]
+[v _cfc `us ~T0 @X0 1 e ]
+[v _cfd `us ~T0 @X0 1 e ]
+[v _compte `us ~T0 @X0 1 e ]
+[; ;encrypt.c: 26: unsigned short pkres,pki,inter,cfc,cfd,compte;
+"27
+[v _x1a0 `us ~T0 @X0 -> 8 `i e ]
+[; ;encrypt.c: 27: unsigned short x1a0[8];
+"28
+[v _cle `uc ~T0 @X0 -> 17 `i e ]
+[; ;encrypt.c: 28: unsigned char cle[17];
+"29
+[v _pkc `s ~T0 @X0 1 e ]
+[; ;encrypt.c: 29: short pkc;
+"35
+[v _initCipher `(v ~T0 @X0 1 ef ]
+"36
+{
+[; ;encrypt.c: 35: void initCipher()
+[; ;encrypt.c: 36: {
+[e :U _initCipher ]
+[f ]
+"37
+[v _j `i ~T0 @X0 1 a ]
+[; ;encrypt.c: 37: int j;
+[; ;encrypt.c: 38: for (j=0;j<=16;j++) {
+"38
+{
+[e = _j -> 0 `i ]
+[e $ <= _j -> 16 `i 2  ]
+[e $U 3  ]
+[e :U 2 ]
+{
+[; ;encrypt.c: 39: cle[j]=0;
+"39
+[e = *U + &U _cle * -> -> _j `ui `ux -> -> # *U &U _cle `ui `ux -> -> 0 `i `uc ]
+"40
+}
+"38
+[e ++ _j -> 1 `i ]
+[e $ <= _j -> 16 `i 2  ]
+[e :U 3 ]
+"40
+}
+[; ;encrypt.c: 40: }
+[; ;encrypt.c: 41: for (j=0;j<=8;j++) {
+"41
+{
+[e = _j -> 0 `i ]
+[e $ <= _j -> 8 `i 5  ]
+[e $U 6  ]
+[e :U 5 ]
+{
+[; ;encrypt.c: 42: x1a0[j]=0;
+"42
+[e = *U + &U _x1a0 * -> -> _j `ui `ux -> -> # *U &U _x1a0 `ui `ux -> -> 0 `i `us ]
+"43
+}
+"41
+[e ++ _j -> 1 `i ]
+[e $ <= _j -> 8 `i 5  ]
+[e :U 6 ]
+"43
+}
+[; ;encrypt.c: 43: }
+[; ;encrypt.c: 45: pkax=0;
+"45
+[e = _pkax -> -> 0 `i `us ]
+[; ;encrypt.c: 46: pkbx=0;
+"46
+[e = _pkbx -> -> 0 `i `us ]
+[; ;encrypt.c: 47: pkcx=0;
+"47
+[e = _pkcx -> -> 0 `i `us ]
+[; ;encrypt.c: 48: pkdx=0;
+"48
+[e = _pkdx -> -> 0 `i `us ]
+[; ;encrypt.c: 49: pksi=0;
+"49
+[e = _pksi -> -> 0 `i `us ]
+[; ;encrypt.c: 50: pktmp=0;
+"50
+[e = _pktmp -> -> 0 `i `us ]
+[; ;encrypt.c: 51: x1a2=0;
+"51
+[e = _x1a2 -> -> 0 `i `us ]
+[; ;encrypt.c: 52: pkres=0;
+"52
+[e = _pkres -> -> 0 `i `us ]
+[; ;encrypt.c: 53: pki=0;
+"53
+[e = _pki -> -> 0 `i `us ]
+[; ;encrypt.c: 54: inter=0;
+"54
+[e = _inter -> -> 0 `i `us ]
+[; ;encrypt.c: 55: cfc=0;
+"55
+[e = _cfc -> -> 0 `i `us ]
+[; ;encrypt.c: 56: cfd=0;
+"56
+[e = _cfd -> -> 0 `i `us ]
+[; ;encrypt.c: 57: compte=0;
+"57
+[e = _compte -> -> 0 `i `us ]
+[; ;encrypt.c: 58: pkc=0;
+"58
+[e = _pkc -> -> 0 `i `s ]
+[; ;encrypt.c: 60: }
+"60
+[e :UE 1 ]
+}
+"64
+[v _clearCypher `(v ~T0 @X0 1 ef ]
+"65
+{
+[; ;encrypt.c: 64: void clearCypher()
+[; ;encrypt.c: 65: {
+[e :U _clearCypher ]
+[f ]
+"66
+[v _j `i ~T0 @X0 1 a ]
+[; ;encrypt.c: 66: int j;
+[; ;encrypt.c: 67: for (j=0;j<=16;j++) {
+"67
+{
+[e = _j -> 0 `i ]
+[e $ <= _j -> 16 `i 9  ]
+[e $U 10  ]
+[e :U 9 ]
+{
+[; ;encrypt.c: 68: cle[j]=0;
+"68
+[e = *U + &U _cle * -> -> _j `ui `ux -> -> # *U &U _cle `ui `ux -> -> 0 `i `uc ]
+"69
+}
+"67
+[e ++ _j -> 1 `i ]
+[e $ <= _j -> 16 `i 9  ]
+[e :U 10 ]
+"69
+}
+[; ;encrypt.c: 69: }
+[; ;encrypt.c: 70: for (j=0;j<=8;j++) {
+"70
+{
+[e = _j -> 0 `i ]
+[e $ <= _j -> 8 `i 12  ]
+[e $U 13  ]
+[e :U 12 ]
+{
+[; ;encrypt.c: 71: x1a0[j]=0;
+"71
+[e = *U + &U _x1a0 * -> -> _j `ui `ux -> -> # *U &U _x1a0 `ui `ux -> -> 0 `i `us ]
+"72
+}
+"70
+[e ++ _j -> 1 `i ]
+[e $ <= _j -> 8 `i 12  ]
+[e :U 13 ]
+"72
+}
+[; ;encrypt.c: 72: }
+[; ;encrypt.c: 74: pkax=0;
+"74
+[e = _pkax -> -> 0 `i `us ]
+[; ;encrypt.c: 75: pkbx=0;
+"75
+[e = _pkbx -> -> 0 `i `us ]
+[; ;encrypt.c: 76: pkcx=0;
+"76
+[e = _pkcx -> -> 0 `i `us ]
+[; ;encrypt.c: 77: pkdx=0;
+"77
+[e = _pkdx -> -> 0 `i `us ]
+[; ;encrypt.c: 78: pksi=0;
+"78
+[e = _pksi -> -> 0 `i `us ]
+[; ;encrypt.c: 79: pktmp=0;
+"79
+[e = _pktmp -> -> 0 `i `us ]
+[; ;encrypt.c: 80: x1a2=0;
+"80
+[e = _x1a2 -> -> 0 `i `us ]
+[; ;encrypt.c: 81: pkres=0;
+"81
+[e = _pkres -> -> 0 `i `us ]
+[; ;encrypt.c: 82: pki=0;
+"82
+[e = _pki -> -> 0 `i `us ]
+[; ;encrypt.c: 83: inter=0;
+"83
+[e = _inter -> -> 0 `i `us ]
+[; ;encrypt.c: 84: cfc=0;
+"84
+[e = _cfc -> -> 0 `i `us ]
+[; ;encrypt.c: 85: cfd=0;
+"85
+[e = _cfd -> -> 0 `i `us ]
+[; ;encrypt.c: 86: compte=0;
+"86
+[e = _compte -> -> 0 `i `us ]
+[; ;encrypt.c: 87: pkc=0;
+"87
+[e = _pkc -> -> 0 `i `s ]
+[; ;encrypt.c: 89: }
+"89
+[e :UE 8 ]
+}
+"90
+[v _encodeCypher `(v ~T0 @X0 1 ef ]
+"91
+{
+[; ;encrypt.c: 90: void encodeCypher()
+[; ;encrypt.c: 91: {
+[e :U _encodeCypher ]
+[f ]
+[; ;encrypt.c: 93: pkdx=x1a2+pki;
+"93
+[e = _pkdx -> + -> _x1a2 `ui -> _pki `ui `us ]
+[; ;encrypt.c: 94: pkax=x1a0[pki];
+"94
+[e = _pkax *U + &U _x1a0 * -> _pki `ux -> -> # *U &U _x1a0 `ui `ux ]
+[; ;encrypt.c: 95: pkcx=0x015a;
+"95
+[e = _pkcx -> -> 346 `i `us ]
+[; ;encrypt.c: 96: pkbx=0x4e35;
+"96
+[e = _pkbx -> -> 20021 `i `us ]
+[; ;encrypt.c: 98: pktmp=pkax;
+"98
+[e = _pktmp _pkax ]
+[; ;encrypt.c: 99: pkax=pksi;
+"99
+[e = _pkax _pksi ]
+[; ;encrypt.c: 100: pksi=pktmp;
+"100
+[e = _pksi _pktmp ]
+[; ;encrypt.c: 102: pktmp=pkax;
+"102
+[e = _pktmp _pkax ]
+[; ;encrypt.c: 103: pkax=pkdx;
+"103
+[e = _pkax _pkdx ]
+[; ;encrypt.c: 104: pkdx=pktmp;
+"104
+[e = _pkdx _pktmp ]
+[; ;encrypt.c: 106: if (pkax!=0) {
+"106
+[e $ ! != -> _pkax `ui -> -> 0 `i `ui 16  ]
+{
+[; ;encrypt.c: 107: pkax=pkax*pkbx;
+"107
+[e = _pkax -> * -> _pkax `ui -> _pkbx `ui `us ]
+"108
+}
+[e :U 16 ]
+[; ;encrypt.c: 108: }
+[; ;encrypt.c: 110: pktmp=pkax;
+"110
+[e = _pktmp _pkax ]
+[; ;encrypt.c: 111: pkax=pkcx;
+"111
+[e = _pkax _pkcx ]
+[; ;encrypt.c: 112: pkcx=pktmp;
+"112
+[e = _pkcx _pktmp ]
+[; ;encrypt.c: 114: if (pkax!=0) {
+"114
+[e $ ! != -> _pkax `ui -> -> 0 `i `ui 17  ]
+{
+[; ;encrypt.c: 115: pkax=pkax*pksi;
+"115
+[e = _pkax -> * -> _pkax `ui -> _pksi `ui `us ]
+[; ;encrypt.c: 116: pkcx=pkax+pkcx;
+"116
+[e = _pkcx -> + -> _pkax `ui -> _pkcx `ui `us ]
+"117
+}
+[e :U 17 ]
+[; ;encrypt.c: 117: }
+[; ;encrypt.c: 119: pktmp=pkax;
+"119
+[e = _pktmp _pkax ]
+[; ;encrypt.c: 120: pkax=pksi;
+"120
+[e = _pkax _pksi ]
+[; ;encrypt.c: 121: pksi=pktmp;
+"121
+[e = _pksi _pktmp ]
+[; ;encrypt.c: 122: pkax=pkax*pkbx;
+"122
+[e = _pkax -> * -> _pkax `ui -> _pkbx `ui `us ]
+[; ;encrypt.c: 123: pkdx=pkcx+pkdx;
+"123
+[e = _pkdx -> + -> _pkcx `ui -> _pkdx `ui `us ]
+[; ;encrypt.c: 125: pkax++;
+"125
+[e ++ _pkax -> -> 1 `i `us ]
+[; ;encrypt.c: 127: x1a2=pkdx;
+"127
+[e = _x1a2 _pkdx ]
+[; ;encrypt.c: 128: x1a0[pki]=pkax;
+"128
+[e = *U + &U _x1a0 * -> _pki `ux -> -> # *U &U _x1a0 `ui `ux _pkax ]
+[; ;encrypt.c: 130: pkres=pkax^pkdx;
+"130
+[e = _pkres -> ^ -> _pkax `ui -> _pkdx `ui `us ]
+[; ;encrypt.c: 131: pki++;
+"131
+[e ++ _pki -> -> 1 `i `us ]
+[; ;encrypt.c: 132: }
+"132
+[e :UE 15 ]
+}
+"133
+[v _assembleCypher `(v ~T0 @X0 1 ef ]
+"134
+{
+[; ;encrypt.c: 133: void assembleCypher(void)
+[; ;encrypt.c: 134: {
+[e :U _assembleCypher ]
+[f ]
+[; ;encrypt.c: 135: x1a0[0]= ( cle[0]*256 )+ cle[1];
+"135
+[e = *U + &U _x1a0 * -> -> -> 0 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> + * -> *U + &U _cle * -> -> -> 0 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 1 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `us ]
+[; ;encrypt.c: 136: encodeCypher();
+"136
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 137: inter=pkres;
+"137
+[e = _inter _pkres ]
+[; ;encrypt.c: 139: x1a0[1]= x1a0[0] ^ ( (cle[2]*256) + cle[3] );
+"139
+[e = *U + &U _x1a0 * -> -> -> 1 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 0 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 2 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 3 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 140: encodeCypher();
+"140
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 141: inter=inter^pkres;
+"141
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 143: x1a0[2]= x1a0[1] ^ ( (cle[4]*256) + cle[5] );
+"143
+[e = *U + &U _x1a0 * -> -> -> 2 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 1 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 4 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 5 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 144: encodeCypher();
+"144
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 145: inter=inter^pkres;
+"145
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 147: x1a0[3]= x1a0[2] ^ ( (cle[6]*256) + cle[7] );
+"147
+[e = *U + &U _x1a0 * -> -> -> 3 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 2 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 6 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 7 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 148: encodeCypher();
+"148
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 149: inter=inter^pkres;
+"149
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 152: x1a0[4]= x1a0[3] ^ ( (cle[8]*256) + cle[9] );
+"152
+[e = *U + &U _x1a0 * -> -> -> 4 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 3 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 8 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 9 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 153: encodeCypher();
+"153
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 154: inter=inter^pkres;
+"154
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 156: x1a0[5]= x1a0[4] ^ ( (cle[10]*256) + cle[11] );
+"156
+[e = *U + &U _x1a0 * -> -> -> 5 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 4 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 10 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 11 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 157: encodeCypher();
+"157
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 158: inter=inter^pkres;
+"158
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 160: x1a0[6]= x1a0[5] ^ ( (cle[12]*256) + cle[13] );
+"160
+[e = *U + &U _x1a0 * -> -> -> 6 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 5 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 12 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 13 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 161: encodeCypher();
+"161
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 162: inter=inter^pkres;
+"162
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 164: x1a0[7]= x1a0[6] ^ ( (cle[14]*256) + cle[15] );
+"164
+[e = *U + &U _x1a0 * -> -> -> 7 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux -> ^ -> *U + &U _x1a0 * -> -> -> 6 `i `ui `ux -> -> # *U &U _x1a0 `ui `ux `ui -> + * -> *U + &U _cle * -> -> -> 14 `i `ui `ux -> -> # *U &U _cle `ui `ux `i -> 256 `i -> *U + &U _cle * -> -> -> 15 `i `ui `ux -> -> # *U &U _cle `ui `ux `i `ui `us ]
+[; ;encrypt.c: 165: encodeCypher();
+"165
+[e ( _encodeCypher ..  ]
+[; ;encrypt.c: 166: inter=inter^pkres;
+"166
+[e = _inter -> ^ -> _inter `ui -> _pkres `ui `us ]
+[; ;encrypt.c: 168: pki=0;
+"168
+[e = _pki -> -> 0 `i `us ]
+[; ;encrypt.c: 169: }
+"169
+[e :UE 18 ]
+}
+"171
+[v _ascii_encrypt128 `(v ~T0 @X0 1 ef3`*uc`*uc`*uc ]
+"172
+{
+[; ;encrypt.c: 171: void ascii_encrypt128(char *in, char *key,char ascCipherText[])
+[; ;encrypt.c: 172: {
+[e :U _ascii_encrypt128 ]
+"171
+[v _in `*uc ~T0 @X0 1 r1 ]
+[v _key `*uc ~T0 @X0 1 r2 ]
+[v _ascCipherText `*uc ~T0 @X0 1 r3 ]
+"172
+[f ]
+"173
+[v _count `i ~T0 @X0 1 a ]
+[v _k `i ~T0 @X0 1 a ]
+[; ;encrypt.c: 173: int count, k=0;
+[e = _k -> 0 `i ]
+"174
+[v _pkd `s ~T0 @X0 1 a ]
+[v _pke `s ~T0 @X0 1 a ]
+[; ;encrypt.c: 174: short pkd, pke;
+[; ;encrypt.c: 175: if(k){}
+"175
+[e $ ! != _k -> 0 `i 20  ]
+{
+}
+[e :U 20 ]
+[; ;encrypt.c: 177: clearCypher();
+"177
+[e ( _clearCypher ..  ]
+[; ;encrypt.c: 179: for (count=0;count<16;count++) {
+"179
+{
+[e = _count -> 0 `i ]
+[e $ < _count -> 16 `i 21  ]
+[e $U 22  ]
+[e :U 21 ]
+{
+[; ;encrypt.c: 180: cle[count]=key[count];
+"180
+[e = *U + &U _cle * -> -> _count `ui `ux -> -> # *U &U _cle `ui `ux *U + _key * -> _count `x -> -> # *U _key `i `x ]
+"181
+}
+"179
+[e ++ _count -> 1 `i ]
+[e $ < _count -> 16 `i 21  ]
+[e :U 22 ]
+"181
+}
+[; ;encrypt.c: 181: }
+[; ;encrypt.c: 182: cle[count]='\0';
+"182
+[e = *U + &U _cle * -> -> _count `ui `ux -> -> # *U &U _cle `ui `ux -> -> 0 `ui `uc ]
+[; ;encrypt.c: 185: for (count=0;count<40;count++) {
+"185
+{
+[e = _count -> 0 `i ]
+[e $ < _count -> 40 `i 24  ]
+[e $U 25  ]
+[e :U 24 ]
+{
+[; ;encrypt.c: 186: pkc=in[count];
+"186
+[e = _pkc -> *U + _in * -> _count `x -> -> # *U _in `i `x `s ]
+[; ;encrypt.c: 188: assembleCypher();
+"188
+[e ( _assembleCypher ..  ]
+[; ;encrypt.c: 189: cfc=inter>>8;
+"189
+[e = _cfc -> >> -> _inter `ui -> 8 `i `us ]
+[; ;encrypt.c: 190: cfd=inter&255;
+"190
+[e = _cfd -> & -> _inter `ui -> -> 255 `i `ui `us ]
+[; ;encrypt.c: 192: for (compte=0;compte<=15;compte++) {
+"192
+{
+[e = _compte -> -> 0 `i `us ]
+[e $ <= -> _compte `ui -> -> 15 `i `ui 27  ]
+[e $U 28  ]
+[e :U 27 ]
+{
+[; ;encrypt.c: 193: cle[compte]=cle[compte]^pkc;
+"193
+[e = *U + &U _cle * -> _compte `ux -> -> # *U &U _cle `ui `ux -> ^ -> *U + &U _cle * -> _compte `ux -> -> # *U &U _cle `ui `ux `i -> _pkc `i `uc ]
+"194
+}
+"192
+[e ++ _compte -> -> 1 `i `us ]
+[e $ <= -> _compte `ui -> -> 15 `i `ui 27  ]
+[e :U 28 ]
+"194
+}
+[; ;encrypt.c: 194: }
+[; ;encrypt.c: 195: pkc = pkc ^ (cfc^cfd);
+"195
+[e = _pkc -> ^ -> _pkc `ui ^ -> _cfc `ui -> _cfd `ui `s ]
+[; ;encrypt.c: 197: pkd =(pkc >> 4);
+"197
+[e = _pkd -> >> -> _pkc `i -> 4 `i `s ]
+[; ;encrypt.c: 198: pke =(pkc & 15);
+"198
+[e = _pke -> & -> _pkc `i -> 15 `i `s ]
+[; ;encrypt.c: 200: *ascCipherText = 0x61+pkd; k++; ascCipherText++;
+"200
+[e = *U _ascCipherText -> + -> 97 `i -> _pkd `i `uc ]
+[e ++ _k -> 1 `i ]
+[e ++ _ascCipherText * -> -> 1 `i `x -> -> # *U _ascCipherText `i `x ]
+[; ;encrypt.c: 201: *ascCipherText = 0x61+pke; k++; ascCipherText++;
+"201
+[e = *U _ascCipherText -> + -> 97 `i -> _pke `i `uc ]
+[e ++ _k -> 1 `i ]
+[e ++ _ascCipherText * -> -> 1 `i `x -> -> # *U _ascCipherText `i `x ]
+"202
+}
+"185
+[e ++ _count -> 1 `i ]
+[e $ < _count -> 40 `i 24  ]
+[e :U 25 ]
+"202
+}
+[; ;encrypt.c: 202: }
+[; ;encrypt.c: 203: *ascCipherText = '\0';
+"203
+[e = *U _ascCipherText -> -> 0 `ui `uc ]
+[; ;encrypt.c: 205: }
+"205
+[e :UE 19 ]
+}
+"207
+[v _ascii_decrypt128 `(v ~T0 @X0 1 ef3`*uc`*uc`*uc ]
+"208
+{
+[; ;encrypt.c: 207: void ascii_decrypt128(char *in, char *key,char plainText[])
+[; ;encrypt.c: 208: {
+[e :U _ascii_decrypt128 ]
+"207
+[v _in `*uc ~T0 @X0 1 r1 ]
+[v _key `*uc ~T0 @X0 1 r2 ]
+[v _plainText `*uc ~T0 @X0 1 r3 ]
+"208
+[f ]
+"209
+[v _count `i ~T0 @X0 1 a ]
+[v _k `i ~T0 @X0 1 a ]
+[; ;encrypt.c: 209: int count, k=0;
+[e = _k -> 0 `i ]
+"210
+[v _pkd `s ~T0 @X0 1 a ]
+[v _pke `s ~T0 @X0 1 a ]
+[; ;encrypt.c: 210: short pkd, pke;
+[; ;encrypt.c: 212: clearCypher();
+"212
+[e ( _clearCypher ..  ]
+[; ;encrypt.c: 214: for (count=0;count<16;count++) {
+"214
+{
+[e = _count -> 0 `i ]
+[e $ < _count -> 16 `i 31  ]
+[e $U 32  ]
+[e :U 31 ]
+{
+[; ;encrypt.c: 215: cle[count]=key[count];
+"215
+[e = *U + &U _cle * -> -> _count `ui `ux -> -> # *U &U _cle `ui `ux *U + _key * -> _count `x -> -> # *U _key `i `x ]
+"216
+}
+"214
+[e ++ _count -> 1 `i ]
+[e $ < _count -> 16 `i 31  ]
+[e :U 32 ]
+"216
+}
+[; ;encrypt.c: 216: }
+[; ;encrypt.c: 217: cle[count]='\0';
+"217
+[e = *U + &U _cle * -> -> _count `ui `ux -> -> # *U &U _cle `ui `ux -> -> 0 `ui `uc ]
+[; ;encrypt.c: 220: for (count=0;count<40;count++) {
+"220
+{
+[e = _count -> 0 `i ]
+[e $ < _count -> 40 `i 34  ]
+[e $U 35  ]
+[e :U 34 ]
+{
+[; ;encrypt.c: 221: pkd =in[k]; k++;
+"221
+[e = _pkd -> *U + _in * -> _k `x -> -> # *U _in `i `x `s ]
+[e ++ _k -> 1 `i ]
+[; ;encrypt.c: 222: pke =in[k]; k++;
+"222
+[e = _pke -> *U + _in * -> _k `x -> -> # *U _in `i `x `s ]
+[e ++ _k -> 1 `i ]
+[; ;encrypt.c: 224: pkd=pkd-0x61;
+"224
+[e = _pkd -> - -> _pkd `i -> 97 `i `s ]
+[; ;encrypt.c: 225: pkd=pkd<<4;
+"225
+[e = _pkd -> << -> _pkd `i -> 4 `i `s ]
+[; ;encrypt.c: 227: pke=pke-0x61;
+"227
+[e = _pke -> - -> _pke `i -> 97 `i `s ]
+[; ;encrypt.c: 228: pkc=pkd+pke;
+"228
+[e = _pkc -> + -> _pkd `i -> _pke `i `s ]
+[; ;encrypt.c: 230: assembleCypher();
+"230
+[e ( _assembleCypher ..  ]
+[; ;encrypt.c: 231: cfc=inter>>8;
+"231
+[e = _cfc -> >> -> _inter `ui -> 8 `i `us ]
+[; ;encrypt.c: 232: cfd=inter&255;
+"232
+[e = _cfd -> & -> _inter `ui -> -> 255 `i `ui `us ]
+[; ;encrypt.c: 234: pkc = pkc ^ (cfc^cfd);
+"234
+[e = _pkc -> ^ -> _pkc `ui ^ -> _cfc `ui -> _cfd `ui `s ]
+[; ;encrypt.c: 236: for (compte=0;compte<=15;compte++)
+"236
+{
+[e = _compte -> -> 0 `i `us ]
+[e $ <= -> _compte `ui -> -> 15 `i `ui 37  ]
+[e $U 38  ]
+"237
+[e :U 37 ]
+[; ;encrypt.c: 237: {
+{
+[; ;encrypt.c: 238: cle[compte]=cle[compte]^pkc;
+"238
+[e = *U + &U _cle * -> _compte `ux -> -> # *U &U _cle `ui `ux -> ^ -> *U + &U _cle * -> _compte `ux -> -> # *U &U _cle `ui `ux `i -> _pkc `i `uc ]
+"239
+}
+"236
+[e ++ _compte -> -> 1 `i `us ]
+[e $ <= -> _compte `ui -> -> 15 `i `ui 37  ]
+[e :U 38 ]
+"239
+}
+[; ;encrypt.c: 239: }
+[; ;encrypt.c: 240: *plainText = pkc; plainText++;
+"240
+[e = *U _plainText -> _pkc `uc ]
+[e ++ _plainText * -> -> 1 `i `x -> -> # *U _plainText `i `x ]
+"242
+}
+"220
+[e ++ _count -> 1 `i ]
+[e $ < _count -> 40 `i 34  ]
+[e :U 35 ]
+"242
+}
+[; ;encrypt.c: 242: }
+[; ;encrypt.c: 243: *plainText = '\0';
+"243
+[e = *U _plainText -> -> 0 `ui `uc ]
+[; ;encrypt.c: 245: }
+"245
+[e :UE 30 ]
+}

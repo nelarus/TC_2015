@@ -1,0 +1,260 @@
+/*Code originallly by MarkP
+
+This version slightly modified to suit PIC16F690 / Hitech 'C'
+
+---
+
+Here are some I2C routines I (MarkP) have written that use bit-banging
+to do the I2C, this has been tested on several boards with
+several different devices and seems to work fine. You will need
+4k7 or so pull-up resistors on the SDA and SCL lines.
+
+The following routines are included in the example. The routines are
+designed to have more than one I2C 'port' pair, you can easily
+add more ports by modifying the case statements and adding some more
+#defines at the beginning to suit. For now this code works as is, using port
+no. 1 as its parameter as this is the only port currently defined.
+
+void scl_out(uchar port, uchar value) - this writes a value to port's scl line
+void sda_out(uchar port, uchar value) - this writes a value to port's sda line
+void start_i2c(uchar port) - sends a start condition to port
+void stop_i2c(uchar port) - sends a stop condition to port
+wr_i2c(uchar port, uchar value) - writes an 8 bit value to port
+uchar rd_i2c(uchar port, uchar ack) - reads an 8 bit value from port
+
+With these basic routines you can build a device specific read or write
+routine. The example shows two routines that talk to a device connected to
+port 1 that simply uses an single 8 bit address to select a register.
+
+To issue a restart simply call start_i2c again without calling stop_i2c.
+*/
+
+#include <htc.h>
+#include "ext_eeprom.h"
+
+// Declare functions
+   
+// Uses open collector outputs. The data registers are
+// assumed to be zero, direction registers used as control.
+// Add more ports as needed. Change these defines as
+// appropriate for the microprocessor you use. #include the
+// header file for your delay function, or use NOPs.
+
+#define DRIVE_SCL1_LOW		TRISB6=0		// PORTB 6 (SCL pin) mode = output, pulls line low
+#define RELEASE_SCL1_HIGH	TRISB6=1		// PORT  6 (SCL pin) mode = input, line released high
+#define DRIVE_SDA1_LOW   	TRISB4=0 		// PORTB 4 (SDA pin) mode = output, pulls line low
+#define RELEASE_SDA1_HIGH	TRISB4=1		// PORTB 4 (SDA pin) mode = input, line released high
+#define GET_SCL_PIN1		RB6				// PORTB 6 is used as SCL state read input
+#define GET_SDA_PIN1		RB4				// PORTB 4 is used as SDA state read input
+
+
+
+void scl_out(unsigned char port, unsigned char value)
+// entered with: ----------------------------* 
+//  port  = i2c port to access               *
+//  value = 0 or 1  bit value                *
+// ------------------------------------------*  
+{
+   // add more ports in the case statement as needed
+   switch(port)
+   {
+      case 1:
+        if(value==1)
+        {   // release clock high
+            RELEASE_SCL1_HIGH; 
+            // wait for clock line high for clock stretching
+            while(GET_SCL_PIN1 == 0);
+        }
+        else
+        {   // drive clock low
+            DRIVE_SCL1_LOW; 
+        }
+        break;
+
+      default:
+        break;
+   }
+   halfclockdelay();
+}  
+
+void sda_out(unsigned char port, unsigned char value)
+// entered with: ----------------------------*
+//  port  = i2c port to access               *
+//  value = 0 or 1  bit value                *
+// ------------------------------------------*  
+{
+   // add more ports in the case statement as needed
+   switch(port)
+   {
+   	case 1:
+    	if(value==1)
+        {   // release SDA high
+         RELEASE_SDA1_HIGH;
+        }
+    	else
+        {   // drive SDA low
+         DRIVE_SDA1_LOW;
+        }
+        break;
+
+   	default:
+    	break;
+   }
+   halfclockdelay();
+} 
+
+void start_i2c(unsigned char port)
+// entered with: ----------------------------* 
+//  port    = i2c port to access             *
+// ------------------------------------------*  
+{
+   scl_out(port,1);  // SCL high                  
+   sda_out(port,1);  // SDA high                  
+   sda_out(port,0);  // SDA low, indicates START  
+   scl_out(port,0);  // SCL low                   
+}
+
+void stop_i2c(unsigned char port)
+// entered with: ----------------------------*
+//  port    = i2c port to access             * 
+// ------------------------------------------*  
+{
+   sda_out(port,0);  // SDA low                   
+   scl_out(port,1);  // SCL high                  
+   sda_out(port,1);  // SDA high, indicates STOP  
+}
+
+unsigned char wr_i2c(unsigned char port, unsigned char value)
+// entered with: ----------------------------*
+//  port    = i2c port to access             *
+//  value   = 8 bit value                    *
+//  returns with ack                         *
+// ------------------------------------------*  
+{
+   unsigned char x,ack;
+   for (x=0; x<=7; x++)                // loop 8 times   
+   {
+      sda_out(port,((value & 0x80) != 0)); 	// msb first  
+      scl_out(port,1);            			// assert clock        
+      scl_out(port,0);            			// de-assert clock     
+      value <<= 1;                			// shift left one      
+   }
+   sda_out(port,1);      // release SDA for ack           
+   scl_out(port,1);      // assert clock                 
+   switch(port)
+   {
+      case 1:
+         ack = GET_SDA_PIN1;        // get ack status           
+         break;
+
+      default:
+         break;
+   }
+   scl_out(port,0);      // de-assert clock             
+   return(ack);       
+}
+
+unsigned char rd_i2c(unsigned char port, unsigned char ack)
+// entered with: ----------------------------*
+//  port    = i2c port to access             *
+//  ack = ack status sent, 0 or 1            *
+//  returns with 8 bit data                  *
+// ------------------------------------------*  
+	{
+   	unsigned char x,read_data;
+   	read_data = 0;
+   	for (x=0; x<=7; x++)           // loop 8 times        
+   		{
+      	read_data <<= 1;            // shift left one      
+      	scl_out(port,1);            // SCL high            
+
+      	switch(port)
+      		{
+         	case 1:
+            read_data |= GET_SDA_PIN1;   // read data bit       
+            break;
+
+         	default:
+            break;
+      		}
+   scl_out(port,0);               // SCL low             
+   }
+   sda_out(port,(ack != 0x0));    // ACK        
+   scl_out(port,1);               // SCL high            
+   scl_out(port,0);               // SCL low             
+   sda_out(port,1);               // ACK de-asserted     
+
+   return(read_data);
+	}
+
+
+// Example of a device write routine to port 1.
+
+void write_i2c_device(unsigned int address, unsigned char value)
+// entered with: ----------------------------------*
+//  address = register address                     *
+//  value  = data to be written                    *
+// ------------------------------------------------*  
+
+	{
+    start_i2c(1);
+	wr_i2c(1,0b10100000); //endereço do dispostivo. 10100 A1 A0 R/W
+    wr_i2c(1,(address & (0xFF>>8)));                 // primeiro byte do endereço da eeprom
+	wr_i2c(1,(address & 0xFF));                 // segundo byte do endereço da eeprom
+    wr_i2c(1,value);                   // write data       
+    stop_i2c(1);
+	}
+ 
+// Example of a device read routine from port 1. Note 
+// ack is sent low, some devices require ack to be sent 
+// high for the last transfer of a read block.
+
+unsigned char read_i2c_device(unsigned int address)
+// entered with: ----------------------------------*
+//  address = register address                     *
+//  Returns:                                       *
+//     value = read byte from address              *
+// ------------------------------------------------*  
+	{
+    unsigned char value;
+
+    start_i2c(1);
+    wr_i2c(1,0b10100001);                   //endereço do dispostivo. 10100 A1 A0 R/W
+	wr_i2c(1,(address & (0xFF>>8)));                 // primeiro byte do endereço da eeprom
+	wr_i2c(1,(address & 0xFF));                 // segundo byte do endereço da eeprom
+	start_i2c(1);
+    value = rd_i2c(1,0);                 // read data, send ack low       
+    stop_i2c(1);
+
+    return(value);
+	}
+
+//  Simple routine for the half clock-time delay
+void halfclockdelay (void)
+	{
+	unsigned int delayvalue = 0x40;	// A completely arbitrary value.
+	unsigned int downcount;
+	for (downcount = delayvalue; downcount >0; downcount--);
+	}
+
+//	PINIT microprocessor initialisation function
+void pinit (void)
+	{
+//	Set the direction mode of all the port pins. Writing '0' to the corresponding port
+//  direction control bit makes it an output. Writing '1' makes it an input.
+
+	TRISA = 0b00111111;	// Port A all inputs
+	TRISB = 0b01010000; // Port B bits 4 and 6 = inputs initially, used for i2c.
+	TRISC = 0b00000000;	// Port C all output
+
+//  Switch all the port bits which have analogue inputs to digital mode.
+
+	ANSEL = 0;
+	ANSELH = 0;
+
+//	Set the initial states of the actual output latches.
+
+	PORTA = 0b00111111;		// Set the port ouput latches to initial values
+	PORTB = 0b00000000;
+	PORTC = 0b00000000;
+	}

@@ -47,8 +47,7 @@
 #pragma config EBTR3 = OFF 
 #pragma config EBTRB = OFF      //table read protection boot block
 
-#define conta_admin 0
-#define nivel_acesso ((conta*TAMANHO_SENHA)+ (TAMANHO_SENHA-1))
+
 
 char qtd_max_dias =31;
 char nova_senha[TAMANHO_SENHA];
@@ -365,7 +364,7 @@ int main(void){
 
 	conta=0;
 	RCIE=1;
-
+	__delay_us(1);
 	data_atual.ano=0;
 	data_atual.mes= Janeiro;
 	data_atual.dia=1;
@@ -400,28 +399,44 @@ int main(void){
 											if(buffer_serial[cont] != PROXIMA_ETAPA) {
 																	setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 		
+											else{
+
 											resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 											ordem=0;
-											etapa++;}
+											etapa++;
+
+											}
+
+}
 									
 									else if(etapa == etapa_inicial){//Inicio da comunicação
-												
 					
 												if(buffer_serial[cont] != INICIO) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 				
 												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 												}
-					
+											
+		//i>000>
+		//01234			
 									else if(etapa == etapa_recebe_funcao){
-	
+													numero_para_ascii(cont);
+													//cont=2
 											    	funcao = buffer_serial[cont++];
+													
 														if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-	
-													conta = ((buffer_serial[cont]) - '0');
-																
-														if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
+																							
+													conta = ascii_para_numero('0',(buffer_serial[cont++]),(buffer_serial[cont]) );
+																	
+														if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N° da conta fora do intervalo
+														
+														if(!(testar_bit(nivel_acesso, ascii_para_numero('0','0',funcao)))  ) {
+																setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
+																numero_para_ascii((testar_bit(nivel_acesso,(funcao-'0') ) ));
+																numero_para_ascii(nivel_acesso);}
 		
 													setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+													enviar_caractere_serial(buffer_serial[cont]);
+													numero_para_ascii(cont);
 																	
 													}
 				
@@ -478,12 +493,36 @@ int main(void){
 																				cont+=2;} 
 															
 															*(ptr_data+ordem) = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
-															char temp = *(ptr_data+ordem);
-															numero_para_ascii(temp);
-															numero_para_ascii(ordem);
+
+															//char temp = *(ptr_data+ordem);
+															//numero_para_ascii(temp);
+															//numero_para_ascii(ordem);
 															cont+=2;}
 	
 															data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
+
+																//Checagem de valores para evitar data fora do intervalo. Ex: Mês 25 ou dia 55//
+
+																if(data_atual.mes > Dezembro) data_atual.mes=Dezembro;
+															
+																else if(data_atual.mes<Janeiro) data_atual.mes=Janeiro;
+
+
+																if(data_atual.dia> qtd_max_dias) data_atual.dia = qtd_max_dias;
+															
+																else if(data_atual.dia<1) data_atual.dia=1;
+
+
+																if(data_atual.hora >= 24 || data_atual.hora< 0){ data_atual.hora=0;}
+
+
+																if(data_atual.minuto>=60 || data_atual.minuto<0){data_atual.minuto= 0;}
+
+																if(data_atual.segundo>=60 || data_atual.segundo<0){data_atual.segundo = 0;}
+											
+															
+																
+
 															setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 															cont--;
 																	}
@@ -491,11 +530,8 @@ int main(void){
 												else if(funcao == MUDAR_SENHA){
 	
 														conta_a_ser_alterada = (buffer_serial[cont] - '0');
-				
-														if(	conta_a_ser_alterada != conta && (!(testar_bit(nivel_acesso,PERMISSAO_RECONFIGURAR_OUTRAS_CONTAS)))	){
-																			setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
-																						}
-														
+
+
 														for(ordem=0;ordem<(TAMANHO_SENHA-1);ordem++){
 															cont++;
 	
@@ -520,15 +556,20 @@ int main(void){
 					
 									else if(etapa == etapa_final){//Fim da comunicação
 												if(buffer_serial[cont] != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-												enviar=1; receber=qtd_caracteres_recebidos_serial=0;}
+												setar_bit(FLAGS_2,ENVIAR);
+												receber=qtd_caracteres_recebidos_serial=0;}
 				
 									
 									
 									if(FLAGS_1>3) {
+													
 													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 													etapa = etapa_inicial;	
 													setar_bit(FLAGS_2,ENVIAR);
-													qtd_caracteres_recebidos_serial=0;}
+													qtd_caracteres_recebidos_serial=0;
+
+													break; //sai do laço for para recebimento de dados
+											}
 		
 																			}		
 					}
@@ -563,7 +604,7 @@ int main(void){
 							
 							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
 										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
-										enviar_string_serial(buffer_teclado_matricial);
+										//enviar_string_serial(buffer_teclado_matricial);
 
 										conta = ( ((buffer_teclado_matricial[0]-'0')*10)  + (buffer_teclado_matricial[1]-'0') );
 										cont=2;
@@ -571,14 +612,24 @@ int main(void){
 										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != 0){
 
 											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
-												enviar_caractere_serial(buffer_teclado_matricial[cont]);
-												enviar_caractere_serial(senha[conta][cont-2]);
+												//enviar_caractere_serial(buffer_teclado_matricial[cont]);
+												//enviar_caractere_serial(senha[conta][cont-2]);
 												setar_bit(FLAGS_1,ERRO_SENHA);}
 
 											cont++;
 										}
-										if(FLAGS_1<4) {
-												}
+										if(FLAGS_1<2) {
+														char tentativas=0;
+														while(FECHADURA_TRAVADA){
+															if(++tentativas == 6){ 
+																	setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura não abriu após 6 tentativas. Não há como saber, pelo atual software, a causa.
+																	break;}
+
+															DESTRAVAR_FECHADURA(325);
+																if(FECHADURA_TRAVADA) delay_ms(100);//preparação para próxima tentativa
+															}
+
+														}
 							}				
 										
 
@@ -588,14 +639,13 @@ int main(void){
 
 		
 		if(testar_bit(FLAGS_2,ENVIAR)){
-			enviar=0;
 			resetar_bit(FLAGS_2,ENVIAR);
 			qtd_caracteres_recebidos_serial=0;
 			etapa = etapa_inicial;
 			cont=0;
 			enviar_string_serial("\nI");
 
-						if(FLAGS_1<4){ //Não houve erros
+						if(!FLAGS_1){ //Não houve erros
 										etapa = etapa_inicial;
 										LATDbits.LD2^=1;
 										enviar_string_serial("OK");
@@ -623,9 +673,12 @@ int main(void){
 														}
 							
 												else if(funcao == ABERTURA_PORTA){
+														char tentativas=0;
 														while(FECHADURA_TRAVADA){
-															if(++cont == 6){ break;}
-															DESTRAVAR_FECHADURA(325)
+															if(++tentativas == 6){ 
+																	setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura não abriu após 6 tentativas. Não há como saber, pelo atual software, a causa.
+																	break;}
+															DESTRAVAR_FECHADURA(325);
 																if(SENSOR_ABERTURA_FECHADURA == 0) delay_ms(100);
 															}
 												}
@@ -634,6 +687,9 @@ int main(void){
 						
 						else{
 						
+							if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
+												enviar_string_serial("EA");
+												resetar_bit(FLAGS_1,ERRO_ABERTURA);	}
 
 							if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){
 

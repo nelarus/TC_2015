@@ -1,6 +1,6 @@
 #include <xc.h>
 #include <delays.h>
-#include "eeprom.h"
+#include "ascii.h"
 #include "main.h"
 
 
@@ -17,7 +17,10 @@ void carregar_senha(char conta, char senha_a_carregar[][17]){
 
 
 					
-					senha_a_carregar[conta][TAMANHO_SENHA] = eeprom_read((TAMANHO_SENHA*(conta+1))-1); 
+					senha_a_carregar[conta][TAMANHO_SENHA-1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
+					unsigned char temp;
+					temp = senha_a_carregar[conta][TAMANHO_SENHA-1]; 
+					numero_para_ascii(temp);
 					}
 
 char verificar_num_contas(void){
@@ -41,5 +44,6 @@ void eeprom_config_inicial(void){
 		eeprom_write(i,0);
 		eeprom_write(TAMANHO_SENHA+i,0);//null da string de cada senha
 
+		eeprom_write(TAMANHO_SENHA-1,255);
 		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111101);
 		}

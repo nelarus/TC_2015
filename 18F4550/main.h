@@ -22,6 +22,9 @@
 
 #define TAMANHO_BUFFER_TECLADO_MATRICIAL 40
 
+//PARAMETROS EEPROM_INTERNA
+#define ENDERECO_INICIAL 0
+#define VALOR_INICIAL 0xFF
 
 //CORRESPONDÊNCIA DE CARACTERES NA COMUNICAÇÃO SERIAL E RECEBIMENTO POR TECLADO MATRICIAL
 
@@ -34,6 +37,8 @@
 	#define RECONFIGURAR_CONTA '3' 
 	#define RECONFIGURAR_PIC '4'
 	#define RECONFIGURAR_MODULO '5'
+	//#define MUDAR_SENHA_OUTRA_CONTA '6'
+	//#define MUDAR_SENHA_PROPRIA_SENHA '7'	
 	#define MUDAR_SENHA '7'	
 
 	//OUTROS CARACTERES
@@ -53,6 +58,8 @@
 	#define NOVA_LINHA '\n'
 
 
+	//RECEBIMENTO DE SENHAS
+	#define FIM_DE_SENHA '<'
 	//TECLADO MATRICIAL
 	#define MAIUSCULA_MINUSCULA '*'
 	#define MODO_T9_ON_OFF 'A'
@@ -70,10 +77,6 @@
 #define PERMISSAO_MUDAR_PROPRIA_SENHA 7
 
 
-//#DEFINE configurar_velocidade variavel=5;
-
-//51: configurar_velocidade
-//51: variavel=5:
 //FLAGS_1;CORRESPONDÊNCIA DE BITS
 #define ERRO_SENHA 6
 #define ERRO_PROTOCOLO 7
@@ -94,7 +97,7 @@
 #define MODO_DEBUG_ON 6
 
 //FLAGS_3 CORRESPONDENCIA DE BITS
-#define SESSAO_EXPIRADA 0
+#define SESSAO_EXPIRADA 0 
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
 #define LED PORTCbits.RC5			//Mostra que a contagem de horas está funcionando
@@ -161,7 +164,8 @@
 //
 
 //Strings
-#define ZERAR(STRING) memset(STRING,0,(strlen(STRING)))
+//
+
 
 //etc.
 #define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0

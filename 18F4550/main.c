@@ -10,6 +10,7 @@
 #include "serial.h"
 
 
+//CONFIGURAÇÃO 18F4550
 
 #pragma config FOSC =  XTPLL_XT
 #pragma config PLLDIV = 1
@@ -50,12 +51,13 @@
 
 
 char qtd_max_dias =31;
-char nova_senha[TAMANHO_SENHA];
-char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+1];
+char nova_senha[TAMANHO_SENHA]; //armazena temporariamente a nova senha atribuida a conta para garantir que a senha atual não seja lida no meio do processo de alteração
+
+char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+1]; //SENHA+1 para compensar o caractere \0 que a string precisa ter 
 unsigned char buffer_serial[TAMANHO_BUFFER_SERIAL]; //Usado para receber dados pela porta serial
-unsigned char buffer_teclado_matricial[TAMANHO_BUFFER_TECLADO_MATRICIAL];
-unsigned char qtd_caracteres_recebidos_serial=0;
-unsigned char qtd_caracteres_recebidos_teclado=0;
+unsigned char buffer_teclado_matricial[TAMANHO_BUFFER_TECLADO_MATRICIAL]; // Usado para receber dados pelo teclado matricial
+unsigned char qtd_caracteres_recebidos_serial=0; //contador para caracteres recebidos pela porta serial
+unsigned char qtd_caracteres_recebidos_teclado=0; //contador para caracteres recebidos pelo teclado matricial 
 char dados_recebidos[41];
 char chave_criptografia[17];
 char texto_critografado[81];
@@ -63,24 +65,26 @@ char texto_descriptografado[41];
 
 struct Data{
 	unsigned char ano;//0
-	char mes;//1
-	char dia;//2
-	char hora;//3
-	char minuto;//4
-	char segundo;//5
-	char dia_da_semana;//6
+	unsigned char mes;//1
+	unsigned char dia;//2
+	unsigned char hora;//3
+	unsigned char minuto;//4
+	unsigned char segundo;//5
+	unsigned char dia_da_semana;//6
 		}data_atual,data_recebida;
+					//data_recebida não utilizada no momento 
 
 unsigned char caractere_recebido = 0; //Caractere recebido pelo teclado matricial
-unsigned char FLAGS_1=0;
-unsigned char FLAGS_2=0;
-unsigned char FLAGS_3=0;
-unsigned char PORTB_SR;
+unsigned char FLAGS_1=0; //Vide main.h para ver as flags de cada variável
+unsigned char FLAGS_2=0; //
+unsigned char FLAGS_3=0; //
+unsigned char PORTB_SR;// Shadow register para leitura do PORTB e atualização do LATB
 unsigned char num_interrupt_timer1=0;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
 
 unsigned int endereco_inic_eeprom=5;
 unsigned int endereco_final_eeprom=5;
+
 char *ptr_data;
 
 bit enviar=0; //Permite o envio de mensagens de erro a central/usuário
@@ -107,9 +111,9 @@ void zerar_string(char *string_a_zerar){
 
 void interrupt aux(void){
 
-			if(TMR1IE && TMR1IF){
+			if(TMR1IE && TMR1IF){ 
 				TMR1IF=0;
-				TMR1H=0xC0;
+				TMR1H=0xC0;//Equivalente a fazer TMR1+=0xC0,´já que se está deixando o TRMR1L correr
 
 				if(MODO_BLUETOOTH){//O dispostivo iniciou comunicação com o PIC mas ficou mais de 500ms sem terminá-la
 						qtd_caracteres_recebidos_serial=0;
@@ -119,7 +123,7 @@ void interrupt aux(void){
 						}
 
 
-				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==10){//Passou-se 5s após a primeira vez que o botão foi apertado.
+				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==5){//Passou-se 5s após a primeira vez que o botão foi apertado.
 					setar_bit(FLAGS_2,RECEBER);
 					TMR1ON=0;
 					num_interrupt_timer1=0;}
@@ -184,19 +188,16 @@ void interrupt aux(void){
 						
 					}
 
-			if(TMR1IE && TMR1IF){
-				LATDbits.LD2^=1;
-				TMR1IF=0;
-				TMR1ON=0;}
+			
 
 			if(RBIE && RBIF){
 					char coluna=0;
 					char linha=0;
-					PORTB_SR=(PORTB&0xF0);
+					PORTB_SR=(PORTB&0xF0);  //PORTB_SR não recebe os 4 primeiros bits do PORTB, pois é usado apenas para mudança de nível, que utiliza os 4 ultimos;
 					RBIF=0;
 					if(PORTB_SR != 0xF0) {
-							RBIE=0;
-							debounce=1;
+							RBIE=0;//
+							debounce=1; //Tratamento de repique
 							modo_teclado_matricial()
 							LATDbits.LD0^=1;
 	
@@ -212,13 +213,13 @@ void interrupt aux(void){
 						
 
 						
-						TRISB&=0x0F;
-						LATB|=0xF0;
+						TRISB&=0x0F; //TRISB 4 ultimos bits como saída, 4 primeiros inalterados; 
+						LATB|=0xF0;  //LATB 4 ultimos bits em 1, 4 primeiros inalterados;
 
-						while(PORTB&0xF0 !=	0xF0){}
-						while( (PORTD&0xF0) != 0){}
+						while(PORTB&0xF0 !=	0xF0){}  //Prende-se o programa nesse laço até que os 4 ultimos bits do PORTB estejam de fato em 1
+						while( (PORTD&0xF0) != 0){}  //Prende-se o programa até que os 4 ultimos bits do PORTD tenham pelo menos 1 diferente de 1
 
-						TRISD|=0xF0;
+						TRISD|=0xF0; //4 ultimos bits como entrada para se verificar qual deles está em 1
 	
 							if(LINHA_1==1){linha=1;}
 
@@ -234,9 +235,7 @@ void interrupt aux(void){
 								TXREG = '\n';
 								while(!TRMT){}
 								caractere_recebido = teclado_matricial(coluna,linha);
-								TXREG = caractere_recebido;
-								numero_para_ascii(linha);
-								numero_para_ascii(coluna);
+								enviar_caractere_serial(caractere_recebido);
 
 						
 									if(caractere_recebido == MODO_T9_ON_OFF){
@@ -250,12 +249,12 @@ void interrupt aux(void){
 						
 									if(testar_bit(FLAGS_2,MODO_T9)) {TMR1ON=1;}
 					
-						TRISB|=0xF0;
-						LATD&=0x0F;
-						TRISD&=0X0F;
+						TRISB|=0xF0;//
+						LATD&=0x0F;//
+						TRISD&=0X0F; //
 
-						while( (PORTD&0xF0) != 0x00){}
-						while( (PORTB&0xF0) != 0xF0){}
+						while( (PORTD&0xF0) != 0x00){}//
+						while( (PORTB&0xF0) != 0xF0){}// Configuração inicial dos PORTS e TRISs
 								
 					}
 
@@ -275,8 +274,9 @@ void interrupt aux(void){
 							if(temp){}
  
 				          }while(OERR);
-						enviar=1;
-						receber=0;
+
+						setar_bit(FLAGS_2,ENVIAR);
+						resetar_bit(FLAGS_2,RECEBER);
 						//OVERRUN
 							}
 			
@@ -289,12 +289,17 @@ void interrupt aux(void){
 									SPEN=1;
 									if(temp){}
 									}while(FERR);
-								enviar=1;
-								receber=0;}
+
+								setar_bit(FLAGS_2,ENVIAR);
+								resetar_bit(FLAGS_2,RECEBER);}
 					
 					else{	
-							TMR1ON=0;
+
+							
+							resetar_timer1(0xC0,0x00);
+
 							buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
+
 							TMR1ON=1;
 							LATDbits.LD0^=1;
 							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
@@ -311,6 +316,8 @@ void interrupt aux(void){
 
 int main(void){
 
+	//VARIAVEIS LOCAIS MAIN
+
 	unsigned char ordem = 0;//usada para compararar uma sequência de dados recebidos com uma string.
 	unsigned char etapa=0;
 	unsigned char funcao=0;//utilizada para determinar qual função o PIC vai executar (abrir porta, fornecer histórico, fornecer status atual)
@@ -319,7 +326,7 @@ int main(void){
 	unsigned char cont=0;
 	unsigned char qtd_total_contas=0;	
 	unsigned char ultimo_caractere_recebido=0;
-
+	int contas_cadastradas=0; //16bits que correspondem cada um a uma conta cadastrada ou não. Exemplo: bit 7 indica se a conta 7 existe ou ainda não tem uma senha cadastrada
 	//CONFIGURAÇÃO OSCILADOR
 	OSCCON=0XF0;
 
@@ -347,20 +354,25 @@ int main(void){
 	ADCON1=0XFF;
 	CMCON=0X07;
 
-	//CONFIGURAÇÃO TIMER1(CONTAGEM DE TEMPO NO MODO_T9)
+	//CONFIGURAÇÃO TIMER1(CONTAGEM DE TEMPO NO MODO_T9 E CONTAGEM DE TEMPO PARA SESSAO EXPIRADA)
 	T1CON = 0b00001110;
 	TMR1H=0XC0; //TMR1 = 49152 (1 interrupção = 0.5s para cristal de 32,768khz)
 	TMR1L=0;
 
+	//CONFIGURAÇÃO INICIAL DA EEPROM
+	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
 
-	if(eeprom_read(0) == 0xFF)	eeprom_config_inicial();
+	config_serial(35); //SPBRG(variável para baud rate) = 35;
 
-	config_serial(35);
+
 	qtd_total_contas = verificar_num_contas();
+
+
 	numero_para_ascii(qtd_total_contas);
 
 		for(conta=0;conta<qtd_total_contas;conta++){
 				carregar_senha(conta, senha);}
+
 
 	conta=0;
 	RCIE=1;
@@ -376,6 +388,8 @@ int main(void){
 	RBIE=1;
 	RBIF=0;
 	cont=0;
+
+
 
 	while(1){
 
@@ -419,7 +433,6 @@ int main(void){
 		//i>000>
 		//01234			
 									else if(etapa == etapa_recebe_funcao){
-													numero_para_ascii(cont);
 													//cont=2
 											    	funcao = buffer_serial[cont++];
 													
@@ -435,8 +448,6 @@ int main(void){
 																numero_para_ascii(nivel_acesso);}
 		
 													setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													enviar_caractere_serial(buffer_serial[cont]);
-													numero_para_ascii(cont);
 																	
 													}
 				
@@ -513,12 +524,12 @@ int main(void){
 																else if(data_atual.dia<1) data_atual.dia=1;
 
 
-																if(data_atual.hora >= 24 || data_atual.hora< 0){ data_atual.hora=0;}
+																if(data_atual.hora >= 24){ data_atual.hora=0;}
 
 
-																if(data_atual.minuto>=60 || data_atual.minuto<0){data_atual.minuto= 0;}
+																if(data_atual.minuto>=60){data_atual.minuto= 0;}
 
-																if(data_atual.segundo>=60 || data_atual.segundo<0){data_atual.segundo = 0;}
+																if(data_atual.segundo>=60){data_atual.segundo = 0;}
 											
 															
 																
@@ -529,13 +540,15 @@ int main(void){
 		
 												else if(funcao == MUDAR_SENHA){
 	
-														conta_a_ser_alterada = (buffer_serial[cont] - '0');
+														conta_a_ser_alterada = buffer_serial[cont] - '0';
+													
 
 
 														for(ordem=0;ordem<(TAMANHO_SENHA-1);ordem++){
 															cont++;
-	
-																if(buffer_serial[cont] == '<') {
+																
+																
+																if(buffer_serial[cont] == FIM_DE_SENHA) {
 																			if(ordem<5) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 						
 																			else {
@@ -545,29 +558,34 @@ int main(void){
 																						
 	
 																else{
-																		
-																	senha[conta_a_ser_alterada][ordem] = buffer_serial[cont];
+																	
+																	nova_senha[ordem] = buffer_serial[cont];
 																	eeprom_write( ((conta_a_ser_alterada*16)+ordem) ,buffer_serial[cont]);}
 	
 																	}	
-									
+															char i;
+															for(i=0; senha[conta_a_ser_alterada][i] != NULL;i++){
+															char temp = senha[conta_a_ser_alterada][i];
+															enviar_caractere_serial(temp);}
+
 															setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
 							}
 					
 									else if(etapa == etapa_final){//Fim da comunicação
 												if(buffer_serial[cont] != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 												setar_bit(FLAGS_2,ENVIAR);
-												receber=qtd_caracteres_recebidos_serial=0;}
+												qtd_caracteres_recebidos_serial=0;
+												zerar_string(buffer_serial);}
 				
 									
 									
 									if(FLAGS_1>3) {
-													
+													enviar_caractere_serial('0'+ etapa);
 													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 													etapa = etapa_inicial;	
 													setar_bit(FLAGS_2,ENVIAR);
 													qtd_caracteres_recebidos_serial=0;
-
+													zerar_string(buffer_serial);
 													break; //sai do laço for para recebimento de dados
 											}
 		
@@ -576,23 +594,30 @@ int main(void){
 
 				else if(MODO_TECLADO_MATRICIAL){
 							
-
+							
 							if(testar_bit(FLAGS_2,MODO_T9)){
-								TMR1ON=0;
-								TMR1H=0xC0;
-								TMR1L=0;
+								resetar_timer1(0xC0,0);
 								enviar_caractere_serial(NOVA_LINHA);
-
-								numero_para_ascii(qtd_vezes_mesma_tecla_pressionada);
-
+				
 								
 
-								if(qtd_vezes_mesma_tecla_pressionada>0){
-											buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]= ('a' -1) + qtd_vezes_mesma_tecla_pressionada + (( caractere_recebido - '1') * Letras_por_tecla) ;
+								if(qtd_vezes_mesma_tecla_pressionada>0 && ultimo_caractere_recebido >='0' && ultimo_caractere_recebido<='9'){ //
+											buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]= ('a' -1) + qtd_vezes_mesma_tecla_pressionada + (( ultimo_caractere_recebido - '1') * Letras_por_tecla) ;
+											qtd_vezes_mesma_tecla_pressionada=0;
+										
+									if(ultimo_caractere_recebido != caractere_recebido) { 
+														ultimo_caractere_recebido = caractere_recebido;
+														TMR1ON=1; 
+										//O recebimento ocorreu porque o usuário apertou, no modo t9, uma tecla diferente da anterior
+										//Reativa-se o timer para que, caso  o usuário fique muito tempo sem 
 											}
+									else ultimo_caractere_recebido=0;
+
+												}
 								else{
-										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido; }
-								qtd_vezes_mesma_tecla_pressionada=0;
+										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
+										qtd_vezes_mesma_tecla_pressionada=0;}
+										
 								}
 
 								
@@ -604,7 +629,8 @@ int main(void){
 							
 							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
 										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
-										//enviar_string_serial(buffer_teclado_matricial);
+										setar_bit(FLAGS_2,ENVIAR);
+
 
 										conta = ( ((buffer_teclado_matricial[0]-'0')*10)  + (buffer_teclado_matricial[1]-'0') );
 										cont=2;
@@ -612,9 +638,8 @@ int main(void){
 										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != 0){
 
 											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
-												//enviar_caractere_serial(buffer_teclado_matricial[cont]);
-												//enviar_caractere_serial(senha[conta][cont-2]);
-												setar_bit(FLAGS_1,ERRO_SENHA);}
+												setar_bit(FLAGS_1,ERRO_SENHA);
+												}
 
 											cont++;
 										}
@@ -626,21 +651,28 @@ int main(void){
 																	break;}
 
 															DESTRAVAR_FECHADURA(325);
-																if(FECHADURA_TRAVADA) delay_ms(100);//preparação para próxima tentativa
-															}
-
+																if(FECHADURA_TRAVADA) delay_ms(100);//preparação para próxima tentativa 
 														}
+
+															
+
+										}
 							}				
 										
 
-				}
+				      
+										enviar_caractere_serial(NOVA_LINHA);
+										enviar_string_serial(buffer_teclado_matricial);}
 
 			}
 
 		
-		if(testar_bit(FLAGS_2,ENVIAR)){
+		if(testar_bit(FLAGS_2,ENVIAR)){//Envio, ao usuário, do resultado do acesso(teclado matricial ou bluetooth). Aqui será enviado se ele conseguiu acesso e pôde abrir a porta.
+			
+								
 			resetar_bit(FLAGS_2,ENVIAR);
 			qtd_caracteres_recebidos_serial=0;
+			qtd_caracteres_recebidos_teclado=0;
 			etapa = etapa_inicial;
 			cont=0;
 			enviar_string_serial("\nI");
@@ -685,7 +717,7 @@ int main(void){
 
 										}
 						
-						else{
+						if(FLAGS_1){
 						
 							if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
 												enviar_string_serial("EA");
@@ -710,6 +742,7 @@ int main(void){
 				
 							if(testar_bit(FLAGS_1,ERRO_SENHA)){
 											enviar_string_serial("ES");
+											
 											resetar_bit(FLAGS_1,ERRO_SENHA);}
 				
 							if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ 
@@ -730,33 +763,34 @@ int main(void){
 					delay_ms(60);
 
 					
-						if(caractere_recebido == MODO_T9_ON_OFF ||caractere_recebido == MAIUSCULA_MINUSCULA){//Caracteres não são armazenados
-									NOP();
+						if(caractere_recebido < '0' || caractere_recebido > '9'){//Caracteres não são armazenados, pois são fora da faixa de 0 a 9.São utilizados para certas funções
+																					//como indicar maiuscula, ativar modo_t9, etc.
+									
+									resetar_timer1(0xC0,0);	
 									ultimo_caractere_recebido = caractere_recebido; //atualiza ultimo caractere recebido
 							}
 
 						else{
-								if(testar_bit(FLAGS_2,MODO_T9)){
+								if(testar_bit(FLAGS_2,MODO_T9)){//modo t9 on
 									if(ultimo_caractere_recebido == caractere_recebido){
 
 											if(++qtd_vezes_mesma_tecla_pressionada == Letras_por_tecla || ((qtd_vezes_mesma_tecla_pressionada==2) && caractere_recebido == '9')) 
-												setar_bit(FLAGS_2,RECEBER);}
+												setar_bit(FLAGS_2,RECEBER);
+												}
 
-									else {
-										if(qtd_vezes_mesma_tecla_pressionada) setar_bit(FLAGS_2,RECEBER);
+									else { //modo t9 off
+										if(qtd_vezes_mesma_tecla_pressionada) setar_bit(FLAGS_2,RECEBER); 
 										
-										else ultimo_caractere_recebido = caractere_recebido;}
+										else ultimo_caractere_recebido = caractere_recebido; //atualiza ultimo caractere recebido
+									}
 
 								}
 
 								else{ 
-									setar_bit(FLAGS_2,RECEBER);}
-						}
+									setar_bit(FLAGS_2,RECEBER);
+									}
+					}
 
-						
-
-
-						
 					
 
 					PORTB_SR=PORTB;//leitura do PORTB antes de ativar a interrupção para evitar uma interrupção não desejada.

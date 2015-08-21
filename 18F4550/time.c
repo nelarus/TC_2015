@@ -26,3 +26,9 @@ char dia_da_semana(unsigned int ano,char mes, char dia){
 	
 
 }
+
+void resetar_timer1(char valor_h, char valor_l){
+	 TMR1ON=0;
+	 TMR1H=valor_h;
+	 TMR1L=valor_l;
+}

@@ -9,9 +9,15 @@
 #define QTD_MAX_CONTAS 16
 #endif
 
+#define CONTA_A_SER_ALTERADA__NAO_EXISTE (!(testar_bit( //Utilizado no teste da existência de uma conta cuja senha foi alterada. Se a senha não existe é porque está sendo criada
+//
 #ifndef	TAMANHO_SENHA
 #define TAMANHO_SENHA 16
 #endif
+
+#define TAMANHO_MINIMO_SENHA 5
+#define conta_admin 0
+#define nivel_acesso senha[conta][TAMANHO_SENHA-1]
 //
 
 //PARAMETRO PARA BUFFER SERIAL
@@ -37,9 +43,8 @@
 	#define RECONFIGURAR_CONTA '3' 
 	#define RECONFIGURAR_PIC '4'
 	#define RECONFIGURAR_MODULO '5'
-	//#define MUDAR_SENHA_OUTRA_CONTA '6'
-	//#define MUDAR_SENHA_PROPRIA_SENHA '7'	
-	#define MUDAR_SENHA '7'	
+	#define MUDAR_SENHA_OUTRA_CONTA '6'
+	#define MUDAR_SENHA_PROPRIA_CONTA '7'	
 
 	//OUTROS CARACTERES
 	#define INICIALIZAR '*' //INDICA QUE O PIC INICIALIZOU OU REINICIALIZOU.
@@ -95,14 +100,22 @@
 #define MODO_T9 4
 #define MAIUSCULA 5
 #define MODO_DEBUG_ON 6
+#define EXIBIR 7
 
 //FLAGS_3 CORRESPONDENCIA DE BITS
-#define SESSAO_EXPIRADA 0 
+#define ATUALIZAR_HORA_DISPLAY 0
+#define ATUALIZAR_SENHA_DISPLAY 1
+
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
 #define LED PORTCbits.RC5			//Mostra que a contagem de horas está funcionando
-#define FECHADURA PORTCbits.RC0    //Destravamento ou não da fechadura
-#define SENSOR_ABERTURA_FECHADURA PORTAbits.RA0 //Sensor magnético(reed switch)
+#define FECHADURA PORTCbits.RC4    //Destravamento ou não da fechadura
+#define SENSOR_ABERTURA_FECHADURA PORTCbits.RC5 //Sensor magnético(reed switch)
+
+#define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0
+#define DESTRAVAR_FECHADURA() FECHADURA=1
+#define TRAVAR_FECHADURA() FECHADURA=0
+//
 
 #define COLUNA_1 PORTBbits.RB7
 #define COLUNA_2	PORTBbits.RB6
@@ -149,11 +162,10 @@
 //
 
 //MODOS DE RECEPÇÃO DE DADOS
-
-#define MODO_TECLADO_MATRICIAL modo_bluetooth_teclado==1
-#define MODO_BLUETOOTH modo_bluetooth_teclado==0
-#define modo_teclado_matricial() modo_bluetooth_teclado=1;
-#define modo_bluetooth() modo_bluetooth_teclado=0;
+#define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_2,MODO_BT_TECLADO)
+#define MODO_BLUETOOTH (!(testar_bit(FLAGS_2,MODO_BT_TECLADO)))
+#define modo_teclado_matricial() setar_bit(FLAGS_2,MODO_BT_TECLADO)
+#define modo_bluetooth() resetar_bit(FLAGS_2,MODO_BT_TECLADO)
 //
 
 // OPERAÇÕES DE BIT
@@ -167,12 +179,12 @@
 //
 
 
-//etc.
-#define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0
 
-#define DESTRAVAR_FECHADURA(TEMPO); FECHADURA=1;delay_ms(TEMPO);FECHADURA=0;
 
-#define conta_admin 0
-#define nivel_acesso senha[conta][TAMANHO_SENHA-1]
+
+
+//contas
+
+
 
 

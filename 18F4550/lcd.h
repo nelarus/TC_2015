@@ -3,17 +3,48 @@
  *	See lcd.c for more info
  */
 
-void posicao_atual_lcd(char *linha, char *coluna);
+//Funções para uso da CGRAM
 
-void CGRAM_goto(char pos);//ir para posição(0 a 7) da CGRAM
+//Escrita de letras com acento na cgram
 
-extern void limpar_linha(unsigned char linha);
+//Acentos
+extern void escrever_crase_cgram(void);
+extern void escrever_til_cgram(void);
+extern void escrever_acento_agudo_cgram(void);
+extern void escrever_acento_circunflexo_cgram(void);
+//
+
+//Letras
+extern void escrever_a_maiusculo_cgram(void);
+extern void escrever_a_minusculo_cgram(void);
+
+extern void escrever_o_cgram(char maiuscula);
+
+extern void escrever_e_minusculo_cgram(void);
+extern void escrever_e_maiusculo_cgram(void);
+
+extern void escrever_i_minusculo_cgram(void);
+extern void escrever_i_maiusculo_cgram(void);
+//
+
+extern void CGRAM_goto(char pos);//ir para posição(0 a 7) da CGRAM
+
+extern void posicao_atual_lcd(char *linha, char *coluna); //retorna posição atual do cursor do lcd
 
 extern void escrever_simbolo_fechadura(void);
 
-extern void escrever_simbolo_CGRAM(char simbolo);
+extern char escrever_simbolo_CGRAM(char simbolo); //Escreve na CGRAM do lcd o simbolo correspondnete, vide lista abaixo
 
-extern void exibir_simbolo_lcd(char simbolo);
+extern void exibir_simbolo_lcd(char simbolo); //Exibe no lcd um dos simbolos da CGRAM
+
+
+
+//Restante das funções
+
+
+//limpa linha selecionada
+extern void limpar_linha(unsigned char linha); 
+
 
 /* write a byte to the LCD in 4 bit mode */
 extern void lcd_write(unsigned char);
@@ -36,12 +67,15 @@ extern void lcd_init(char tipo_lcd);
 
 extern void lcd_putch(char);
 
-void substituir_por_asterisco(void);
+//Substitui ultimo caractere impresso por um asterisco
+void substituir_por_asterisco(void); 
+
 
 /*	Set the cursor position */
 
 #define	lcd_cursor(x)	lcd_write(((x)&0x7F)|0x80)
 
+//VARIÁVEIS GLOBAIS PARA USO DO LCD
 extern char linha_lcd;
 extern char linha_lcd_aux_posicao;
 extern char coluna_lcd;
@@ -70,21 +104,13 @@ extern unsigned char Linha_4;
 //Defines para envio de dados ao lcd
 #define	LCD_STROBE()	((LCD_EN = 1),(LCD_EN=0))
 
-//Caracteres especiais
 
-#define A_COM_TIL 0
-#define A_COM_ACENTO_AGUDO 1
-#define A_COM_ACENTO_CIRCUNFLEXO 2
-#define O_COM_ACENTO_AGUDO 3         
-#define O_COM_ACENTO_CIRCUNFLEXO 4
-#define E_COM_ACENTO_CIRCUNFLEXO 5
-#define E_COM_ACENTO_AGUDO 6
-#define SIMBOLO_FECHADURA_ABERTA 7
-#define SIMBOLO_FECHADURA_FECHADA 8
+//Caracteres especiais: Correspondência decimal
 
+#define SIMBOLO_FECHADURA_ABERTA 215
+#define SIMBOLO_FECHADURA_FECHADA 216
+//
 
-#define LETRA_MAISCULA 0
-#define LETRA_MINUSCULA 1
 
 //ENDERECO DAS LINHAS
 

@@ -12,6 +12,76 @@ char lcd_type;
 unsigned char Linha_3;
 unsigned char Linha_4;
 
+//Funções para escrever caracteres especiais na CGRAM
+
+//Acentos
+void escrever_crase_cgram(void){
+	lcd_write(0X08);
+	lcd_write(0X04);
+}
+
+void escrever_til_cgram(void){
+	lcd_write(0x0D);//0
+	lcd_write(0X12);//1	
+}
+
+void escrever_acento_agudo_cgram(void){
+	lcd_write(0X02);
+	lcd_write(0X04);}
+
+void escrever_acento_circunflexo_cgram(void){
+	lcd_write(0x04);
+	lcd_write(0x0A);}
+//
+
+//Letras
+void escrever_o_cgram(char maiuscula){
+	lcd_write(0x00);
+	lcd_write(0x0E);
+	lcd_write(0X11);
+	if(maiuscula) lcd_write(0x11);
+	lcd_write(0X11);
+	lcd_write(0x0E);}
+
+void escrever_e_minusculo_cgram(void){
+	lcd_write(0x00);
+	lcd_write(0x0E);
+	lcd_write(0x11);
+	lcd_write(0x1F);
+	lcd_write(0x10);
+	lcd_write(0x0E);
+	}
+
+void escrever_e_maiusculo_cgram(void){
+	lcd_write(0x1E);
+	lcd_write(0x10);
+	lcd_write(0x1C);
+	lcd_write(0x10);
+	lcd_write(0x1E);
+	}
+
+void escrever_i_minusculo_cgram(void){}
+void escrever_i_maiusculo_cgram(void){}
+
+void escrever_a_minusculo_cgram(void){
+	lcd_write(0X00);
+	lcd_write(0X0E);
+	lcd_write(0X01);
+	lcd_write(0x0F);
+	lcd_write(0X11);
+	lcd_write(0X0F);}
+
+void escrever_a_maiusculo_cgram(void){
+	lcd_write(0X00);
+	lcd_write(0X0E);
+	lcd_write(0X11);
+	lcd_write(0X1F);
+	lcd_write(0x11);
+	lcd_write(0X11);
+}
+//
+//
+
 void posicao_atual_lcd(char *linha, char *coluna){
 		*linha = linha_lcd_aux_posicao; //retorna linha atual do lcd
 		*coluna = coluna_lcd; //retorna coluna atual do lcd
@@ -39,87 +109,123 @@ void limpar_linha(unsigned char linha){
 //#define SIMBOLO_FECHADURA_ABERTA 8
 
 
-void escrever_simbolo_CGRAM(char simbolo){
-		char maiuscula=0;
-		//simbolos 7 e 8 são os das fechaduras
-		//0 a 6 são caracteres com acento minusculos
-		//9 a 15 são caracteres com acento maisculos
-		if(simbolo>SIMBOLO_FECHADURA_FECHADA){
-			maiuscula=1;
-			simbolo-=9;} 
+char escrever_simbolo_CGRAM(char simbolo){
+/*Como parte dos simbolos que serão escritos na CGRAM são letras com acento, é 
+preciso especificar se a letra é maiuscula ou minuscula. Para símbolos que
+não necessitam disso esse valor é irrelevante
+*/
 		
-		if(simbolo== SIMBOLO_FECHADURA_FECHADA || simbolo == SIMBOLO_FECHADURA_ABERTA){
-			CGRAM_goto(7);}
-		else CGRAM_goto(simbolo);
+		CGRAM_goto(0);
 
 		LCD_RS=1;
+		char maiuscula=0;
 
-		switch(simbolo){
-			case A_COM_TIL:
-				lcd_write(0x0D);//0
-				lcd_write(0X12);//1
-				lcd_write(0X00);//2
-				lcd_write(0X0E);
-				lcd_write(0X01);
-				lcd_write(0x0F);
-				lcd_write(0X1F);
-				lcd_write(0X0F);	
-			
-				break;
-
-			case A_COM_ACENTO_CIRCUNFLEXO:
-				lcd_write(0x04);
-				lcd_write(0x0A);
-				lcd_write(0x00);
-				lcd_write(0X0E);
-				lcd_write(0X01);
-				lcd_write(0x0F);
-				lcd_write(0X1F);
-				lcd_write(0X0F);	
-				break;
-
-
-			case SIMBOLO_FECHADURA_FECHADA:		
-				lcd_write(0x0E);//Linha 0 
-				lcd_write(0x0A);//1 
-				lcd_write(0x0A);//2
-				lcd_write(0x0A);//3
-				lcd_write(0x1F);//4
-				lcd_write(0x1B);//5
-				lcd_write(0x1B);//6
-				lcd_write(0x1F);//7
-				break;
-
-			case SIMBOLO_FECHADURA_ABERTA:		
-				lcd_write(0x03);//0
-				lcd_write(0x02);//1
-				lcd_write(0x02);//2
-				lcd_write(0x02);//3
-				lcd_write(0x1F);//4
-				lcd_write(0x1B);//5
-				lcd_write(0x1B);//6
-				lcd_write(0x1F);//7
-				break;
-
-
-		}
-}
-
-void exibir_simbolo_lcd(char simbolo){
-	char maiuscula =0;
-
-	if(simbolo>SIMBOLO_FECHADURA_FECHADA){
+		if(simbolo<'à'){//O símbolo é uma caractere especial maiusculo
+			simbolo+= 32; //"translada" o caractere para minusculo(À-à = 32)
 			maiuscula=1;
-			simbolo-=9;} 
+			}
 		
-		if(simbolo == SIMBOLO_FECHADURA_FECHADA || simbolo == SIMBOLO_FECHADURA_ABERTA){
-			CGRAM_goto(7);}
-		else CGRAM_goto(simbolo);
+			switch(simbolo){
 
-	LCD_RS=1;
-	if(simbolo>7) escrever_simbolo_CGRAM(simbolo);
-	lcd_write(simbolo);
+				case 'à':
+					escrever_crase_cgram();
+					
+					if(!maiuscula) escrever_a_minusculo_cgram();
+					
+					else escrever_a_maiusculo_cgram();
+
+					break;
+				case 'ã':
+
+					escrever_til_cgram();	
+		
+						//if(!maiuscula) escrever_a_minusculo_cgram();
+
+					//	else 
+					escrever_a_maiusculo_cgram();	
+
+					break;
+	
+				case 'á':
+					escrever_acento_agudo_cgram();
+					
+					if(!maiuscula) escrever_a_minusculo_cgram();
+
+					else escrever_a_maiusculo_cgram();
+	
+				case 'â':
+
+					escrever_acento_circunflexo_cgram();
+
+					if(!maiuscula) escrever_a_minusculo_cgram();
+
+					else escrever_a_maiusculo_cgram();	
+					break;
+
+				case 'ó' :
+					if(!maiuscula) lcd_write(0x00);
+					escrever_acento_agudo_cgram();
+					escrever_o_cgram(maiuscula); //se maiscula for 0, escreve um o minusculo. se for 1, um maiusculo
+					break;
+
+				case 'ô' :
+					if(!maiuscula) lcd_write(0x00);
+					escrever_acento_circunflexo_cgram();
+					escrever_o_cgram(maiuscula);
+					break;
+
+				case 'ê' :
+					escrever_acento_circunflexo_cgram();
+					
+					if(!maiuscula) escrever_e_minusculo_cgram();
+
+					else escrever_e_maiusculo_cgram();
+					break;
+
+				case 'é' :
+					escrever_acento_agudo_cgram();
+					
+					if(!maiuscula) escrever_e_minusculo_cgram();
+
+					else escrever_e_maiusculo_cgram();
+					break;
+
+	
+	
+				case SIMBOLO_FECHADURA_FECHADA:		
+					lcd_write(0x0E);//Linha 0 
+					lcd_write(0x0A);//1 
+					lcd_write(0x0A);//2
+					lcd_write(0x0A);//3
+					lcd_write(0x1F);//4
+					lcd_write(0x1B);//5
+					lcd_write(0x1B);//6
+					lcd_write(0x1F);//7
+					break;
+	
+				case SIMBOLO_FECHADURA_ABERTA:		
+					lcd_write(0x03);//0
+					lcd_write(0x02);//1
+					lcd_write(0x02);//2
+					lcd_write(0x02);//3
+					lcd_write(0x1F);//4
+					lcd_write(0x1B);//5
+					lcd_write(0x1B);//6
+					lcd_write(0x1F);//7
+					break;
+	
+	
+				default:
+					return 0;
+					}
+
+				return 1;
+		
+	
+		
+
 }
+
 
 void
 lcd_init(char definir_tipo_lcd)
@@ -170,7 +276,10 @@ lcd_init(char definir_tipo_lcd)
 	lcd_clear();	// Clear screen
 	lcd_write(0x6); // Set entry Mode
 
-	escrever_simbolo_fechadura();}
+	escrever_simbolo_fechadura();
+	//escrever_simbolo_CGRAM(SIMBOLO_FECHADURA_FECHADA,0);
+	//escrever_simbolo_CGRAM(SIMBOLO_FECHADURA_ABERTA,0)
+}
 
 
 void escrever_simbolo_fechadura(void){ //Escreve na CGRAM o simbolo de uma fechadura fechada e uma destravada
@@ -233,15 +342,6 @@ lcd_clear(void)
 	__delay_ms(2);
 }
 
-/* write a string of chars to the LCD */
-
-void
-lcd_puts(const char * s)
-{
-	LCD_RS = 1;	// write characters
-	while(*s)
-		lcd_write(*s++);
-}
 
 /* write one character to the LCD */
 
@@ -250,10 +350,13 @@ lcd_putc(char c)
 {
 	 switch (c) {
      case '\f'   :
+					coluna_lcd=0;
      			//LCD_RS = 0;	// write characters
 					lcd_clear();	// Clear screen
           break;
      case '\n'   :
+					coluna_lcd=0;
+
 				switch(lcd_type){
 					case LCD_20X4:
 					case LCD_16X4:
@@ -269,24 +372,58 @@ lcd_putc(char c)
      			lcd_gotoxy(linha_lcd,1);
      			break;
      case '\r'   :
+				linha_lcd=1;
      			LCD_RS = 0;	// write characters
-					lcd_write(0x80);
+				lcd_write(0x80);
 					break;
      default     :
-				linha_lcd=1;
+     			LCD_RS = 1;	// write characters	
 				coluna_lcd++;
-     			LCD_RS = 1;	// write characters
-				switch(c){
-					case 'ã':
-					break;
-					
-					default:
-					lcd_write( c );
-					break;
+
+				if(c > 128 && c < 144){ //valores que não correspondem a um caractere no lcd. São usados para que o usuário possa imprimir as duas ultimas duas colunas
+										//de caracteres da tabela(caracteres de 208 a 255) sem que isso atrapalhe o uso de caracteres especiais(que são impressos quando
+										//c > 'À')
+					lcd_write(c+80);
 				}
-					break;
+				
+				else if(c > 'À'){ //caracteres especiais começam nesse valor
+						if(escrever_simbolo_CGRAM(c)){			
+							LCD_RS=0;
+							lcd_gotoxy(linha_lcd,coluna_lcd);
+							LCD_RS=1;
+							lcd_write(0);}
+
+						else{
+							lcd_gotoxy(1,1);
+							LCD_RS=1;
+							lcd_write(c);}
+						}
+
+
+				
+					
+				else lcd_write( c );
+					
+				linha_lcd=1;
+				break;
 		}
 }
+
+/* write a string of chars to the LCD */
+
+void
+lcd_puts(const char * s)
+{
+	char temp;
+	LCD_RS = 1;	// write characters
+	while(*s){
+		temp = *s++;
+		//lcd_write(*s++);
+		lcd_putc(temp);
+}
+}
+
+
 
 //escolher posição CGRAM
 void CGRAM_goto(char pos){
@@ -302,7 +439,7 @@ lcd_gotoxy(unsigned char linha,unsigned char coluna)
 {
 	LCD_RS = 0;
 	coluna_lcd = coluna;
-	linha_lcd_aux_posicao= linha;
+	linha_lcd_aux_posicao = linha;
 	switch(linha){
 		case 1:
 			lcd_write(Linha_1+(coluna-1));
@@ -319,8 +456,6 @@ lcd_gotoxy(unsigned char linha,unsigned char coluna)
 		case 4:
 			lcd_write(Linha_4+(coluna-1));
 			break;
-
-
 	}
 }
 

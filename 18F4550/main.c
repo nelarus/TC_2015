@@ -1,7 +1,5 @@
 #include <xc.h>
 #include <stdio.h>
-#include <delays.h>
-#include <string.h>
 #include <i2c.h>
 #include "encrypt.h"
 #include "ascii.h"
@@ -59,10 +57,12 @@ unsigned char buffer_serial[TAMANHO_BUFFER_SERIAL]; //Usado para receber dados p
 unsigned char buffer_teclado_matricial[TAMANHO_BUFFER_TECLADO_MATRICIAL]; // Usado para receber dados pelo teclado matricial
 unsigned char qtd_caracteres_recebidos_serial=0; //contador para caracteres recebidos pela porta serial
 unsigned char qtd_caracteres_recebidos_teclado=0; //contador para caracteres recebidos pelo teclado matricial 
-char dados_recebidos[41];
-char chave_criptografia[17];
-char texto_critografado[81];
-char texto_descriptografado[41];
+
+
+//char dados_recebidos[41];
+//char chave_criptografia[17];
+//char texto_critografado[81];
+//char texto_descriptografado[41];
 
 struct Data{
 	unsigned char ano;//0
@@ -105,7 +105,12 @@ char *ptr_data;
 //9-> Seleciona entre 9,y e z(maiusculas ou minusculas)
 					
 void zerar_string(char *string_a_zerar){
-		memset(string_a_zerar,0, strlen(string_a_zerar));}
+
+		while(*string_a_zerar != NULL){
+			*string_a_zerar=0;
+			string_a_zerar++;}
+
+}
 
 void interrupt aux(void){
 
@@ -400,7 +405,10 @@ int main(void){
 	lcd_init(LCD_20X4);
 	lcd_gotoxy(LINHA1,20);
 	LCD_RS=1;
-	lcd_write(0);
+	lcd_write(0);	
+
+	printf("\rуг");
+	printf("\n%d%d",'г','Г');
 
 	while(1){
 
@@ -704,6 +712,7 @@ int main(void){
 												lcd_gotoxy(LINHA1,20);
 												LCD_RS=1;
 												lcd_write(SENSOR_ABERTURA_FECHADURA);
+												limpar_linha(LINHA3);
 												lcd_gotoxy(LINHA3,1);									
 												if(FECHADURA_TRAVADA){
 														printf("Erro de abertura            ");}
@@ -713,7 +722,9 @@ int main(void){
 
 										}
 
-										else{printf("\n\nSenha incorreta  ");}
+										else{
+											
+											printf("\n\nSenha incorreta  ");}
 							}				
 				}
 

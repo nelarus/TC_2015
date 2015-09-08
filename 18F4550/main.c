@@ -409,7 +409,7 @@ int main(void){
 
 				enviar_caractere_serial(NOVA_LINHA);
 
-					if(buffer_serial[0] == REPASSAR_MENSAGEM){
+					if(0){
 						char i=1;
 						char endereco_modulo_repasse[18];
 							while(buffer_serial[i] != REPASSAR_MENSAGEM){
@@ -612,7 +612,7 @@ int main(void){
 									
 									
 									if(FLAGS_1>1) { //Transição etapa é o bit 0,os outros sinalizam erros.
-
+													numero_para_ascii(etapa);
 													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 													etapa = etapa_inicial;	
 													setar_bit(FLAGS_2,ENVIAR);

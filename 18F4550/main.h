@@ -7,6 +7,7 @@
 //PARAMETRO PARA CONTAS
 #define QTD_MAX_CONTAS 16
 <<<<<<< HEAD
+<<<<<<< HEAD
 //
 
 //PARAMETROS DO BANCO DE DADOS DE SENHAS
@@ -14,6 +15,13 @@
 #define TAMANHO_MINIMO_SENHA 5
 #define conta_admin 0
 #define nivel_acesso senha[conta][TAMANHO_SENHA-1]
+=======
+#endif
+
+#ifndef	TAMANHO_SENHA
+#define TAMANHO_SENHA 16
+#endif
+>>>>>>> parent of 639478b... Vers찾o 1.0.5
 //
 
 //RENOMEA플O DOS PINOS DAS PORTAS E DOS LATCHES
@@ -197,6 +205,9 @@
 
 #define conta_admin 0
 #define nivel_acesso senha[conta][TAMANHO_SENHA-1]
+<<<<<<< HEAD
+>>>>>>> parent of 639478b... Vers찾o 1.0.5
+=======
 >>>>>>> parent of 639478b... Vers찾o 1.0.5
 
 

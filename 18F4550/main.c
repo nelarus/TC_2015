@@ -1,7 +1,10 @@
 #include <xc.h>
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <stdio.h>
 =======
+=======
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 #include <delays.h>
 #include <string.h>
 #include <i2c.h>
@@ -13,9 +16,13 @@
 #include "main.h"
 #include "serial.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "lcd.h"
 #include "flags.h"
 #include "recebimento_dados.h"
+=======
+
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
@@ -100,13 +107,19 @@ unsigned int endereco_final_eeprom=5;
 char *ptr_data;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 bit enviar=0; //Permite o envio de mensagens de erro a central/usu·rio
 bit receber=0;
 bit modo_bluetooth_teclado=0; //Indica se o usu·rio est· se conectando por bluetooth(modo_bluetooth_teclado=0) ou teclado matricial(modo_bluetooth_teclado=1)
 bit debounce=0;
 bit modo_t9=0;//modo_t9=1 -> As teclas 1 a 9 do teclado matricial podem ser usadas para inserir as 26 letras do alfabeto
 bit maiuscula=0;//Se for 1 as letras inseridas pelo teclado matricial ser„o maisculas;
+<<<<<<< HEAD
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
+=======
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 //REPRESENTA«√O DO TECLADO MATRICIAL NO MODO_T9
@@ -377,10 +390,15 @@ int main(void){
 	
 	TRISB=0xF0; // 4 ultimos bits-> teclado matricial
 <<<<<<< HEAD
+<<<<<<< HEAD
 	TRISA=0x00;
 	TRISE=0X04;
 	LATB=0x0F; 
 	TRISC=0xDF;
+=======
+	LATB=0x0F; 
+	TRISC=0xC3;
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 	LATB=0x0F; 
 	TRISC=0xC3;
@@ -424,11 +442,15 @@ int main(void){
 	RBIF=0;
 	cont=0;
 
+<<<<<<< HEAD
 	lcd_init(LCD_20X4);
 	lcd_gotoxy(LINHA1,20);
 	printf("%c",!SENSOR_ABERTURA_FECHADURA);
 	lcd_gotoxy(LINHA1,1);
 	LCD_RS=1;
+=======
+
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 	while(1){
 
@@ -487,6 +509,7 @@ int main(void){
 									else if(etapa == etapa_recebe_funcao){
 													//cont=2
 <<<<<<< HEAD
+<<<<<<< HEAD
 											    funcao = buffer_serial[cont++];
 
 													
@@ -511,6 +534,12 @@ int main(void){
 													
 														if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 																							
+=======
+											    	funcao = buffer_serial[cont++];
+													
+														if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+																							
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 													conta = ascii_para_numero('0',(buffer_serial[cont++]),(buffer_serial[cont]) );
 																	
 														if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N∞ da conta fora do intervalo
@@ -697,6 +726,7 @@ int main(void){
 								
 							
 <<<<<<< HEAD
+<<<<<<< HEAD
 						
 							else{ //Se modo_t9 estiver off, n„o h· necessidade de fazer qualquer lÛgica antes de armazen·-lo no buffer
 									buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
@@ -726,11 +756,16 @@ int main(void){
 
 
 =======
+=======
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 							else{
 									buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;}
 								
 							
+<<<<<<< HEAD
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
+=======
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
 							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
 		
@@ -741,6 +776,7 @@ int main(void){
 
 										conta = ( ((buffer_teclado_matricial[0]-'0')*10)  + (buffer_teclado_matricial[1]-'0') );
 										cont=2;
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 										if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N∞ da conta fora do intervalo
@@ -766,6 +802,10 @@ int main(void){
 										
 										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != 0){
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
+=======
+										
+										while(cont<2+TAMANHO_SENHA && buffer_teclado_matricial[cont-2] != 0){
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
 												setar_bit(FLAGS_1,ERRO_SENHA);
@@ -773,6 +813,7 @@ int main(void){
 
 											cont++;
 										}
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 										setar_bit(FLAGS_2,EXIBIR);
@@ -827,12 +868,17 @@ int main(void){
 												else{
 														printf("\n\nPorta aberta");}
 =======
+=======
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 										if(FLAGS_1<2) {
 														char tentativas=0;
 														while(FECHADURA_TRAVADA){
 															if(++tentativas == 6){ 
 																	setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura n„o abriu apÛs 6 tentativas. N„o h· como saber, pelo atual software, a causa.
 																	break;}
+<<<<<<< HEAD
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
+=======
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 															DESTRAVAR_FECHADURA(325);
@@ -842,6 +888,7 @@ int main(void){
 															
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 										else{//Houve erros, de senha ou de protocolo.
 											limpar_linha(LINHA3);
 												if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)) printf("\n\nErro de protocolo");
@@ -849,6 +896,15 @@ int main(void){
 										}
 							}				
 										
+=======
+										}
+							}				
+										
+
+				      
+										enviar_caractere_serial(NOVA_LINHA);
+										enviar_string_serial(buffer_teclado_matricial);}
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 
 				      
 										enviar_caractere_serial(NOVA_LINHA);
@@ -883,11 +939,16 @@ int main(void){
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 												else if(funcao == MUDAR_SENHA_PROPRIA_CONTA || funcao == MUDAR_SENHA_OUTRA_CONTA){
 													
 													setar_bit(contas_cadastradas,conta_a_ser_alterada); //seta-se o bit correspondente a conta que sera alterada para marcar
 																										//que ela existe.Se j· existir mantem-se em 1.
 													char i=0;
+=======
+												else if(funcao == MUDAR_SENHA){
+													char i=0;	
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 												else if(funcao == MUDAR_SENHA){
 													char i=0;	
@@ -912,6 +973,7 @@ int main(void){
 
 										}
 						
+<<<<<<< HEAD
 <<<<<<< HEAD
 						else{//Houve erros
 							
@@ -946,6 +1008,8 @@ int main(void){
 				RBIE=1;
 		}
 =======
+=======
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 						if(FLAGS_1){
 						
 							if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
@@ -997,12 +1061,16 @@ int main(void){
 					delay_ms(60);
 
 					
+<<<<<<< HEAD
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
+=======
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
 						if(caractere_recebido < '0' || caractere_recebido > '9'){//Caracteres n„o s„o armazenados, pois s„o fora da faixa de 0 a 9.S„o utilizados para certas funÁıes
 																					//como indicar maiuscula, ativar modo_t9, etc.
 									
 									resetar_timer1(0xC0,0);	
 									ultimo_caractere_recebido = caractere_recebido; //atualiza ultimo caractere recebido
+<<<<<<< HEAD
 <<<<<<< HEAD
 									
 						
@@ -1026,6 +1094,9 @@ int main(void){
 
 						}
 
+=======
+							}
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 							}
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
@@ -1053,6 +1124,7 @@ int main(void){
 
 					
 <<<<<<< HEAD
+<<<<<<< HEAD
 						
 					while(PORTB&0xF0 != 0xF0){}
 
@@ -1075,6 +1147,15 @@ int main(void){
 			}
 
 			if( (!testar_bit(FLAGS_2,EXIBIR))&& (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupÁıes ativadas(RBIE pode estar zerado pelo tratamento de debounce)
+=======
+
+					PORTB_SR=PORTB;//leitura do PORTB antes de ativar a interrupÁ„o para evitar uma interrupÁ„o n„o desejada.
+					RBIE=1;
+					debounce=0;
+		}
+
+			if( (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupÁıes ativadas(RBIE pode estar zerado pelo tratamento de debounce)
+>>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 
 					PORTB_SR=PORTB;//leitura do PORTB antes de ativar a interrupÁ„o para evitar uma interrupÁ„o n„o desejada.

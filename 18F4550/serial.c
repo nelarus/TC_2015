@@ -30,6 +30,7 @@ void enviar_string_serial(const char string_a_enviar[]){
 				TXREG = string_a_enviar[i];
 				while(!TRMT){}
 				i++;}
+<<<<<<< HEAD
 
 
 }
@@ -83,6 +84,8 @@ void enviar_comando_at(unsigned char comando,char *parametro){
 				enviar_string_serial("CON");
 				enviar_string_serial(parametro);}
 
+=======
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 
 }

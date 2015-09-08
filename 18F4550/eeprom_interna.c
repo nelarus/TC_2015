@@ -4,14 +4,8 @@
 
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 void carregar_senha( char conta, char senha_a_carregar[][17]){
 					
-=======
-void carregar_senha(char conta, char senha_a_carregar[][17]){
-					TXREG = '\n';
-					while(!TRMT);
->>>>>>> parent of 639478b... Versão 1.0.5
 =======
 void carregar_senha(char conta, char senha_a_carregar[][17]){
 					TXREG = '\n';

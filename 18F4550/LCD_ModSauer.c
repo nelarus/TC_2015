@@ -7,7 +7,6 @@
  #define _XTAL_FREQ 16000000
 #endif
 
-<<<<<<< HEAD
 
 <<<<<<< HEAD
 
@@ -122,16 +121,6 @@ void substituir_por_asterisco(void){
 =======
 #define	LCD_STROBE()	((LCD_EN = 1),(LCD_EN=0))
 >>>>>>> parent of 639478b... Versão 1.0.5
-=======
-
-#define	LCD_RS LATEbits.LE0
-//#define	LCD_RW RA2
-#define LCD_EN LATEbits.LE1
-
-#define LCD_DATA	LATA
-
-#define	LCD_STROBE()	((LCD_EN = 1),(LCD_EN=0))
->>>>>>> parent of 639478b... Versão 1.0.5
 
 /* write a byte to the LCD in 4 bit mode */
 
@@ -173,7 +162,6 @@ lcd_putc(char c)
           break;
      case '\n'   :
 <<<<<<< HEAD
-<<<<<<< HEAD
 					coluna_lcd=0;
 
 				switch(lcd_type){
@@ -192,9 +180,6 @@ lcd_putc(char c)
 =======
      			lcd_goto(0x40);
 >>>>>>> parent of 639478b... Versão 1.0.5
-=======
-     			lcd_goto(0x40);
->>>>>>> parent of 639478b... Versão 1.0.5
      			break;
      case '\r'   :
 				linha_lcd=1;
@@ -202,7 +187,6 @@ lcd_putc(char c)
 				lcd_write(0x80);
 					break;
      default     :
-<<<<<<< HEAD
 <<<<<<< HEAD
      			LCD_RS = 1;	// write characters	
 				coluna_lcd++;
@@ -242,14 +226,6 @@ void CGRAM_goto(char pos){
 }
 
 >>>>>>> parent of 639478b... Versão 1.0.5
-=======
-     			LCD_RS = 1;	// write characters
-					lcd_write( c );
-					break;
-		}
-}
-
->>>>>>> parent of 639478b... Versão 1.0.5
 
 /*
  * Go to the specified position
@@ -260,17 +236,12 @@ lcd_goto(unsigned char pos)
 {
 	LCD_RS = 0;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	coluna_lcd = coluna;
 	linha_lcd_aux_posicao = linha;
 	switch(linha){
 		case 1:
 			lcd_write(Linha_1+(coluna-1));
 			break;
-=======
-	lcd_write(0x80+pos);
-}
->>>>>>> parent of 639478b... Versão 1.0.5
 =======
 	lcd_write(0x80+pos);
 }
@@ -283,7 +254,6 @@ lcd_init()
 	char init_value;
 
 
-<<<<<<< HEAD
 <<<<<<< HEAD
 		case 4:
 			lcd_write(Linha_4+(coluna-1));
@@ -309,25 +279,6 @@ lcd_init()
 	LCD_STROBE();
 >>>>>>> parent of 639478b... Versão 1.0.5
 
-=======
-	init_value = 0x3;
-
-	LCD_RS = 0;
-	LCD_EN = 0;
-	//LCD_RW = 0;
-
-	__delay_ms(15);	// wait 15mSec after power applied,
-	LCD_DATA	 = init_value;
-	LCD_STROBE();
-	__delay_ms(5);
-	LCD_STROBE();
-	__delay_us(200);
-	LCD_STROBE();
-	__delay_us(200);
-	LCD_DATA = 2;	// Four bit mode
-	LCD_STROBE();
-
->>>>>>> parent of 639478b... Versão 1.0.5
 	lcd_write(0x28); // Set interface length
 	lcd_write(0x0C); // Display On, Cursor On, Cursor OFF
 	lcd_clear();	// Clear screen

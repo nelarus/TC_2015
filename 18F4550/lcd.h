@@ -4,7 +4,6 @@
  */
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 //FunÁıes para uso da CGRAM
 
 
@@ -26,8 +25,6 @@ extern void exibir_simbolo_lcd(char simbolo); //Exibe no lcd um dos simbolos da 
 //limpa linha selecionada
 extern void limpar_linha(unsigned char linha); 
 
-=======
->>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 >>>>>>> parent of 639478b... Vers√£o 1.0.5
 
@@ -53,7 +50,6 @@ extern void lcd_init(void);
 
 extern void lcd_putch(char);
 
-<<<<<<< HEAD
 <<<<<<< HEAD
 //Substitui ultimo caractere impresso por um asterisco
 void substituir_por_asterisco(void); 
@@ -115,11 +111,6 @@ extern unsigned char Linha_4;
 #define LINHA2 2
 #define LINHA3 3
 #define LINHA4 4
-=======
-/*	Set the cursor position */
-
-#define	lcd_cursor(x)	lcd_write(((x)&0x7F)|0x80)
->>>>>>> parent of 639478b... Vers√£o 1.0.5
 =======
 /*	Set the cursor position */
 

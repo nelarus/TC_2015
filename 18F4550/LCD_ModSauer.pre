@@ -6367,11 +6367,7 @@ extern int vsscanf(const char *, const char *, va_list) __attribute__((unsupport
 extern int sprintf(char *, const char *, ...);
 extern int printf(const char *, ...);
 
-# 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
-<<<<<<< HEAD
-
-
-
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
 extern void CGRAM_goto(char pos);
 
 extern void posicao_atual_lcd(char *linha, char *coluna);
@@ -6382,11 +6378,8 @@ extern char escrever_simbolo_CGRAM(char simbolo);
 
 extern void exibir_simbolo_lcd(char simbolo);
 
-# 26
+# 25
 extern void limpar_linha(unsigned char linha);
-
-=======
->>>>>>> parent of 639478b... Versão 1.0.5
 
 
 
@@ -6402,19 +6395,18 @@ extern void lcd_puts(const char * s);
 
 
 
-extern void lcd_goto(unsigned char pos);
+extern void lcd_gotoxy(unsigned char linha,unsigned char coluna);
 
 
 
-extern void lcd_init(void);
+extern void lcd_init(char tipo_lcd);
 
 extern void lcd_putch(char);
 
-<<<<<<< HEAD
 
 void substituir_por_asterisco(void);
 
-# 63
+# 58
 extern char linha_lcd;
 extern char linha_lcd_aux_posicao;
 extern char coluna_lcd;
@@ -6424,29 +6416,26 @@ extern char lcd_type;
 extern unsigned char Linha_3;
 extern unsigned char Linha_4;
 
-# 114
-=======
+# 7 "D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c"
+char linha_lcd;
+char linha_lcd_aux_posicao;
+char coluna_lcd;
+char qtd_max_colunas_lcd;
+char lcd_type;
+unsigned char Linha_3;
+unsigned char Linha_4;
 
-
-
->>>>>>> parent of 639478b... Versão 1.0.5
-
-# 11 "D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c"
-<<<<<<< HEAD
 
 void posicao_atual_lcd(char *linha, char *coluna){
 *linha = linha_lcd_aux_posicao;
 *coluna = coluna_lcd;
 }
-=======
 
 
+void limpar_linha(unsigned char linha){
+unsigned char coluna_atual=1;
+lcd_gotoxy(linha,coluna_atual);
 
->>>>>>> parent of 639478b... Versão 1.0.5
-
-
-
-<<<<<<< HEAD
 while(coluna_atual<qtd_max_colunas_lcd){
 LATEbits.LE0=1;
 lcd_write(0x10);
@@ -6542,10 +6531,6 @@ lcd_write(0x10);
 LATEbits.LE0=1;
 lcd_write('*');
 }
-=======
-
->>>>>>> parent of 639478b... Versão 1.0.5
-
 
 
 void
@@ -6560,7 +6545,7 @@ LATA |= ( c & 0x0F );
 ((LATEbits.LE1 = 1),(LATEbits.LE1=0));
 }
 
-# 143
+# 139
 void
 lcd_clear(void)
 {
@@ -6582,7 +6567,6 @@ coluna_lcd=0;
 lcd_clear();
 break;
 case '\n' :
-<<<<<<< HEAD
 coluna_lcd=0;
 
 switch(lcd_type){
@@ -6598,9 +6582,6 @@ break;
 }
 
 lcd_gotoxy(linha_lcd,1);
-=======
-lcd_goto(0x40);
->>>>>>> parent of 639478b... Versão 1.0.5
 break;
 case '\r' :
 linha_lcd=1;
@@ -6608,7 +6589,6 @@ LATEbits.LE0 = 0;
 lcd_write(0x80);
 break;
 default :
-<<<<<<< HEAD
 LATEbits.LE0 = 1;
 coluna_lcd++;
 linha_lcd=1;
@@ -6639,69 +6619,34 @@ lcd_putc(temp);
 void CGRAM_goto(char pos){
 LATEbits.LE0=0;
 lcd_write(0x40 + (pos*8));}
-=======
-LATEbits.LE0 = 1;
-lcd_write( c );
-break;
-}
-}
 
->>>>>>> parent of 639478b... Versão 1.0.5
-
-# 234
+# 217
 void
-lcd_goto(unsigned char pos)
+lcd_gotoxy(unsigned char linha,unsigned char coluna)
 {
 LATEbits.LE0 = 0;
-<<<<<<< HEAD
 coluna_lcd = coluna;
 linha_lcd_aux_posicao = linha;
 switch(linha){
 case 1:
 lcd_write(0x80+(coluna-1));
 break;
-=======
-lcd_write(0x80+pos);
-}
->>>>>>> parent of 639478b... Versão 1.0.5
 
+case 2:
+lcd_write(0xC0+(coluna-1));
+break;
 
-void
-lcd_init()
-{
-char init_value;
+case 3:
+lcd_write(Linha_3+(coluna-1));
+break;
 
-
-<<<<<<< HEAD
 case 4:
 lcd_write(Linha_4+(coluna-1));
 break;
 }
 }
-=======
-init_value = 0x3;
-
-LATEbits.LE0 = 0;
-LATEbits.LE1 = 0;
 
 
-_delay((unsigned long)((15)*(16000000/4000.0)));
-LATA = init_value;
-((LATEbits.LE1 = 1),(LATEbits.LE1=0));
-_delay((unsigned long)((5)*(16000000/4000.0)));
-((LATEbits.LE1 = 1),(LATEbits.LE1=0));
-_delay((unsigned long)((200)*(16000000/4000000.0)));
-((LATEbits.LE1 = 1),(LATEbits.LE1=0));
-_delay((unsigned long)((200)*(16000000/4000000.0)));
-LATA = 2;
-((LATEbits.LE1 = 1),(LATEbits.LE1=0));
->>>>>>> parent of 639478b... Versão 1.0.5
-
-lcd_write(0x28);
-lcd_write(0x0C);
-lcd_clear();
-lcd_write(0x6);
-}
 
 void putch(char c)
 {

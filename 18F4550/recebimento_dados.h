@@ -76,6 +76,3 @@
 #define etapa_detalha_funcao 3
 #define etapa_final 4
 //
-
-//PARAMETROS DA FECHADURA
-#define ID_DESSA_FECHADURA '0'

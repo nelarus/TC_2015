@@ -6304,29 +6304,10 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.h"
-<<<<<<< HEAD
-
-# 28
-=======
-
-# 178
->>>>>>> parent of 639478b... Versão 1.0.5
-
-# 186
-<<<<<<< HEAD
-
-=======
-
-# 200
->>>>>>> parent of 639478b... Versão 1.0.5
-
 # 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.h"
 extern void config_serial(char baud);
-extern void enviar_string_serial(const char string_a_enviar[]);
+extern void enviar_string_serial(const char *string_a_enviar);
 extern void enviar_caractere_serial(char carater_a_enviar);
-void teste_comando_at(void);
-void enviar_comando_at(unsigned char comando,char *novo_parametro);
 
 # 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c"
 void config_serial(char baud){
@@ -6350,65 +6331,11 @@ TXREG = carater_a_enviar;
 while(!TRMT){}
 }
 
-void enviar_string_serial(const char string_a_enviar[]){
-char i=0;
-while(string_a_enviar[i] != (0)){
-TXREG = string_a_enviar[i];
+void enviar_string_serial(const char *string_a_enviar){
+while(*string_a_enviar != (0)){
+TXREG = *string_a_enviar;
 while(!TRMT){}
-i++;}
-
-
-}
-
-void teste_comando_at(void){
-enviar_string_serial("AT");}
-
-
-
-void enviar_comando_at(unsigned char comando,char *parametro){
-enviar_string_serial("AT+");
-
-if(comando<=1) {
-enviar_string_serial("NAME");
-if(comando==1)enviar_string_serial(parametro);
-else enviar_caractere_serial('?');
-}
-
-else if(comando<=3){
-enviar_string_serial("BAUD");
-if( comando==3 ) enviar_string_serial(parametro);
-else enviar_caractere_serial('?');
-}
-
-else if(comando<=5){
-enviar_string_serial("ROLE");
-if( comando==5 ) enviar_string_serial(parametro);
-else enviar_caractere_serial('?');
-}
-
-else if( comando==6 ){
-enviar_string_serial("ADDR?");
-}
-
-else if( comando==7 ){
-enviar_string_serial("DISC?");}
-
-else if(comando==8){
-enviar_string_serial("RESET");}
-
-else if(comando==9){
-enviar_string_serial("START");}
-
-else if( comando==10 ){
-enviar_string_serial("RADD?");}
-
-else if( comando==11 ){
-enviar_string_serial("SLEEP");}
-
-else if(comando == 13){
-enviar_string_serial("CON");
-enviar_string_serial(parametro);}
-
+string_a_enviar++;}
 
 
 }

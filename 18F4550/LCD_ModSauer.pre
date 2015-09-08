@@ -1,5 +1,5 @@
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c"
+# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c"
 
 # 26 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\htc.h"
 extern const char __xc8_OPTIM_SPEED;
@@ -6304,34 +6304,351 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 5 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c"
-void delay_ms(unsigned int delay_total){
-unsigned int temp = 0;
-while(temp < delay_total){
-_delay((unsigned long)((1)*(16000000/4000.0)));
-temp++;}
+# 7 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdarg.h"
+typedef void * va_list[1];
+
+#pragma intrinsic(__va_start)
+extern void * __va_start(void);
+
+#pragma intrinsic(__va_arg)
+extern void * __va_arg(void *, ...);
+
+# 24 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdio.h"
+extern int errno;
+
+# 55
+struct __prbuf
+{
+char * ptr;
+void (* func)(char);
+};
+
+# 17 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\conio.h"
+extern int errno;
+
+
+extern void init_uart(void);
+
+extern char getch(void);
+extern char getche(void);
+extern void putch(char);
+extern void ungetch(char);
+
+extern __bit kbhit(void);
+
+# 31
+extern char * cgets(char *);
+extern void cputs(const char *);
+
+# 100 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdio.h"
+extern int cprintf(char *, ...);
+#pragma printf_check(cprintf)
+
+
+
+extern int _doprnt(struct __prbuf *, const register char *, register va_list);
+
+
+# 192
+#pragma printf_check(vprintf) const
+#pragma printf_check(vsprintf) const
+
+extern char * gets(char *);
+extern int puts(const char *);
+extern int scanf(const char *, ...) __attribute__((unsupported("scanf() is not supported by this compiler")));
+extern int sscanf(const char *, const char *, ...) __attribute__((unsupported("sscanf() is not supported by this compiler")));
+extern int vprintf(const char *, va_list) __attribute__((unsupported("vprintf() is not supported by this compiler")));
+extern int vsprintf(char *, const char *, va_list) __attribute__((unsupported("vsprintf() is not supported by this compiler")));
+extern int vscanf(const char *, va_list ap) __attribute__((unsupported("vscanf() is not supported by this compiler")));
+extern int vsscanf(const char *, const char *, va_list) __attribute__((unsupported("vsscanf() is not supported by this compiler")));
+
+#pragma printf_check(printf) const
+#pragma printf_check(sprintf) const
+extern int sprintf(char *, const char *, ...);
+extern int printf(const char *, ...);
+
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
+extern void CGRAM_goto(char pos);
+
+extern void posicao_atual_lcd(char *linha, char *coluna);
+
+extern void escrever_simbolo_fechadura(void);
+
+extern char escrever_simbolo_CGRAM(char simbolo);
+
+extern void exibir_simbolo_lcd(char simbolo);
+
+# 25
+extern void limpar_linha(unsigned char linha);
+
+
+
+extern void lcd_write(unsigned char);
+
+
+
+extern void lcd_clear(void);
+
+
+
+extern void lcd_puts(const char * s);
+
+
+
+extern void lcd_gotoxy(unsigned char linha,unsigned char coluna);
+
+
+
+extern void lcd_init(char tipo_lcd);
+
+extern void lcd_putch(char);
+
+
+void substituir_por_asterisco(void);
+
+# 58
+extern char linha_lcd;
+extern char linha_lcd_aux_posicao;
+extern char coluna_lcd;
+extern char qtd_max_coluna_lcd;
+extern char lcd_type;
+
+extern unsigned char Linha_3;
+extern unsigned char Linha_4;
+
+# 7 "D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c"
+char linha_lcd;
+char linha_lcd_aux_posicao;
+char coluna_lcd;
+char qtd_max_colunas_lcd;
+char lcd_type;
+unsigned char Linha_3;
+unsigned char Linha_4;
+
+
+void posicao_atual_lcd(char *linha, char *coluna){
+*linha = linha_lcd_aux_posicao;
+*coluna = coluna_lcd;
 }
 
-char dia_da_semana(unsigned int ano,char mes, char dia){
 
-char tabela_mes[]= {0,3,3,6,1,4,6,2,5,0,3,5};
-unsigned char seculo;
+void limpar_linha(unsigned char linha){
+unsigned char coluna_atual=1;
+lcd_gotoxy(linha,coluna_atual);
 
-ano+=15;
-seculo = ano/100;
-ano-= (ano/100);
-
-if(! ((ano+3)%4) ){
-if (mes==1) tabela_mes[mes-1]=6;
-else if(mes==2) tabela_mes[mes-1]=2;}
-
-return (( (6 - seculo*2) + dia + tabela_mes[mes-1] + ano + (ano/4))%7);
-
-
+while(coluna_atual<qtd_max_colunas_lcd){
+LATEbits.LE0=1;
+lcd_write(0x10);
+coluna_atual++;}
 }
 
-void resetar_timer1(char valor_h, char valor_l){
-TMR1ON=0;
-TMR1H=valor_h;
-TMR1L=valor_l;
+
+
+void
+lcd_init(char definir_tipo_lcd)
+{
+char init_value;
+linha_lcd=1;
+init_value = 0x3;
+lcd_type = definir_tipo_lcd;
+
+switch(lcd_type){
+case 2:
+qtd_max_colunas_lcd=20;
+break;
+
+case 0:
+qtd_max_colunas_lcd=16;
+break;
+
+case 3:
+qtd_max_colunas_lcd=20;
+Linha_3 = 0x94;
+Linha_4 = 0xD4;
+break;
+
+case 1:
+qtd_max_colunas_lcd=16;
+Linha_3 = 0x90;
+Linha_4 = 0xD0;
+break;
+}
+LATEbits.LE0 = 0;
+LATEbits.LE1 = 0;
+
+
+_delay((unsigned long)((15)*(16000000/4000.0)));
+LATA = init_value;
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+_delay((unsigned long)((5)*(16000000/4000.0)));
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+_delay((unsigned long)((200)*(16000000/4000000.0)));
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+_delay((unsigned long)((200)*(16000000/4000000.0)));
+LATA = 2;
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+
+lcd_write(0x28);
+lcd_write(0x0C);
+lcd_clear();
+lcd_write(0x6);
+
+escrever_simbolo_fechadura();
+}
+
+
+void escrever_simbolo_fechadura(void){
+LATEbits.LE0=0;
+lcd_write(0x40);
+LATEbits.LE0=1;
+
+lcd_write(0x0E);
+lcd_write(0x0A);
+lcd_write(0x0A);
+lcd_write(0x0A);
+lcd_write(0x1F);
+lcd_write(0x1B);
+lcd_write(0x1B);
+lcd_write(0x1F);
+
+
+lcd_write(0x03);
+lcd_write(0x02);
+lcd_write(0x02);
+lcd_write(0x02);
+lcd_write(0x1F);
+lcd_write(0x1B);
+lcd_write(0x1B);
+lcd_write(0x1F);
+
+LATEbits.LE0=0;
+}
+
+# 115
+void substituir_por_asterisco(void){
+LATEbits.LE0=0;
+lcd_write(0x10);
+LATEbits.LE0=1;
+lcd_write('*');
+}
+
+
+void
+lcd_write(unsigned char c)
+{
+_delay((unsigned long)((40)*(16000000/4000000.0)));
+LATA &= 0xF0;
+LATA |= ( ( c >> 4 ) & 0x0F );
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+LATA &=0xF0;
+LATA |= ( c & 0x0F );
+((LATEbits.LE1 = 1),(LATEbits.LE1=0));
+}
+
+# 139
+void
+lcd_clear(void)
+{
+LATEbits.LE0 = 0;
+lcd_write(0x1);
+_delay((unsigned long)((2)*(16000000/4000.0)));
+}
+
+
+
+
+void
+lcd_putc(char c)
+{
+switch (c) {
+case '\f' :
+coluna_lcd=0;
+
+lcd_clear();
+break;
+case '\n' :
+coluna_lcd=0;
+
+switch(lcd_type){
+case 3:
+case 1:
+if(++linha_lcd>4) linha_lcd=1;
+break;
+
+case 2:
+case 0:
+if(++linha_lcd>2) linha_lcd=1;
+break;
+}
+
+lcd_gotoxy(linha_lcd,1);
+break;
+case '\r' :
+linha_lcd=1;
+LATEbits.LE0 = 0;
+lcd_write(0x80);
+break;
+default :
+LATEbits.LE0 = 1;
+coluna_lcd++;
+linha_lcd=1;
+lcd_write( c );
+
+
+break;
+}
+}
+
+
+
+void
+lcd_puts(const char * s)
+{
+char temp;
+LATEbits.LE0 = 1;
+while(*s){
+temp = *s++;
+
+lcd_putc(temp);
+}
+}
+
+
+
+
+void CGRAM_goto(char pos){
+LATEbits.LE0=0;
+lcd_write(0x40 + (pos*8));}
+
+# 217
+void
+lcd_gotoxy(unsigned char linha,unsigned char coluna)
+{
+LATEbits.LE0 = 0;
+coluna_lcd = coluna;
+linha_lcd_aux_posicao = linha;
+switch(linha){
+case 1:
+lcd_write(0x80+(coluna-1));
+break;
+
+case 2:
+lcd_write(0xC0+(coluna-1));
+break;
+
+case 3:
+lcd_write(Linha_3+(coluna-1));
+break;
+
+case 4:
+lcd_write(Linha_4+(coluna-1));
+break;
+}
+}
+
+
+
+void putch(char c)
+{
+lcd_putc(c);
 }

@@ -6304,37 +6304,68 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 22 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\string.h"
-extern void * memcpy(void *, const void *, size_t);
-extern void * memmove(void *, const void *, size_t);
-extern void * memset(void *, int, size_t);
+# 7 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdarg.h"
+typedef void * va_list[1];
 
-# 42
-extern char * strcat(char *, const char *);
-extern char * strcpy(char *, const char *);
-extern char * strncat(char *, const char *, size_t);
-extern char * strncpy(char *, const char *, size_t);
-extern char * strdup(const char *);
-extern char * strtok(char *, const char *);
+#pragma intrinsic(__va_start)
+extern void * __va_start(void);
+
+#pragma intrinsic(__va_arg)
+extern void * __va_arg(void *, ...);
+
+# 24 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdio.h"
+extern int errno;
+
+# 55
+struct __prbuf
+{
+char * ptr;
+void (* func)(char);
+};
+
+# 17 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\conio.h"
+extern int errno;
 
 
-extern int memcmp(const void *, const void *, size_t);
-extern int strcmp(const char *, const char *);
-extern int stricmp(const char *, const char *);
-extern int strncmp(const char *, const char *, size_t);
-extern int strnicmp(const char *, const char *, size_t);
-extern void * memchr(const void *, int, size_t);
-extern size_t strcspn(const char *, const char *);
-extern char * strpbrk(const char *, const char *);
-extern size_t strspn(const char *, const char *);
-extern char * strstr(const char *, const char *);
-extern char * stristr(const char *, const char *);
-extern char * strerror(int);
-extern size_t strlen(const char *);
-extern char * strchr(const char *, int);
-extern char * strichr(const char *, int);
-extern char * strrchr(const char *, int);
-extern char * strrichr(const char *, int);
+extern void init_uart(void);
+
+extern char getch(void);
+extern char getche(void);
+extern void putch(char);
+extern void ungetch(char);
+
+extern __bit kbhit(void);
+
+# 31
+extern char * cgets(char *);
+extern void cputs(const char *);
+
+# 100 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdio.h"
+extern int cprintf(char *, ...);
+#pragma printf_check(cprintf)
+
+
+
+extern int _doprnt(struct __prbuf *, const register char *, register va_list);
+
+
+# 192
+#pragma printf_check(vprintf) const
+#pragma printf_check(vsprintf) const
+
+extern char * gets(char *);
+extern int puts(const char *);
+extern int scanf(const char *, ...) __attribute__((unsupported("scanf() is not supported by this compiler")));
+extern int sscanf(const char *, const char *, ...) __attribute__((unsupported("sscanf() is not supported by this compiler")));
+extern int vprintf(const char *, va_list) __attribute__((unsupported("vprintf() is not supported by this compiler")));
+extern int vsprintf(char *, const char *, va_list) __attribute__((unsupported("vsprintf() is not supported by this compiler")));
+extern int vscanf(const char *, va_list ap) __attribute__((unsupported("vscanf() is not supported by this compiler")));
+extern int vsscanf(const char *, const char *, va_list) __attribute__((unsupported("vsscanf() is not supported by this compiler")));
+
+#pragma printf_check(printf) const
+#pragma printf_check(sprintf) const
+extern int sprintf(char *, const char *, ...);
+extern int printf(const char *, ...);
 
 # 22 "D:\Dropbox\Micros\2015\TC_2015\18F4550\encrypt.h"
 void clearCypher(void);
@@ -6347,32 +6378,87 @@ void ascii_decrypt128(char *in, char *key,char ascCipherText[]);
 
 void initCipher(void);
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.h"
+# 4 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.h"
 char teclado_matricial(char coluna, char linha);
-
-void delay_ms(unsigned int delay_total);
 
 void numero_para_ascii(char numero);
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1);
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
-extern char verificar_num_contas(void);
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
+char verificar_num_contas(void);
 
-extern void eeprom_config_inicial(void);
+void eeprom_config_inicial(void);
 
-extern void carregar_senha(char conta, char senha_a_carregar[][17]);
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h"
+
+void carregar_senha(char conta, char senha_a_carregar[][17]);
+
+# 25 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h"
+void delay_ms(unsigned int delay_total);
+
 char dia_da_semana(unsigned int ano,char mes, char dia);
 
+void resetar_timer1(char valor_h, char valor_l);
+
 # 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.h"
-void config_serial(char baud);
-void enviar_string_serial(char *string_a_enviar);
-void enviar_caractere_serial(char carater_a_enviar);
+extern void config_serial(char baud);
+extern void enviar_string_serial(const char *string_a_enviar);
+extern void enviar_caractere_serial(char carater_a_enviar);
+void teste_comando_at(void);
+void enviar_comando_at(unsigned char comando,char *novo_parametro);
+
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
+extern void CGRAM_goto(char pos);
+
+extern void posicao_atual_lcd(char *linha, char *coluna);
+
+extern void escrever_simbolo_fechadura(void);
+
+extern char escrever_simbolo_CGRAM(char simbolo);
+
+extern void exibir_simbolo_lcd(char simbolo);
+
+# 25
+extern void limpar_linha(unsigned char linha);
 
 
-# 18 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+
+extern void lcd_write(unsigned char);
+
+
+
+extern void lcd_clear(void);
+
+
+
+extern void lcd_puts(const char * s);
+
+
+
+extern void lcd_gotoxy(unsigned char linha,unsigned char coluna);
+
+
+
+extern void lcd_init(char tipo_lcd);
+
+extern void lcd_putch(char);
+
+
+void substituir_por_asterisco(void);
+
+# 58
+extern char linha_lcd;
+extern char linha_lcd_aux_posicao;
+extern char coluna_lcd;
+extern char qtd_max_coluna_lcd;
+extern char lcd_type;
+
+extern unsigned char Linha_3;
+extern unsigned char Linha_4;
+
+
+# 15 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
 #pragma config FOSC = XTPLL_XT
 #pragma config PLLDIV = 1
 #pragma config CPUDIV = OSC4_PLL6
@@ -6411,48 +6497,49 @@ void enviar_caractere_serial(char carater_a_enviar);
 
 
 
-
 char qtd_max_dias =31;
 char nova_senha[16];
+
 char senha[16][16+1];
 unsigned char buffer_serial[80];
-unsigned char qtd_caracteres_recebidos=0;
-char dados_recebidos[41];
-char chave_criptografia[17];
-char texto_critografado[81];
-char texto_descriptografado[41];
+unsigned char buffer_teclado_matricial[40];
+unsigned char qtd_caracteres_recebidos_serial=0;
+unsigned char qtd_caracteres_recebidos_teclado=0;
 
+# 68
 struct Data{
 unsigned char ano;
-char mes;
-char dia;
-char hora;
-char minuto;
-char segundo;
-char dia_da_semana;
+unsigned char mes;
+unsigned char dia;
+unsigned char hora;
+unsigned char minuto;
+unsigned char segundo;
+unsigned char dia_da_semana;
 }data_atual,data_recebida;
+
 
 unsigned char caractere_recebido = 0;
 unsigned char FLAGS_1=0;
 unsigned char FLAGS_2=0;
+unsigned char FLAGS_3=0;
 unsigned char PORTB_SR;
 unsigned char num_interrupt_timer1=0;
+unsigned char num_interrupt_caracter_por_asterisco=0;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
-
 unsigned int endereco_inic_eeprom=5;
 unsigned int endereco_final_eeprom=5;
+
+
 char *ptr_data;
 
-bit enviar=0;
-bit receber=0;
-bit modo_bluetooth_teclado=0;
-bit debounce=0;
-bit modo_t9=0;
-bit maiuscula=0;
-
-# 107
+# 106
 void zerar_string(char *string_a_zerar){
-memset(string_a_zerar,0, strlen(string_a_zerar));}
+
+while(*string_a_zerar != (0)){
+*string_a_zerar=0;
+string_a_zerar++;}
+
+}
 
 void interrupt aux(void){
 
@@ -6460,22 +6547,19 @@ if(TMR1IE && TMR1IF){
 TMR1IF=0;
 TMR1H=0xC0;
 
-if(modo_bluetooth_teclado==0){
-qtd_caracteres_recebidos=0;
-(FLAGS_1 |= (1<<7));
-enviar=1;
+if((!((FLAGS_3 & (1<<3))))){
+qtd_caracteres_recebidos_serial=0;
+(FLAGS_1 |= (1<<1));
+(FLAGS_2 |= (1<<0));
 TMR1ON=0;
 }
 
 
-else if(modo_bluetooth_teclado==1 && ++num_interrupt_timer1==10){
-numero_para_ascii(qtd_vezes_mesma_tecla_pressionada);
 
-char caractere_a_exibir;
-caractere_a_exibir = ( ('a' + ((caractere_recebido-'1')*3))+ qtd_vezes_mesma_tecla_pressionada);
-TXREG = caractere_a_exibir;
-while(!TRMT){}
-qtd_vezes_mesma_tecla_pressionada=0;
+else if((FLAGS_3 & (1<<2)) && ++num_interrupt_timer1==5){
+if((FLAGS_2 & (1<<4))){(FLAGS_2 |= (1<<1));}
+lcd_gotoxy(2,qtd_caracteres_recebidos_teclado);
+printf("*");
 TMR1ON=0;
 num_interrupt_timer1=0;}
 
@@ -6486,7 +6570,8 @@ TMR0H = 0xC2;
 TMR0L+=0xF7;
 TMR0IF=0;
 LATDbits.LD1^=1;
-
+(FLAGS_2 |= (1<<7));
+(FLAGS_3 |= (1<<0));
 if(++data_atual.segundo>59){
 data_atual.segundo=0;
 
@@ -6539,21 +6624,18 @@ break;}
 
 }
 
-if(TMR1IE && TMR1IF){
-LATDbits.LD2^=1;
-TMR1IF=0;
-TMR1ON=0;}
+
 
 if(RBIE && RBIF){
-char coluna=0;
-char linha=0;
+char coluna,linha=0;
 PORTB_SR=(PORTB&0xF0);
 RBIF=0;
 if(PORTB_SR != 0xF0) {
 RBIE=0;
-debounce=1;
-modo_bluetooth_teclado=1;
+(FLAGS_2 |= (1<<3));
+(FLAGS_3 |= (1<<3));
 LATDbits.LD0^=1;
+
 
 if(PORTBbits.RB7==0){coluna=1;}
 
@@ -6566,14 +6648,16 @@ else if(PORTBbits.RB4==0){coluna=4;}
 else{coluna=0;}
 
 
-
 TRISB&=0x0F;
 LATB|=0xF0;
+
 
 while(PORTB&0xF0 != 0xF0){}
 while( (PORTD&0xF0) != 0){}
 
 TRISD|=0xF0;
+
+
 
 if(PORTDbits.RD4==1){linha=1;}
 
@@ -6586,21 +6670,11 @@ else if(PORTDbits.RD7==1){linha=4;}
 else{linha=0;}
 
 if(linha && coluna){
-TXREG = '\n';
-while(!TRMT){}
+
 caractere_recebido = teclado_matricial(coluna,linha);
-TXREG = caractere_recebido;
-numero_para_ascii(linha);
-numero_para_ascii(coluna);
-
-if(caractere_recebido == 'A'){
-(FLAGS_2 ^= (1<<4));
-}
-
-else if(caractere_recebido == 'M'){
-(FLAGS_2 ^= (1<<5));}
 
 }
+
 
 
 TRISB|=0xF0;
@@ -6615,8 +6689,7 @@ while( (PORTB&0xF0) != 0xF0){}
 PORTB_SR=(PORTB&0xF0);}
 
 if(RCIE && RCIF){
-modo_bluetooth_teclado=0;;
-LATDBits.LD0^=1;
+(FLAGS_3 &= ~(1<<2));
 
 if(OERR==1){
 (FLAGS_1 |= (1<<4));
@@ -6628,8 +6701,9 @@ CREN = 1;
 if(temp){}
 
 }while(OERR);
-enviar=1;
-receber=0;
+
+(FLAGS_2 |= (1<<0));
+(FLAGS_2 &= ~(1<<1));
 
 }
 
@@ -6642,19 +6716,19 @@ SPEN=0;
 SPEN=1;
 if(temp){}
 }while(FERR);
-enviar=1;
-receber=0;}
+
+(FLAGS_2 |= (1<<0));
+(FLAGS_2 &= ~(1<<1));}
 
 else{
-TMR1ON=0;
-buffer_serial[qtd_caracteres_recebidos] = RCREG;
-TXREG = buffer_serial[qtd_caracteres_recebidos];
+resetar_timer1(0xC0,0);
+buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
+
 TMR1ON=1;
-if(++qtd_caracteres_recebidos == 80 || buffer_serial[qtd_caracteres_recebidos-1] == 'F'){
-receber=1;
-TMR1ON=0;
-TMR1L=0;
-TMR1H=0xC0;}
+
+if(++qtd_caracteres_recebidos_serial == 80 || buffer_serial[qtd_caracteres_recebidos_serial-1] == 'F'){
+(FLAGS_2 |= (1<<1));
+resetar_timer1(0xC0,0);}
 }
 
 RCIF=0;}
@@ -6664,6 +6738,8 @@ RCIF=0;}
 
 int main(void){
 
+
+
 unsigned char ordem = 0;
 unsigned char etapa=0;
 unsigned char funcao=0;
@@ -6672,11 +6748,7 @@ unsigned char conta_a_ser_alterada=0;
 unsigned char cont=0;
 unsigned char qtd_total_contas=0;
 unsigned char ultimo_caractere_recebido=0;
-
-zerar_string(buffer_serial);
-
-memset(buffer_serial,0,(strlen(buffer_serial)));
-
+int contas_cadastradas=0;
 
 OSCCON=0XF0;
 
@@ -6695,9 +6767,13 @@ TMR0L= 0xF7;
 
 LATD=0;
 
+
+
 TRISB=0xF0;
+TRISA=0x00;
+TRISE=0X04;
 LATB=0x0F;
-TRISC=0xC3;
+TRISC=0xDF;
 TRISD=0x00;
 ADCON1=0XFF;
 CMCON=0X07;
@@ -6711,17 +6787,28 @@ TMR1L=0;
 if(Read_b_eep(0) == 0xFF) eeprom_config_inicial();
 
 config_serial(35);
+
+
 qtd_total_contas = verificar_num_contas();
+
+
 numero_para_ascii(qtd_total_contas);
 
 for(conta=0;conta<qtd_total_contas;conta++){
-carregar_senha(conta, senha);}
+carregar_senha(conta,senha);
+
+enviar_string_serial(&senha[conta][0]);
+numero_para_ascii(senha[conta][16-1]);
+
+(contas_cadastradas |= (1<<conta));
+}
+
 
 conta=0;
 RCIE=1;
-
+_delay((unsigned long)((1)*(16000000/4000000.0)));
 data_atual.ano=0;
-data_atual.mes=1;
+data_atual.mes= 1;
 data_atual.dia=1;
 data_atual.dia_da_semana= dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
 data_atual.hora=0;
@@ -6732,29 +6819,45 @@ RBIE=1;
 RBIF=0;
 cont=0;
 
-
+lcd_init(3);
+lcd_gotoxy(1,20);
+printf("%c",!PORTEbits.RE2);
+lcd_gotoxy(1,1);
+LATEbits.LE0=1;
 
 while(1){
 
+if((FLAGS_2 & (1<<1))){
 
 
-if(receber == 1){
+(FLAGS_2 &= ~(1<<1));
+if((!((FLAGS_3 & (1<<3))))){
 
-receber=0;
-if(1){
-TXREG = '\n';
-while(!TRMT){}
-char j;
-for(j=0;j<qtd_caracteres_recebidos;j++){
-TXREG = buffer_serial[j];
-while(!TRMT){}
+enviar_caractere_serial('\n');
+
+enviar_string_serial(buffer_serial);
+
+enviar_caractere_serial('\n');
+
+if(0){
+char i=1;
+char endereco_modulo_repasse[18];
+while(buffer_serial[i] != 'R'){
+endereco_modulo_repasse[i-1] = buffer_serial[i++];
 }
 
+enviar_string_serial("AT");
+delay_ms(100);
+enviar_string_serial("AT+CON");
+enviar_string_serial(endereco_modulo_repasse);
+delay_ms(20);
+enviar_caractere_serial('\n');
+enviar_string_serial(&buffer_serial[++i]);
 
-TXREG = '\n';
-while(!TRMT){}
+}
 
-for(cont=0;cont<qtd_caracteres_recebidos;cont++){
+else{
+for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
 
 
 if((FLAGS_1 & (1<<0))){
@@ -6762,12 +6865,14 @@ if((FLAGS_1 & (1<<0))){
 if(buffer_serial[cont] != '>') {
 (FLAGS_1 |= (1<<7));}
 
+else{
 (FLAGS_1 &= ~(1<<0));
 ordem=0;
 etapa++;}
 
-else if(etapa == 0){
+}
 
+else if(etapa == 0){
 
 if(buffer_serial[cont] != 'I') {(FLAGS_1 |= (1<<7));}
 
@@ -6777,11 +6882,29 @@ if(buffer_serial[cont] != 'I') {(FLAGS_1 |= (1<<7));}
 else if(etapa == 1){
 
 funcao = buffer_serial[cont++];
+
+
 if(funcao<'0' || funcao>'7') {(FLAGS_1 |= (1<<7));}
 
-conta = ((buffer_serial[cont]) - '0');
+
+
+conta = ascii_para_numero('0',(buffer_serial[cont]),(buffer_serial[++cont]) );
+
+
+
 
 if(!(conta<16)) (FLAGS_1 |= (1<<2));
+
+
+
+
+else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
+(FLAGS_1 |= (1<<2));}
+
+if(!((senha[conta][16-1] & (1<<ascii_para_numero('0','0',funcao)))) ) {
+(FLAGS_1 |= (1<<3));
+numero_para_ascii(((senha[conta][16-1] & (1<<(funcao-'0'))) ));
+numero_para_ascii(senha[conta][16-1]);}
 
 (FLAGS_1 |= (1<<0));
 
@@ -6791,12 +6914,14 @@ if(!(conta<16)) (FLAGS_1 |= (1<<2));
 
 else if(etapa == 2){
 
+
+
 for(ordem=0;senha[conta][ordem]!= 0;ordem++){
+
 if(senha[conta][ordem] != buffer_serial[cont++]) {
 (FLAGS_1 |= (1<<6));
-TXREG = senha[conta][ordem]; while(!TRMT){}
-TXREG = buffer_serial[--cont]; while(!TRMT){}
 }
+
 }
 cont--;
 (FLAGS_1 |= (1<<0));
@@ -6825,7 +6950,7 @@ ordem++;
 
 else if(funcao == '4'){
 
-# 487
+# 529
 ptr_data= &data_atual.ano;
 
 for(ordem=0;ordem<6;ordem++){
@@ -6834,81 +6959,258 @@ ordem++;
 cont+=2;}
 
 *(ptr_data+ordem) = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
-char temp = *(ptr_data+ordem);
-numero_para_ascii(temp);
-numero_para_ascii(ordem);
+
+
+
+
 cont+=2;}
 
 data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
+
+
+
+if(data_atual.mes > 12) data_atual.mes=12;
+
+else if(data_atual.mes<1) data_atual.mes=1;
+
+
+if(data_atual.dia> qtd_max_dias) data_atual.dia = qtd_max_dias;
+
+else if(data_atual.dia<1) data_atual.dia=1;
+
+
+if(data_atual.hora >= 24){ data_atual.hora=0;}
+
+
+if(data_atual.minuto>=60){data_atual.minuto= 0;}
+
+if(data_atual.segundo>=60){data_atual.segundo = 0;}
+
+
+
+
 (FLAGS_1 |= (1<<0));
 cont--;
 }
 
-else if(funcao == '7'){
+else if(funcao == '6' || funcao == '7'){
 
-conta_a_ser_alterada = (buffer_serial[cont] - '0');
+if(funcao == '6') conta_a_ser_alterada = buffer_serial[cont] - '0';
 
-if( conta_a_ser_alterada != conta && (!((((conta*16)+ (16-1)) & (1<<6)))) ){
-(FLAGS_1 |= (1<<3));
-}
+else if(funcao == '7') conta_a_ser_alterada = conta;
+
+
 
 for(ordem=0;ordem<(16-1);ordem++){
-cont++;
 
-if(buffer_serial[cont] == '<') {
+
+if(buffer_serial[cont] == '>'){
+(FLAGS_1 |= (1<<7));}
+
+else if(buffer_serial[cont] == '<') {
 if(ordem<5) (FLAGS_1 |= (1<<7));
 
 else {
-if(ordem<16-2) (Busy_eep(), Write_b_eep(((conta_a_ser_alterada*16)+ordem),0));
+if(ordem<16-2) nova_senha[ordem]= 0;
 break;}
 }
 
 
 else{
+nova_senha[ordem] = buffer_serial[cont];}
 
-senha[conta_a_ser_alterada][ordem] = buffer_serial[cont];
-(Busy_eep(), Write_b_eep(((conta_a_ser_alterada*16)+ordem),buffer_serial[cont]));}
+cont++;
 
 }
+
+enviar_string_serial(nova_senha);
 
 (FLAGS_1 |= (1<<0));}
 }
 
 else if(etapa == 4){
 if(buffer_serial[cont] != 'F') {(FLAGS_1 |= (1<<7));}
-enviar=1; receber=qtd_caracteres_recebidos=0;}
+(FLAGS_2 |= (1<<0));
+qtd_caracteres_recebidos_serial=0;
+zerar_string(buffer_serial);}
 
 
 
-if(FLAGS_1>3) {
+if(FLAGS_1>1) {
+numero_para_ascii(etapa);
 (FLAGS_1 &= ~(1<<0));
-TXREG = '0' + etapa;
 etapa = 0;
-enviar=1;
-receber=qtd_caracteres_recebidos=0;}
+(FLAGS_2 |= (1<<0));
+break;
+}
+
+}
+}
+}
+
+else if((FLAGS_3 & (1<<2))){
+
+if((FLAGS_2 & (1<<4))){
+resetar_timer1(0xC0,0);
+
+
+if(qtd_vezes_mesma_tecla_pressionada>0 && ultimo_caractere_recebido >='0' && ultimo_caractere_recebido<='9'){
+
+
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]= ('a' -1) + qtd_vezes_mesma_tecla_pressionada + (( ultimo_caractere_recebido - '1') * 3) ;
+qtd_vezes_mesma_tecla_pressionada=0;
+
+if(ultimo_caractere_recebido != caractere_recebido) {
+ultimo_caractere_recebido = caractere_recebido;
+TMR1ON=1;
+
+
+}
+else ultimo_caractere_recebido=0;
+
+}
+
+else{
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
+
+}
+
+}
+
+
+
+
+else{
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
+}
+
+
+
+qtd_vezes_mesma_tecla_pressionada=0;
+caractere_recebido=0;
+
+
+
+printf("\n\n%s",buffer_teclado_matricial);
+
+if(buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] != 'F'){
+
+if(qtd_caracteres_recebidos_teclado){
+lcd_gotoxy(2,qtd_caracteres_recebidos_teclado);
+printf("*%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+TMR1ON=1;}
+
+else{
+lcd_gotoxy(2,(qtd_caracteres_recebidos_teclado+1));
+printf("%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+TMR1ON=1;}
+}
+
+
+if( buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == 'F' || ++qtd_caracteres_recebidos_teclado==(40-1)){
+
+resetar_timer1(0xC0,0);
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
+
+
+conta = ( ((buffer_teclado_matricial[0]-'0')*10) + (buffer_teclado_matricial[1]-'0') );
+cont=2;
+
+if(!(conta<16)) (FLAGS_1 |= (1<<2));
+
+
+
+
+else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
+(FLAGS_1 |= (1<<2));}
+
+# 706
+if(qtd_caracteres_recebidos_teclado<(5+2)){(FLAGS_1 |= (1<<7));}
+limpar_linha(2);
+
+while(cont<(16+2) && buffer_teclado_matricial[cont-2] != 0 && FLAGS_1<2){
+
+
+
+
+if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
+(FLAGS_1 |= (1<<6));
+}
+
+cont++;
+}
+
+(FLAGS_2 |= (1<<7));
+(FLAGS_2 |= (1<<0));
 
 }
 }
 
-else if(modo_bluetooth_teclado==1){
-}
 }
 
-if(enviar==1){
-enviar=0;
-qtd_caracteres_recebidos=0;
-memset(buffer_serial,0, 80);
-TXREG = '\n';
-while(!TRMT){}
-TXREG = 'I';
-while(!TRMT){}
 
-if(FLAGS_1<4 && etapa == 4){
+if((FLAGS_2 & (1<<0))){
+
+
+(FLAGS_2 &= ~(1<<0));
+qtd_caracteres_recebidos_serial, qtd_caracteres_recebidos_teclado,cont=0;
 etapa = 0;
-TXREG = 'O';
-while(!TRMT){}
-TXREG = 'K';
-while(!TRMT){}
+zerar_string(buffer_serial);
+zerar_string(buffer_teclado_matricial);
+
+
+if((FLAGS_3 & (1<<2))){
+
+if(FLAGS_1<2) {
+
+
+limpar_linha(3);
+printf("\n\nDestravando...");
+_delay((unsigned long)((49)*(16000000/4000.0)));
+delay_ms(800);
+char tentativas=0;
+
+while(PORTEbits.RE2==0){
+if(++tentativas == 6){
+(FLAGS_1 |= (1<<5));
+break;}
+
+LATCbits.LC4=1;
+delay_ms(350);
+if(PORTEbits.RE2==0) delay_ms(100);
+LATCbits.LC4=0;
+}
+
+
+lcd_gotoxy(1,20);
+printf("%c",PORTEbits.RE2);
+
+limpar_linha(3);
+if(PORTEbits.RE2==0){
+printf("\n\nErro de abertura");}
+
+else{
+printf("\n\nPorta aberta");}
+
+}
+
+else{
+limpar_linha(3);
+if((FLAGS_1 & (1<<7))) printf("\n\nErro de protocolo");
+
+else if((FLAGS_1 & (1<<2))) printf("\n\nConta nao existente");
+
+else if((FLAGS_1 & (1<<6))) printf("\n\nSenha incorreta");}
+}
+
+else{
+
+enviar_string_serial("\nI");
+
+if(!FLAGS_1){
+etapa = 0;
+LATDbits.LD2^=1;
+enviar_string_serial("OK");
 
 if(funcao == '2'){
 numero_para_ascii(data_atual.ano);
@@ -6920,10 +7222,13 @@ numero_para_ascii(data_atual.minuto);
 numero_para_ascii(data_atual.segundo);
 numero_para_ascii(qtd_total_contas);
 numero_para_ascii(16);
-numero_para_ascii(PORTAbits.RA0);}
+numero_para_ascii(PORTEbits.RE2);}
 
 
-else if(funcao == '7'){
+else if(funcao == '7' || funcao == '6'){
+
+(contas_cadastradas |= (1<<conta_a_ser_alterada));
+
 char i=0;
 do{
 senha[conta_a_ser_alterada][i] = nova_senha[i];
@@ -6933,102 +7238,131 @@ i++;} while(nova_senha[i-1] && i<16);
 }
 
 else if(funcao == '0'){
-while(PORTAbits.RA0 == 0){
-
-PORTCbits.RC0=1;
+char tentativas=0;
+while(PORTEbits.RE2==0){
+if(++tentativas == 6){
+(FLAGS_1 |= (1<<5));
+break;}
+LATCbits.LC4=1;
 delay_ms(325);
-PORTCbits.RC0=0;
-if(PORTAbits.RA0 == 0) delay_ms(100);
+LATCbits.LC4=0;
+if(PORTEbits.RE2==0) delay_ms(100);
 }
 }
 
 }
 
 else{
-etapa = 0;
-cont=qtd_caracteres_recebidos=0;
+
+enviar_caractere_serial('E');
+if((FLAGS_1 & (1<<1))){
+enviar_string_serial("SE");}
+
+if((FLAGS_1 & (1<<5))){
+enviar_caractere_serial('A');}
 
 if((FLAGS_1 & (1<<3))){
-TXREG = 'E';
-while(!TRMT){}
-TXREG = 'N';
-while(!TRMT){}
-
-(FLAGS_1 &= ~(1<<3));}
+enviar_caractere_serial('N');}
 
 if((FLAGS_1 & (1<<7))){
-TXREG = 'E';
-while(!TRMT){}
-TXREG = 'P';
-while(!TRMT){}
-if(funcao == '7'){
-TXREG = 'S';
-while(!TRMT){}
-}
-
-(FLAGS_1 &= ~(1<<7));}
+enviar_caractere_serial('P');}
 
 if((FLAGS_1 & (1<<4))){
-
-TXREG = 'E';
-while(!TRMT){}
-TXREG = 'C';
-while(!TRMT){}
-(FLAGS_1 &= ~(1<<4));}
-
+enviar_caractere_serial('C');}
 
 if((FLAGS_1 & (1<<6))){
-TXREG = 'E';
-while(!TRMT){}
-TXREG = 'S';
-while(!TRMT){}
-(FLAGS_1 &= ~(1<<6));}
+enviar_caractere_serial('S');}
 
 if((FLAGS_1 & (1<<2))){
-TXREG = 'E';
-while(!TRMT){}
-TXREG = 'I';
-while(!TRMT){}
-(FLAGS_1 &= ~(1<<2));}
-}
+enviar_caractere_serial('I');}
+
+FLAGS_1=0;}
 
 
 
-TXREG='F';
-while(!TRMT){}
+enviar_caractere_serial('F');
 PORTB_SR = PORTB;
-RBIE=1;}
+RBIE=1;
+}
+
+}
+
+if((PORTB&0xF0) == 0xF0 && RBIE==0 && (FLAGS_2 & (1<<3)) && (FLAGS_3 & (1<<2))){
+
+delay_ms(100);
+if(caractere_recebido < '0' || caractere_recebido > '9'){
 
 
+resetar_timer1(0xC0,0);
+ultimo_caractere_recebido = caractere_recebido;
 
-if((PORTB&0xF0) == 0xF0 && RBIE==0 && debounce==1 && modo_bluetooth_teclado==1){
 
-delay_ms(60);
+if(caractere_recebido == 'F'){
+(FLAGS_2 |= (1<<1));}
 
-if((FLAGS_2 & (1<<4)) && !TMR1ON) {
+else if(caractere_recebido == 'A'){
+(FLAGS_2 ^= (1<<4));}
 
-TMR1ON=1;
-ultimo_caractere_recebido=0;}
+else if(caractere_recebido == '*'){
+(FLAGS_2 ^= (1<<5));}
 
-else if(caractere_recebido == ultimo_caractere_recebido){
+else if(caractere_recebido == 'D'){
 
-if(++qtd_vezes_mesma_tecla_pressionada == 3 || ( (qtd_vezes_mesma_tecla_pressionada>3-1) && caractere_recebido == '9')){
-TMR1ON=0;
-TMR1H=TMR1L=0;
-qtd_vezes_mesma_tecla_pressionada=0;}
+if(qtd_caracteres_recebidos_teclado) qtd_caracteres_recebidos_teclado--;
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]=0;
+
+lcd_gotoxy(2,qtd_caracteres_recebidos_teclado); printf(" ");
 }
 
 
+}
 
-else if((FLAGS_2 & (1<<4))) {
-ultimo_caractere_recebido=caractere_recebido;}
 
+else{
+if((FLAGS_2 & (1<<4))){
+if(ultimo_caractere_recebido == caractere_recebido){
+if(++qtd_vezes_mesma_tecla_pressionada == 3 || ((qtd_vezes_mesma_tecla_pressionada==2) && caractere_recebido == '9'))
+(FLAGS_2 |= (1<<1));
+}
+
+
+else {
+if(qtd_vezes_mesma_tecla_pressionada) (FLAGS_2 |= (1<<1));
+
+else ultimo_caractere_recebido = caractere_recebido;
+}
+}
+
+else (FLAGS_2 |= (1<<1));
+
+}
+
+
+while(PORTB&0xF0 != 0xF0){}
+
+if((FLAGS_2 & (1<<4))) {TMR1ON=1;}
 
 PORTB_SR=PORTB;
 RBIE=1;
-debounce=0;
 }
 
-# 694
+
+if((FLAGS_2 & (1<<7))){
+(FLAGS_2 &= ~(1<<7));
+
+if((FLAGS_3 & (1<<0))){
+printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
+(FLAGS_3 &= ~(1<<0));
+}
+
+
+}
+
+if( (!(FLAGS_2 & (1<<7)))&& (!(FLAGS_2 & (1<<1))) && (!(FLAGS_2 & (1<<0))) && RBIE && RCIE){
+asm(" sleep");
+__nop();}
+
+
+
 }
 }

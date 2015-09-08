@@ -1,9 +1,5 @@
 Version 3.2 HI-TECH Software Intermediate Code
-[v F5261 `uc ~T0 @X0 -> 17 `i t ]
-"6008 C:\Program Files (x86)\Microchip\xc8\v1.34\include\pic18f4550.h
-[v _TXREG `Vuc ~T0 @X0 0 e@4013 ]
-"10909
-[v _TRMT `Vb ~T0 @X0 0 e@32097 ]
+[v F5263 `uc ~T0 @X0 -> 17 `i t ]
 "37 C:\Program Files (x86)\Microchip\xc8\v1.34\include\plib\EEP.h
 [v _Read_b_eep `(uc ~T0 @X0 0 ef1`ui ]
 "36
@@ -4816,146 +4812,132 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic18.h: 161: extern __nonreentrant void _delay(unsigned long);
 [; ;pic18.h: 163: extern __nonreentrant void _delaywdt(unsigned long);
 [; ;pic18.h: 165: extern __nonreentrant void _delay3(unsigned char);
-[; ;eeprom.h: 1: extern char verificar_num_contas(void);
-"7 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
-[v _carregar_senha `(v ~T0 @X0 1 ef2`uc`*F5261 ]
+[; ;eeprom_interna.h: 7: char verificar_num_contas(void);
+[; ;eeprom_interna.h: 9: void eeprom_config_inicial(void);
+[; ;eeprom_interna.h: 11: void carregar_senha(char conta, char senha_a_carregar[][17]);
+"6 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
+[v _carregar_senha `(v ~T0 @X0 1 ef2`uc`*F5263 ]
 {
-[; ;eeprom_interna.c: 7: void carregar_senha(char conta, char senha_a_carregar[][17]){
+[; ;eeprom_interna.c: 6: void carregar_senha( char conta, char senha_a_carregar[][17]){
 [e :U _carregar_senha ]
 [v _conta `uc ~T0 @X0 1 r1 ]
-[v _senha_a_carregar `*F5261 ~T0 @X0 1 r2 ]
+[v F5266 `uc ~T0 @X0 -> 17 `i t ]
+[v _senha_a_carregar `*F5266 ~T0 @X0 1 r2 ]
 [f ]
-[; ;eeprom_interna.c: 8: TXREG = '\n';
 "8
-[e = _TXREG -> -> 10 `ui `uc ]
-[; ;eeprom_interna.c: 9: while(!TRMT);
-"9
-[e $U 594  ]
-[e :U 595 ]
-[e :U 594 ]
-[e $ ! _TRMT 595  ]
-[e :U 596 ]
-"10
 [v _i `uc ~T0 @X0 1 a ]
-[; ;eeprom_interna.c: 10: char i = 0;
+[; ;eeprom_interna.c: 8: char i = 0;
 [e = _i -> -> 0 `i `uc ]
-[; ;eeprom_interna.c: 12: do{
-"12
-[e :U 599 ]
+[; ;eeprom_interna.c: 10: do{
+"10
+[e :U 596 ]
 {
-[; ;eeprom_interna.c: 13: senha_a_carregar[conta][i] = Read_b_eep((conta*16) + i);
-"13
+[; ;eeprom_interna.c: 11: senha_a_carregar[conta][i] = Read_b_eep((conta*16) + i);
+"11
 [e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> _i `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> + * -> _conta `i -> 16 `i -> _i `i `ui ]
-[; ;eeprom_interna.c: 14: TXREG= senha_a_carregar[conta][i];
-"14
-[e = _TXREG *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> _i `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ]
-[; ;eeprom_interna.c: 15: while(!TRMT);
-"15
-[e $U 600  ]
-[e :U 601 ]
-[e :U 600 ]
-[e $ ! _TRMT 601  ]
-[e :U 602 ]
-[; ;eeprom_interna.c: 16: i++;} while( senha_a_carregar[conta][i-1] && i<(16-1));
-"16
+[; ;eeprom_interna.c: 12: i++;} while( senha_a_carregar[conta][i-1] && i<(16-1));
+"12
 [e ++ _i -> -> 1 `i `uc ]
 }
-[e $ && != -> *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> - -> _i `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux `i -> -> -> 0 `i `uc `i < -> _i `i - -> 16 `i -> 1 `i 599  ]
-[e :U 598 ]
-[; ;eeprom_interna.c: 20: senha_a_carregar[conta][16] = Read_b_eep((16*(conta+1))-1);
-"20
-[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> -> 16 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> - * -> 16 `i + -> _conta `i -> 1 `i -> 1 `i `ui ]
-[; ;eeprom_interna.c: 21: }
-"21
+[e $ && != -> *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> - -> _i `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux `i -> -> -> 0 `i `uc `i < -> _i `i - -> 16 `i -> 1 `i 596  ]
+[e :U 595 ]
+[; ;eeprom_interna.c: 16: senha_a_carregar[conta][16-1] = Read_b_eep((16*(conta+1))-1);
+"16
+[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> - -> 16 `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> - * -> 16 `i + -> _conta `i -> 1 `i -> 1 `i `ui ]
+[; ;eeprom_interna.c: 17: }
+"17
 [e :UE 593 ]
 }
-"23
+"19
 [v _verificar_num_contas `(uc ~T0 @X0 1 ef ]
 {
-[; ;eeprom_interna.c: 23: char verificar_num_contas(void){
+[; ;eeprom_interna.c: 19: char verificar_num_contas(void){
 [e :U _verificar_num_contas ]
 [f ]
-"24
+"20
 [v _i `uc ~T0 @X0 1 a ]
-"25
+"21
 [v _qtd_contas `uc ~T0 @X0 1 a ]
-[; ;eeprom_interna.c: 24: char i;
-[; ;eeprom_interna.c: 25: unsigned char qtd_contas=0;
+[; ;eeprom_interna.c: 20: char i;
+[; ;eeprom_interna.c: 21: unsigned char qtd_contas=0;
 [e = _qtd_contas -> -> 0 `i `uc ]
-[; ;eeprom_interna.c: 26: for(i=0;i<16;i++){
-"26
+[; ;eeprom_interna.c: 22: for(i=0;i<16;i++){
+"22
 {
 [e = _i -> -> 0 `i `uc ]
-[e $ < -> _i `i -> 16 `i 604  ]
-[e $U 605  ]
-[e :U 604 ]
+[e $ < -> _i `i -> 16 `i 598  ]
+[e $U 599  ]
+[e :U 598 ]
 {
-[; ;eeprom_interna.c: 27: if(Read_b_eep(i*16) != 0xFF) {qtd_contas++;}
-"27
-[e $ ! != -> ( _Read_b_eep (1 -> * -> _i `i -> 16 `i `ui `i -> 255 `i 607  ]
+[; ;eeprom_interna.c: 23: if(Read_b_eep(i*16) != 0xFF) {qtd_contas++;}
+"23
+[e $ ! != -> ( _Read_b_eep (1 -> * -> _i `i -> 16 `i `ui `i -> 255 `i 601  ]
 {
 [e ++ _qtd_contas -> -> 1 `i `uc ]
 }
-[e :U 607 ]
-"28
+[e :U 601 ]
+"24
 }
-"26
+"22
 [e ++ _i -> -> 1 `i `uc ]
-[e $ < -> _i `i -> 16 `i 604  ]
-[e :U 605 ]
-"28
+[e $ < -> _i `i -> 16 `i 598  ]
+[e :U 599 ]
+"24
 }
-[; ;eeprom_interna.c: 28: }
-[; ;eeprom_interna.c: 29: return (qtd_contas);
-"29
+[; ;eeprom_interna.c: 24: }
+[; ;eeprom_interna.c: 25: return (qtd_contas);
+"25
 [e ) _qtd_contas ]
-[e $UE 603  ]
-[; ;eeprom_interna.c: 30: }
-"30
-[e :UE 603 ]
+[e $UE 597  ]
+[; ;eeprom_interna.c: 26: }
+"26
+[e :UE 597 ]
 }
-"33
+"29
 [v _eeprom_config_inicial `(v ~T0 @X0 1 ef ]
 {
-[; ;eeprom_interna.c: 33: void eeprom_config_inicial(void){
+[; ;eeprom_interna.c: 29: void eeprom_config_inicial(void){
 [e :U _eeprom_config_inicial ]
 [f ]
-"34
+"30
 [v _i `uc ~T0 @X0 1 a ]
-[; ;eeprom_interna.c: 34: unsigned char i;
-[; ;eeprom_interna.c: 36: for(i=0;i<10;i++){
-"36
+[; ;eeprom_interna.c: 30: unsigned char i;
+[; ;eeprom_interna.c: 32: for(i=0;i<10;i++){
+"32
 {
 [e = _i -> -> 0 `i `uc ]
-[e $ < -> _i `i -> 10 `i 609  ]
-[e $U 610  ]
-[e :U 609 ]
+[e $ < -> _i `i -> 10 `i 603  ]
+[e $U 604  ]
+[e :U 603 ]
 {
-[; ;eeprom_interna.c: 37: (Busy_eep(), Write_b_eep(i,('0'+i)));
-"37
+[; ;eeprom_interna.c: 33: (Busy_eep(), Write_b_eep(i,('0'+i)));
+"33
 [e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> _i `ui -> + -> 48 `ui -> _i `ui `uc ]
-[; ;eeprom_interna.c: 38: (Busy_eep(), Write_b_eep(16+i,('a'+i)));
-"38
+[; ;eeprom_interna.c: 34: (Busy_eep(), Write_b_eep(16+i,('a'+i)));
+"34
 [e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> + -> 16 `i -> _i `i `ui -> + -> 97 `ui -> _i `ui `uc ]
-"40
-}
 "36
-[e ++ _i -> -> 1 `i `uc ]
-[e $ < -> _i `i -> 10 `i 609  ]
-[e :U 610 ]
-"40
 }
-[; ;eeprom_interna.c: 40: }
-[; ;eeprom_interna.c: 41: (Busy_eep(), Write_b_eep(i,0));
-"41
+"32
+[e ++ _i -> -> 1 `i `uc ]
+[e $ < -> _i `i -> 10 `i 603  ]
+[e :U 604 ]
+"36
+}
+[; ;eeprom_interna.c: 36: }
+[; ;eeprom_interna.c: 37: (Busy_eep(), Write_b_eep(i,0));
+"37
 [e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> _i `ui -> -> 0 `i `uc ]
-[; ;eeprom_interna.c: 42: (Busy_eep(), Write_b_eep(16+i,0));
-"42
+[; ;eeprom_interna.c: 38: (Busy_eep(), Write_b_eep(16+i,0));
+"38
 [e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> + -> 16 `i -> _i `i `ui -> -> 0 `i `uc ]
-[; ;eeprom_interna.c: 44: (Busy_eep(), Write_b_eep(((16*2)-1),0b11111101));
-"44
-[e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> - * -> 16 `i -> 2 `i -> 1 `i `ui -> -> 253 `i `uc ]
-[; ;eeprom_interna.c: 45: }
-"45
-[e :UE 608 ]
+[; ;eeprom_interna.c: 40: (Busy_eep(), Write_b_eep(16-1,255));
+"40
+[e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> - -> 16 `i -> 1 `i `ui -> -> 255 `i `uc ]
+[; ;eeprom_interna.c: 41: (Busy_eep(), Write_b_eep(((16*2)-1),0b11111100));
+"41
+[e ; ( _Busy_eep ..  ( _Write_b_eep (2 , -> - * -> 16 `i -> 2 `i -> 1 `i `ui -> -> 252 `i `uc ]
+[; ;eeprom_interna.c: 42: }
+"42
+[e :UE 602 ]
 }

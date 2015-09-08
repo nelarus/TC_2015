@@ -6307,21 +6307,19 @@ extern __nonreentrant void _delay3(unsigned char);
 # 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.h"
 char teclado_matricial(char coluna, char linha);
 
-void delay_ms(unsigned int delay_total);
-
 void numero_para_ascii(char numero);
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1);
 
-# 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c"
-char teclado_matricial(char coluna, char linha){
+# 5 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c"
+char teclado_matricial(unsigned char coluna, char linha){
 
 char temp = ((linha-1)*4) + coluna;
 char caractere;
 
 switch(temp){
 case 1:
-caractere = 'M';
+caractere = '*';
 break;
 
 case 2:
@@ -6387,16 +6385,10 @@ break;}
 return caractere;
 }
 
-void delay_ms(unsigned int delay_total){
-unsigned int temp = 0;
-while(temp < delay_total){
-_delay((unsigned long)((1)*(16000000/4000.0)));
-temp++;}
-}
 
 void numero_para_ascii(char numero){
-char temp1;
-char temp2;
+int temp1;
+int temp2;
 
 TXREG = '+';
 while(!TRMT){}

@@ -6304,24 +6304,25 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom.h"
-extern char verificar_num_contas(void);
+# 7 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
+char verificar_num_contas(void);
 
-# 7 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c"
-void carregar_senha(char conta, char senha_a_carregar[][17]){
-TXREG = '\n';
-while(!TRMT);
+void eeprom_config_inicial(void);
+
+void carregar_senha(char conta, char senha_a_carregar[][17]);
+
+# 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c"
+void carregar_senha( char conta, char senha_a_carregar[][17]){
+
 char i = 0;
 
 do{
 senha_a_carregar[conta][i] = Read_b_eep((conta*16) + i);
-TXREG= senha_a_carregar[conta][i];
-while(!TRMT);
 i++;} while( senha_a_carregar[conta][i-1] && i<(16-1));
 
 
 
-senha_a_carregar[conta][16] = Read_b_eep((16*(conta+1))-1);
+senha_a_carregar[conta][16-1] = Read_b_eep((16*(conta+1))-1);
 }
 
 char verificar_num_contas(void){
@@ -6345,5 +6346,6 @@ for(i=0;i<10;i++){
 (Busy_eep(), Write_b_eep(i,0));
 (Busy_eep(), Write_b_eep(16+i,0));
 
-(Busy_eep(), Write_b_eep(((16*2)-1),0b11111101));
+(Busy_eep(), Write_b_eep(16-1,255));
+(Busy_eep(), Write_b_eep(((16*2)-1),0b11111100));
 }

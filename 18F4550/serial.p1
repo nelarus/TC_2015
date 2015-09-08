@@ -4833,9 +4833,11 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic18.h: 161: extern __nonreentrant void _delay(unsigned long);
 [; ;pic18.h: 163: extern __nonreentrant void _delaywdt(unsigned long);
 [; ;pic18.h: 165: extern __nonreentrant void _delay3(unsigned char);
-[; ;serial.h: 1: void config_serial(char baud);
-[; ;serial.h: 2: void enviar_string_serial(char *string_a_enviar);
-[; ;serial.h: 3: void enviar_caractere_serial(char carater_a_enviar);
+[; ;serial.h: 1: extern void config_serial(char baud);
+[; ;serial.h: 2: extern void enviar_string_serial(const char *string_a_enviar);
+[; ;serial.h: 3: extern void enviar_caractere_serial(char carater_a_enviar);
+[; ;serial.h: 4: void teste_comando_at(void);
+[; ;serial.h: 5: void enviar_comando_at(unsigned char comando,char *novo_parametro);
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
 [v _config_serial `(v ~T0 @X0 1 ef1`uc ]
 {
@@ -4910,11 +4912,11 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :UE 594 ]
 }
 "27
-[v _enviar_string_serial `(v ~T0 @X0 1 ef1`*uc ]
+[v _enviar_string_serial `(v ~T0 @X0 1 ef1`*Cuc ]
 {
-[; ;serial.c: 27: void enviar_string_serial(char *string_a_enviar){
+[; ;serial.c: 27: void enviar_string_serial(const char *string_a_enviar){
 [e :U _enviar_string_serial ]
-[v _string_a_enviar `*uc ~T0 @X0 1 r1 ]
+[v _string_a_enviar `*Cuc ~T0 @X0 1 r1 ]
 [f ]
 [; ;serial.c: 28: while(*string_a_enviar != (0)){
 "28
@@ -4945,3 +4947,190 @@ Version 3.2 HI-TECH Software Intermediate Code
 "34
 [e :UE 598 ]
 }
+"36
+[v _teste_comando_at `(v ~T0 @X0 1 ef ]
+{
+[; ;serial.c: 36: void teste_comando_at(void){
+[e :U _teste_comando_at ]
+[f ]
+[; ;serial.c: 37: enviar_string_serial("AT");}
+"37
+[e ( _enviar_string_serial (1 :s 1C ]
+[e :UE 605 ]
+}
+"41
+[v _enviar_comando_at `(v ~T0 @X0 1 ef2`uc`*uc ]
+{
+[; ;serial.c: 41: void enviar_comando_at(unsigned char comando,char *parametro){
+[e :U _enviar_comando_at ]
+[v _comando `uc ~T0 @X0 1 r1 ]
+[v _parametro `*uc ~T0 @X0 1 r2 ]
+[f ]
+[; ;serial.c: 42: enviar_string_serial("AT+");
+"42
+[e ( _enviar_string_serial (1 :s 2C ]
+[; ;serial.c: 44: if(comando<=1) {
+"44
+[e $ ! <= -> _comando `i -> 1 `i 607  ]
+{
+[; ;serial.c: 45: enviar_string_serial("NAME");
+"45
+[e ( _enviar_string_serial (1 :s 3C ]
+[; ;serial.c: 46: if(comando==1)enviar_string_serial(parametro);
+"46
+[e $ ! == -> _comando `i -> 1 `i 608  ]
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+[e $U 609  ]
+"47
+[e :U 608 ]
+[; ;serial.c: 47: else enviar_caractere_serial('?');
+[e ( _enviar_caractere_serial (1 -> -> 63 `ui `uc ]
+[e :U 609 ]
+"48
+}
+[; ;serial.c: 48: }
+[e $U 610  ]
+"50
+[e :U 607 ]
+[; ;serial.c: 50: else if(comando<=3){
+[e $ ! <= -> _comando `i -> 3 `i 611  ]
+{
+[; ;serial.c: 51: enviar_string_serial("BAUD");
+"51
+[e ( _enviar_string_serial (1 :s 4C ]
+[; ;serial.c: 52: if( comando==3 ) enviar_string_serial(parametro);
+"52
+[e $ ! == -> _comando `i -> 3 `i 612  ]
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+[e $U 613  ]
+"53
+[e :U 612 ]
+[; ;serial.c: 53: else enviar_caractere_serial('?');
+[e ( _enviar_caractere_serial (1 -> -> 63 `ui `uc ]
+[e :U 613 ]
+"54
+}
+[; ;serial.c: 54: }
+[e $U 614  ]
+"56
+[e :U 611 ]
+[; ;serial.c: 56: else if(comando<=5){
+[e $ ! <= -> _comando `i -> 5 `i 615  ]
+{
+[; ;serial.c: 57: enviar_string_serial("ROLE");
+"57
+[e ( _enviar_string_serial (1 :s 5C ]
+[; ;serial.c: 58: if( comando==5 ) enviar_string_serial(parametro);
+"58
+[e $ ! == -> _comando `i -> 5 `i 616  ]
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+[e $U 617  ]
+"59
+[e :U 616 ]
+[; ;serial.c: 59: else enviar_caractere_serial('?');
+[e ( _enviar_caractere_serial (1 -> -> 63 `ui `uc ]
+[e :U 617 ]
+"60
+}
+[; ;serial.c: 60: }
+[e $U 618  ]
+"62
+[e :U 615 ]
+[; ;serial.c: 62: else if( comando==6 ){
+[e $ ! == -> _comando `i -> 6 `i 619  ]
+{
+[; ;serial.c: 63: enviar_string_serial("ADDR?");
+"63
+[e ( _enviar_string_serial (1 :s 6C ]
+"64
+}
+[; ;serial.c: 64: }
+[e $U 620  ]
+"66
+[e :U 619 ]
+[; ;serial.c: 66: else if( comando==7 ){
+[e $ ! == -> _comando `i -> 7 `i 621  ]
+{
+[; ;serial.c: 67: enviar_string_serial("DISC?");}
+"67
+[e ( _enviar_string_serial (1 :s 7C ]
+}
+[e $U 622  ]
+"69
+[e :U 621 ]
+[; ;serial.c: 69: else if(comando==8){
+[e $ ! == -> _comando `i -> 8 `i 623  ]
+{
+[; ;serial.c: 70: enviar_string_serial("RESET");}
+"70
+[e ( _enviar_string_serial (1 :s 8C ]
+}
+[e $U 624  ]
+"72
+[e :U 623 ]
+[; ;serial.c: 72: else if(comando==9){
+[e $ ! == -> _comando `i -> 9 `i 625  ]
+{
+[; ;serial.c: 73: enviar_string_serial("START");}
+"73
+[e ( _enviar_string_serial (1 :s 9C ]
+}
+[e $U 626  ]
+"75
+[e :U 625 ]
+[; ;serial.c: 75: else if( comando==10 ){
+[e $ ! == -> _comando `i -> 10 `i 627  ]
+{
+[; ;serial.c: 76: enviar_string_serial("RADD?");}
+"76
+[e ( _enviar_string_serial (1 :s 10C ]
+}
+[e $U 628  ]
+"78
+[e :U 627 ]
+[; ;serial.c: 78: else if( comando==11 ){
+[e $ ! == -> _comando `i -> 11 `i 629  ]
+{
+[; ;serial.c: 79: enviar_string_serial("SLEEP");}
+"79
+[e ( _enviar_string_serial (1 :s 11C ]
+}
+[e $U 630  ]
+"81
+[e :U 629 ]
+[; ;serial.c: 81: else if(comando == 13){
+[e $ ! == -> _comando `i -> 13 `i 631  ]
+{
+[; ;serial.c: 82: enviar_string_serial("CON");
+"82
+[e ( _enviar_string_serial (1 :s 12C ]
+[; ;serial.c: 83: enviar_string_serial(parametro);}
+"83
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+}
+[e :U 631 ]
+"87
+[e :U 630 ]
+[e :U 628 ]
+[e :U 626 ]
+[e :U 624 ]
+[e :U 622 ]
+[e :U 620 ]
+[e :U 618 ]
+[e :U 614 ]
+[e :U 610 ]
+[; ;serial.c: 87: }
+[e :UE 606 ]
+}
+[a 9C 83 84 65 82 84 0 ]
+[a 8C 82 69 83 69 84 0 ]
+[a 1C 65 84 0 ]
+[a 11C 83 76 69 69 80 0 ]
+[a 12C 67 79 78 0 ]
+[a 3C 78 65 77 69 0 ]
+[a 5C 82 79 76 69 0 ]
+[a 4C 66 65 85 68 0 ]
+[a 6C 65 68 68 82 63 0 ]
+[a 10C 82 65 68 68 63 0 ]
+[a 7C 68 73 83 67 63 0 ]
+[a 2C 65 84 43 0 ]

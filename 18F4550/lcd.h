@@ -5,27 +5,6 @@
 
 //Funções para uso da CGRAM
 
-//Escrita de letras com acento na cgram
-
-//Acentos
-extern void escrever_crase_cgram(void);
-extern void escrever_til_cgram(void);
-extern void escrever_acento_agudo_cgram(void);
-extern void escrever_acento_circunflexo_cgram(void);
-//
-
-//Letras
-extern void escrever_a_maiusculo_cgram(void);
-extern void escrever_a_minusculo_cgram(void);
-
-extern void escrever_o_cgram(char maiuscula);
-
-extern void escrever_e_minusculo_cgram(void);
-extern void escrever_e_maiusculo_cgram(void);
-
-extern void escrever_i_minusculo_cgram(void);
-extern void escrever_i_maiusculo_cgram(void);
-//
 
 extern void CGRAM_goto(char pos);//ir para posição(0 a 7) da CGRAM
 
@@ -107,8 +86,8 @@ extern unsigned char Linha_4;
 
 //Caracteres especiais: Correspondência decimal
 
-#define SIMBOLO_FECHADURA_ABERTA 215
-#define SIMBOLO_FECHADURA_FECHADA 216
+#define SIMBOLO_FECHADURA_ABERTA (NULL+1)
+#define SIMBOLO_FECHADURA_FECHADA NULL
 //
 
 

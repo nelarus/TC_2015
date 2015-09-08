@@ -1,9 +1,8 @@
 #include <xc.h>
-#include <delays.h>
 #include "ascii.h"
 #include "main.h"
 
-char teclado_matricial(char coluna, char linha){
+char teclado_matricial(unsigned char coluna, char linha){
 
 	char temp = ((linha-1)*4) + coluna;
 	char caractere;

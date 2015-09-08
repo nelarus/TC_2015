@@ -1,6 +1,5 @@
 #include <xc.h>
 #include <stdio.h>
-#include <i2c.h>
 #include "encrypt.h"
 #include "ascii.h"
 #include "eeprom_interna.h"
@@ -8,6 +7,8 @@
 #include "main.h"
 #include "serial.h"
 #include "lcd.h"
+#include "flags.h"
+#include "recebimento_dados.h"
 
 //CONFIGURAÇÃO 18F4550
 
@@ -88,8 +89,6 @@ unsigned int endereco_final_eeprom=5;
 
 
 char *ptr_data;
-
-
 
 
 //REPRESENTAÇÃO DO TECLADO MATRICIAL NO MODO_T9
@@ -207,7 +206,8 @@ void interrupt aux(void){
 							modo_teclado_matricial();
 							LATDbits.LD0^=1;
 	
-							if(COLUNA_1==0){coluna=1;}
+							//detecção de coluna
+							if(COLUNA_1==0){coluna=1;} 
 
 							else if(COLUNA_2==0){coluna=2;}
 
@@ -220,11 +220,14 @@ void interrupt aux(void){
 						
 						TRISB&=0x0F; //TRISB 4 ultimos bits como saída, 4 primeiros inalterados; 
 						LATB|=0xF0;  //LATB 4 ultimos bits em 1, 4 primeiros inalterados;
+						
 
 						while(PORTB&0xF0 !=	0xF0){}  //Prende-se o programa nesse laço até que os 4 ultimos bits do PORTB estejam de fato em 1
 						while( (PORTD&0xF0) != 0){}  //Prende-se o programa até que os 4 ultimos bits do PORTD tenham pelo menos 1 diferente de 1
 
-						TRISD|=0xF0; //4 ultimos bits como entrada para se verificar qual deles está em 1
+						TRISD|=0xF0; //4 ultimos bits como entrada para se verificar qual deles está em 1. 
+						
+						//LB4<>LD4, LB5<>LD5, LB6<>LD6,LB7<>LD7
 	
 							if(LINHA_1==1){linha=1;}
 
@@ -237,22 +240,12 @@ void interrupt aux(void){
 							else{linha=0;}//Houve algum problema na detecção de qual linha está a tecla pressionada
 
 							if(linha && coluna){//Não faz nada se houve algum erro na detecção da linha ou da linha
-								TXREG = '\n';
-								while(!TRMT){}
-								caractere_recebido = teclado_matricial(coluna,linha);
-								enviar_caractere_serial(caractere_recebido);
-								printf("\r%c",caractere_recebido);
-						
-									if(caractere_recebido == MODO_T9_ON_OFF){
-											inverter_bit(FLAGS_2,MODO_T9);
-											}
 
-									else if(caractere_recebido == MAIUSCULA_MINUSCULA){
-											inverter_bit(FLAGS_2,MAIUSCULA);}
+								caractere_recebido = teclado_matricial(coluna,linha);
 								
 											}
 						
-									if(testar_bit(FLAGS_2,MODO_T9)) {TMR1ON=1;}
+							
 					
 						TRISB|=0xF0;//
 						LATD&=0x0F;//
@@ -267,7 +260,6 @@ void interrupt aux(void){
 
 			if(RCIE && RCIF){
 					modo_bluetooth();
-					RBIE=0;
 
 					if(OERR==1){
 						setar_bit(FLAGS_1,ERRO_COMUNICACAO);
@@ -298,20 +290,15 @@ void interrupt aux(void){
 								setar_bit(FLAGS_2,ENVIAR);
 								resetar_bit(FLAGS_2,RECEBER);}
 					
-					else{	
-
-							
+					else{							
 							resetar_timer1(0xC0,0);
-
 							buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
-
+						
 							TMR1ON=1;
-							LATDbits.LD0^=1;
+
 							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
 									setar_bit(FLAGS_2,RECEBER);
-									TMR1ON=0;
-									TMR1L=0;
-									TMR1H=0xC0;}
+									resetar_timer1(0xC0,0);}
 						}
 
 					RCIF=0;}
@@ -354,9 +341,9 @@ int main(void){
 	
 	TRISB=0xF0; // 4 ultimos bits-> teclado matricial
 	TRISA=0x00;
-	TRISE=0X00;
+	TRISE=0X04;
 	LATB=0x0F; 
-	TRISC=0xD3;
+	TRISC=0xDF;
 	TRISD=0x00;
 	ADCON1=0XFF;
 	CMCON=0X07;
@@ -404,11 +391,9 @@ int main(void){
 
 	lcd_init(LCD_20X4);
 	lcd_gotoxy(LINHA1,20);
+	printf("%c",!SENSOR_ABERTURA_FECHADURA);
+	lcd_gotoxy(LINHA1,1);
 	LCD_RS=1;
-	lcd_write(0);	
-
-	printf("\róã");
-	printf("\n%d%d",'ã','Ã');
 
 	while(1){
 
@@ -423,8 +408,26 @@ int main(void){
 				enviar_string_serial(buffer_serial);
 
 				enviar_caractere_serial(NOVA_LINHA);
+
+					if(buffer_serial[0] == REPASSAR_MENSAGEM){
+						char i=1;
+						char endereco_modulo_repasse[18];
+							while(buffer_serial[i] != REPASSAR_MENSAGEM){
+									endereco_modulo_repasse[i-1] = buffer_serial[i++];
+									}
+
+							enviar_string_serial("AT");
+							delay_ms(100);
+							enviar_string_serial("AT+CON");
+							enviar_string_serial(endereco_modulo_repasse);
+							delay_ms(20);
+							enviar_caractere_serial(NOVA_LINHA);
+							enviar_string_serial(&buffer_serial[++i]);
+
+						}
 		
-					for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
+					else{
+							for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
 	
 		
 									if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
@@ -433,14 +436,11 @@ int main(void){
 																	setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 		
 											else{
+												resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
+												ordem=0;
+												etapa++;}
 
-											resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-											ordem=0;
-											etapa++;
-
-											}
-
-}
+									}
 									
 									else if(etapa == etapa_inicial){//Inicio da comunicação
 					
@@ -449,30 +449,36 @@ int main(void){
 												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 												}
 											
-		//i>000>
-		//01234			
 									else if(etapa == etapa_recebe_funcao){
 													//cont=2
-											    	funcao = buffer_serial[cont++];
+											    funcao = buffer_serial[cont++];
+
+													
+												if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA_PROPRIA_CONTA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);} //Função fora do do intervalo
+												
+												
+																							
+												conta = ascii_para_numero('0',(buffer_serial[cont]),(buffer_serial[++cont]) );
 
 												
-													
-													if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA_PROPRIA_CONTA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);} //Função fora do do intervalo
-														
-																							
-													conta = ascii_para_numero('0',(buffer_serial[cont]),(buffer_serial[++cont]) );
 
-			
-														if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N° da conta fora do intervalo
+
+												if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N° da conta fora do intervalo
+
+												//N° dentro do intervalo, mas a conta não existe.Só é feito exceção a cadastro de contas, que																			
+												//usa a função de mudar senha de outra conta
+
+												else if(funcao != MUDAR_SENHA_OUTRA_CONTA && (!testar_bit(contas_cadastradas,conta)) ){ 
+													setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);} 
 														
-														if(!(testar_bit(nivel_acesso, ascii_para_numero('0','0',funcao)))  ) {
+												if(!(testar_bit(nivel_acesso, ascii_para_numero('0','0',funcao)))  ) {
 																setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
 																numero_para_ascii((testar_bit(nivel_acesso,(funcao-'0') ) ));
 																numero_para_ascii(nivel_acesso);}
 		
-													setar_bit(FLAGS_1,TRANSICAO_ETAPA);
+												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
 																	
-													}
+									}
 				
 									
 					
@@ -519,7 +525,6 @@ int main(void){
 														//ordem 3 ajuste de hora
 														//ordem 4 ajuste de minuto
 														//ordem 5 ajuste de segundo
-					
 	
 														ptr_data= &data_atual.ano;
 	
@@ -606,17 +611,16 @@ int main(void){
 				
 									
 									
-									if(FLAGS_1>3) {
-													enviar_caractere_serial('0'+ etapa);
+									if(FLAGS_1>1) { //Transição etapa é o bit 0,os outros sinalizam erros.
+
 													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
 													etapa = etapa_inicial;	
 													setar_bit(FLAGS_2,ENVIAR);
-													qtd_caracteres_recebidos_serial=0;
-													zerar_string(buffer_serial);
 													break; //sai do laço for para recebimento de dados
 											}
 		
-																			}		
+																			}	
+					}				
 					}
 
 				else if(MODO_TECLADO_MATRICIAL){
@@ -640,54 +644,72 @@ int main(void){
 									else ultimo_caractere_recebido=0;
 
 												}
-								else{
+
+								else{ //se o modo_t9 estiver on mas o usuário apertou a tecla uma única vez para inserir um número
 										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
-										qtd_vezes_mesma_tecla_pressionada=0;}
+										
+									}
 										
 								}
 
 								
 							
-
-							else{
+						
+							else{ //Se modo_t9 estiver off, não há necessidade de fazer qualquer lógica antes de armazená-lo no buffer
 									buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
-									}
+								}
 
 							
 						
-							
+							qtd_vezes_mesma_tecla_pressionada=0;
+							caractere_recebido=0;
+
 
 							//comparação com senha recebida
 							printf("\n\n%s",buffer_teclado_matricial);
 
-							if(qtd_caracteres_recebidos_teclado){			
-								lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado); 
-								printf("*%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
-								TMR1ON=1;}
+							if(buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] != FIM){
 
-							else{
-								lcd_gotoxy(LINHA2,(qtd_caracteres_recebidos_teclado+1));
-								printf("%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
-								TMR1ON=1;
-								}
+										if(qtd_caracteres_recebidos_teclado){			
+											lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado); 
+											printf("*%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+											TMR1ON=1;}
+			
+										else{
+											lcd_gotoxy(LINHA2,(qtd_caracteres_recebidos_teclado+1));
+											printf("%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+											TMR1ON=1;}
+							}
+
 
 							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
+		
+										resetar_timer1(0xC0,0);//Reseta timer para evitar que o caractere F seja impresso ou que um asterisco seja por algum erro no programa
 										buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
 										
 
 										conta = ( ((buffer_teclado_matricial[0]-'0')*10)  + (buffer_teclado_matricial[1]-'0') );
 										cont=2;
+
+										if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N° da conta fora do intervalo
+
+												//N° dentro do intervalo, mas a conta não existe.Só é feito exceção a cadastro de contas, que																			
+												//usa a função de mudar senha de outra conta
+
+												else if(funcao != MUDAR_SENHA_OUTRA_CONTA && (!testar_bit(contas_cadastradas,conta)) ){ 
+													setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);} 
+
 									  	//cont inicia em 2 porque a senha do usuário no buffer do teclado matricial inicia em
 										//buffer_teclado_matricial[2]
 
 										
-										if(qtd_caracteres_recebidos_teclado<(TAMANHO_MINIMO_SENHA+2)){setar_bit(FLAGS_1,ERRO_PROTOCOLO);
-										}
+										if(qtd_caracteres_recebidos_teclado<(TAMANHO_MINIMO_SENHA+2)){setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+										limpar_linha(LINHA2);
 										
 										while(cont<(TAMANHO_SENHA+2) && buffer_teclado_matricial[cont-2] != 0 && FLAGS_1<2){
 											
-											enviar_caractere_serial(senha[conta][cont-2]);
-											enviar_caractere_serial(buffer_teclado_matricial[cont]);
+											//enviar_caractere_serial(senha[conta][cont-2]);
+											//enviar_caractere_serial(buffer_teclado_matricial[cont]);
 
 											if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
 												setar_bit(FLAGS_1,ERRO_SENHA);
@@ -696,37 +718,11 @@ int main(void){
 											cont++;
 										}
 
-										if(FLAGS_1<2) {
-												printf("\n\nSenha correta.Destravando...");
-												char tentativas=0;
-													while(FECHADURA_TRAVADA){
-														if(++tentativas == 6){ 
-															setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura não abriu após 6 tentativas. Não há como saber, pelo atual software, a causa.
-															break;}
-	
-														FECHADURA=1;
-															if(FECHADURA_TRAVADA) delay_ms(100);//preparação para próxima tentativa 
-															}
-												
-												delay_ms(1500);			
-												lcd_gotoxy(LINHA1,20);
-												LCD_RS=1;
-												lcd_write(SENSOR_ABERTURA_FECHADURA);
-												limpar_linha(LINHA3);
-												lcd_gotoxy(LINHA3,1);									
-												if(FECHADURA_TRAVADA){
-														printf("Erro de abertura            ");}
-		
-												else{
-														printf("Abertura bem-sucedida       ");}
-
-										}
-
-										else{
-											
-											printf("\n\nSenha incorreta  ");}
+										setar_bit(FLAGS_2,EXIBIR);
+										setar_bit(FLAGS_2,ENVIAR);
+										
 							}				
-				}
+						}
 
 			}
 
@@ -735,13 +731,61 @@ int main(void){
 			
 								
 			resetar_bit(FLAGS_2,ENVIAR);
-			qtd_caracteres_recebidos_serial=0;
-			qtd_caracteres_recebidos_teclado=0;
+			qtd_caracteres_recebidos_serial, qtd_caracteres_recebidos_teclado,cont=0;
 			etapa = etapa_inicial;
-			cont=0;
-			enviar_string_serial("\nI");
+			zerar_string(buffer_serial);
+			zerar_string(buffer_teclado_matricial);
+			
 
-						if(!FLAGS_1){ //Não houve erros
+				if(MODO_TECLADO_MATRICIAL){
+
+						if(FLAGS_1<2) { //Não houve erros
+												
+
+												limpar_linha(LINHA3);
+												printf("\n\nDestravando...");
+												__delay_ms(49);
+												delay_ms(800);	
+												char tentativas=0;
+
+													while(FECHADURA_TRAVADA){
+														if(++tentativas == 6){ 
+															setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura não abriu após 6 tentativas. Não há como saber, pelo atual software, a causa.
+															break;}
+	
+														FECHADURA=1;
+														delay_ms(350);
+															if(FECHADURA_TRAVADA) delay_ms(100);//preparação para próxima tentativa 
+														FECHADURA=0;
+															}
+												
+														
+												lcd_gotoxy(LINHA1,20);
+												printf("%c",SENSOR_ABERTURA_FECHADURA);
+
+												limpar_linha(LINHA3);								
+												if(FECHADURA_TRAVADA){
+														printf("\n\nErro de abertura");}
+		
+												else{
+														printf("\n\nPorta aberta");}
+
+										}
+
+										else{//Houve erros, de senha ou de protocolo.
+											limpar_linha(LINHA3);
+												if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)) printf("\n\nErro de protocolo");
+
+												else if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)) printf("\n\nConta nao existente");
+
+												else if(testar_bit(FLAGS_1,ERRO_SENHA))	printf("\n\nSenha incorreta");}
+				}				
+
+		else{
+
+					enviar_string_serial("\nI");
+
+						if(!FLAGS_1){//Não houve erros
 										etapa = etapa_inicial;
 										LATDbits.LD2^=1;
 										enviar_string_serial("OK");
@@ -761,7 +805,8 @@ int main(void){
 
 												else if(funcao == MUDAR_SENHA_PROPRIA_CONTA || funcao == MUDAR_SENHA_OUTRA_CONTA){
 													
-													
+													setar_bit(contas_cadastradas,conta_a_ser_alterada); //seta-se o bit correspondente a conta que sera alterada para marcar
+																										//que ela existe.Se já existir mantem-se em 1.
 													char i=0;
 														do{
 															senha[conta_a_ser_alterada][i] = nova_senha[i];
@@ -785,67 +830,68 @@ int main(void){
 
 										}
 						
-						if(FLAGS_1){
+						else{//Houve erros
+							
+							enviar_caractere_serial('E');
+								if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){
+											enviar_string_serial("SE");}
+							
+								if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
+											enviar_caractere_serial('A');}
+	
+								if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){
+											enviar_caractere_serial('N');}
+	
+								if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)){ 		
+											enviar_caractere_serial('P');}
+	
+								if(testar_bit(FLAGS_1,ERRO_COMUNICACAO)){
+											enviar_caractere_serial('C');}
+							
+								if(testar_bit(FLAGS_1,ERRO_SENHA)){
+											enviar_caractere_serial('S');}
+					
+								if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ 
+											enviar_caractere_serial('I');}
+							
+						 FLAGS_1=0;}
 
 							
-
-							if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){
-										enviar_string_serial("SE");
-										resetar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA);}
-						
-							if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
-												enviar_string_serial("EA");
-												resetar_bit(FLAGS_1,ERRO_ABERTURA);	}
-
-							if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){
-
-												enviar_string_serial("EN");
-												resetar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);}
-
-							if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)){ 
-
-													
-												enviar_string_serial("EP");
-												resetar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-
-							if(testar_bit(FLAGS_1,ERRO_COMUNICACAO)){
-
-											enviar_string_serial("EC");
-											resetar_bit(FLAGS_1,ERRO_COMUNICACAO);}
-						
-				
-							if(testar_bit(FLAGS_1,ERRO_SENHA)){
-											enviar_string_serial("ES");
-											
-											resetar_bit(FLAGS_1,ERRO_SENHA);}
-				
-							if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ 
-											enviar_string_serial("EI");
-											resetar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);}
-								}
-
-							if(FLAGS_3){
-								FLAGS_3=0;}
 															
-				enviar_caractere_serial(FIM);
-				PORTB_SR = PORTB;
-				RBIE=1;}
+				enviar_caractere_serial(FIM);	
+				PORTB_SR = PORTB; //Reativa a interrupção por mudança de nível ,liberando o acesso pelo teclado
+				RBIE=1;
+		}
 
-
+		}
 
 		if((PORTB&0xF0) == 0xF0 && RBIE==0 && testar_bit(FLAGS_2,DEBOUNCE) && MODO_TECLADO_MATRICIAL){//Tratamento de debounce. Espera-se até que nenhum botão esteja pressionado e que o debounce esteja autorizado
 																			//(existem situações em que RBIE=0 e não se quer fazer tratamento de debounce
-					delay_ms(60);
-					printf("%c",caractere_recebido);
+					delay_ms(100);
 						if(caractere_recebido < '0' || caractere_recebido > '9'){//Caracteres não são armazenados, pois são fora da faixa de 0 a 9.São utilizados para certas funções
 																					//como indicar maiuscula, ativar modo_t9, etc.
 									
 									resetar_timer1(0xC0,0);	//Para evitar que o timer dê uma interrupção e receba o caracter
 									ultimo_caractere_recebido = caractere_recebido; //atualiza ultimo caractere recebido
 									
-									
-						if(caractere_recebido == FIM){
-							setar_bit(FLAGS_2,RECEBER);}
+						
+							if(caractere_recebido == FIM){
+								setar_bit(FLAGS_2,RECEBER);}
+	
+							else if(caractere_recebido == MODO_T9_ON_OFF){
+								inverter_bit(FLAGS_2,MODO_T9);}
+	
+							else if(caractere_recebido == MAIUSCULA_MINUSCULA){
+								inverter_bit(FLAGS_2,MAIUSCULA);}
+
+							else if(caractere_recebido == VOLTAR_CARACTERE){//Retorna o indice do buffer em 1  põe-se um zero nele para que se "retire" o caractere que tenha ali
+
+								if(qtd_caracteres_recebidos_teclado) qtd_caracteres_recebidos_teclado--;
+								buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]=0;
+								
+								lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado); printf(" ");
+								}			
+						
 
 						}
 
@@ -870,11 +916,12 @@ int main(void){
 						}
 					
 						
+					while(PORTB&0xF0 != 0xF0){}
+
+					if(testar_bit(FLAGS_2,MODO_T9)) {TMR1ON=1;}
 
 					PORTB_SR=PORTB;//leitura do PORTB antes de ativar a interrupção para evitar uma interrupção não desejada.
 					RBIE=1;
-					resetar_bit(FLAGS_2,DEBOUNCE);
-					if(testar_bit(FLAGS_2,RECEBER)) printf("sdss");
 		}
 
 
@@ -882,16 +929,18 @@ int main(void){
 			resetar_bit(FLAGS_2,EXIBIR);
 
 			if(testar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY)){
-			printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
+				printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
+				resetar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY);
 			}
 			
-
 
 			}
 
 			if( (!testar_bit(FLAGS_2,EXIBIR))&& (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
 				SLEEP();
 				NOP();}
+
+
 
 }
 }

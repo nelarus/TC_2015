@@ -1,10 +1,9 @@
 #include <xc.h>
-#include <delays.h>
-#include "ascii.h"
 #include "main.h"
+#include "eeprom_interna.h"
 
 
-void carregar_senha(char conta, char senha_a_carregar[][17]){
+void carregar_senha( char conta, char senha_a_carregar[][17]){
 					
 					char i = 0;
 
@@ -21,7 +20,7 @@ char verificar_num_contas(void){
 		char i;
 		unsigned char qtd_contas=0;
 		for(i=0;i<QTD_MAX_CONTAS;i++){
-			if(eeprom_read(i*TAMANHO_SENHA) != 0xFF) {qtd_contas++;}
+			if(eeprom_read(i*TAMANHO_SENHA) != VALOR_INICIAL) {qtd_contas++;}
 				}
 		return (qtd_contas);
 }

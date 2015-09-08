@@ -1,28 +1,28 @@
 #include <xc.h>
 #include <stdio.h>
 #include "lcd.h"
-#include "main.h"
+
+#ifndef _XTAL_FREQ
+ // Unless specified elsewhere, 4MHz system frequency is assumed
+ #define _XTAL_FREQ 16000000
+#endif
 
 
-char linha_lcd;
-char linha_lcd_aux_posicao;
-char coluna_lcd;
-char qtd_max_colunas_lcd;
-char lcd_type;
-unsigned char Linha_3;
-unsigned char Linha_4;
-
+<<<<<<< HEAD
 
 void posicao_atual_lcd(char *linha, char *coluna){
 		*linha = linha_lcd_aux_posicao; //retorna linha atual do lcd
 		*coluna = coluna_lcd; //retorna coluna atual do lcd
 	}
+=======
+#define	LCD_RS LATEbits.LE0
+//#define	LCD_RW RA2
+#define LCD_EN LATEbits.LE1
+>>>>>>> parent of 639478b... Versão 1.0.5
 
-//Substitui todos os caracteres de uma linha por nada, limpando a linha
-void limpar_linha(unsigned char linha){
-	unsigned char coluna_atual=1;
-	lcd_gotoxy(linha,coluna_atual);
+#define LCD_DATA	LATA
 
+<<<<<<< HEAD
 	while(coluna_atual<qtd_max_colunas_lcd){
 		LCD_RS=1;
 		lcd_write(0x10);
@@ -118,8 +118,12 @@ void substituir_por_asterisco(void){
 	LCD_RS=1;
 	lcd_write('*');
 	}
+=======
+#define	LCD_STROBE()	((LCD_EN = 1),(LCD_EN=0))
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 /* write a byte to the LCD in 4 bit mode */
+
 void
 lcd_write(unsigned char c)
 {
@@ -157,6 +161,7 @@ lcd_putc(char c)
 					lcd_clear();	// Clear screen
           break;
      case '\n'   :
+<<<<<<< HEAD
 					coluna_lcd=0;
 
 				switch(lcd_type){
@@ -172,6 +177,9 @@ lcd_putc(char c)
 				}
 
      			lcd_gotoxy(linha_lcd,1);
+=======
+     			lcd_goto(0x40);
+>>>>>>> parent of 639478b... Versão 1.0.5
      			break;
      case '\r'   :
 				linha_lcd=1;
@@ -179,6 +187,7 @@ lcd_putc(char c)
 				lcd_write(0x80);
 					break;
      default     :
+<<<<<<< HEAD
      			LCD_RS = 1;	// write characters	
 				coluna_lcd++;
 				linha_lcd=1;
@@ -209,37 +218,72 @@ lcd_puts(const char * s)
 void CGRAM_goto(char pos){
 	LCD_RS=0;
 	lcd_write(0x40 + (pos*8));}
+=======
+     			LCD_RS = 1;	// write characters
+					lcd_write( c );
+					break;
+		}
+}
+
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 /*
  * Go to the specified position
  */
 
 void
-lcd_gotoxy(unsigned char linha,unsigned char coluna)
+lcd_goto(unsigned char pos)
 {
 	LCD_RS = 0;
+<<<<<<< HEAD
 	coluna_lcd = coluna;
 	linha_lcd_aux_posicao = linha;
 	switch(linha){
 		case 1:
 			lcd_write(Linha_1+(coluna-1));
 			break;
+=======
+	lcd_write(0x80+pos);
+}
+>>>>>>> parent of 639478b... Versão 1.0.5
 
-		case 2:
-			lcd_write(Linha_2+(coluna-1));
-			break;
+/* initialise the LCD - put into 4 bit mode */
+void
+lcd_init()
+{
+	char init_value;
 
-		case 3:
-			lcd_write(Linha_3+(coluna-1));
-			break;
 
+<<<<<<< HEAD
 		case 4:
 			lcd_write(Linha_4+(coluna-1));
 			break;
 	}
 }
+=======
+	init_value = 0x3;
 
-/* initialise the LCD - put into 4 bit mode */
+	LCD_RS = 0;
+	LCD_EN = 0;
+	//LCD_RW = 0;
+
+	__delay_ms(15);	// wait 15mSec after power applied,
+	LCD_DATA	 = init_value;
+	LCD_STROBE();
+	__delay_ms(5);
+	LCD_STROBE();
+	__delay_us(200);
+	LCD_STROBE();
+	__delay_us(200);
+	LCD_DATA = 2;	// Four bit mode
+	LCD_STROBE();
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+	lcd_write(0x28); // Set interface length
+	lcd_write(0x0C); // Display On, Cursor On, Cursor OFF
+	lcd_clear();	// Clear screen
+	lcd_write(0x6); // Set entry Mode
+}
 
 void putch(char c)
 {

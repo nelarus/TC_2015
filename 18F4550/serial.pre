@@ -6304,9 +6304,26 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.h"
+<<<<<<< HEAD
+
+# 28
+=======
+
+# 178
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+# 186
+<<<<<<< HEAD
+
+=======
+
+# 200
+>>>>>>> parent of 639478b... Versão 1.0.5
+
 # 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.h"
 extern void config_serial(char baud);
-extern void enviar_string_serial(const char *string_a_enviar);
+extern void enviar_string_serial(const char string_a_enviar[]);
 extern void enviar_caractere_serial(char carater_a_enviar);
 void teste_comando_at(void);
 void enviar_comando_at(unsigned char comando,char *novo_parametro);
@@ -6333,11 +6350,12 @@ TXREG = carater_a_enviar;
 while(!TRMT){}
 }
 
-void enviar_string_serial(const char *string_a_enviar){
-while(*string_a_enviar != (0)){
-TXREG = *string_a_enviar;
+void enviar_string_serial(const char string_a_enviar[]){
+char i=0;
+while(string_a_enviar[i] != (0)){
+TXREG = string_a_enviar[i];
 while(!TRMT){}
-string_a_enviar++;}
+i++;}
 
 
 }

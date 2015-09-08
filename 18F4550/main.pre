@@ -6304,6 +6304,9 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
+# 2 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+<<<<<<< HEAD
+
 # 7 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdarg.h"
 typedef void * va_list[1];
 
@@ -6367,6 +6370,44 @@ extern int vsscanf(const char *, const char *, va_list) __attribute__((unsupport
 extern int sprintf(char *, const char *, ...);
 extern int printf(const char *, ...);
 
+# 4 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+=======
+
+# 22 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\string.h"
+extern void * memcpy(void *, const void *, size_t);
+extern void * memmove(void *, const void *, size_t);
+extern void * memset(void *, int, size_t);
+
+# 42
+extern char * strcat(char *, const char *);
+extern char * strcpy(char *, const char *);
+extern char * strncat(char *, const char *, size_t);
+extern char * strncpy(char *, const char *, size_t);
+extern char * strdup(const char *);
+extern char * strtok(char *, const char *);
+
+
+extern int memcmp(const void *, const void *, size_t);
+extern int strcmp(const char *, const char *);
+extern int stricmp(const char *, const char *);
+extern int strncmp(const char *, const char *, size_t);
+extern int strnicmp(const char *, const char *, size_t);
+extern void * memchr(const void *, int, size_t);
+extern size_t strcspn(const char *, const char *);
+extern char * strpbrk(const char *, const char *);
+extern size_t strspn(const char *, const char *);
+extern char * strstr(const char *, const char *);
+extern char * stristr(const char *, const char *);
+extern char * strerror(int);
+extern size_t strlen(const char *);
+extern char * strchr(const char *, int);
+extern char * strichr(const char *, int);
+extern char * strrchr(const char *, int);
+extern char * strrichr(const char *, int);
+
+# 8 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+>>>>>>> parent of 639478b... Versão 1.0.5
+
 # 22 "D:\Dropbox\Micros\2015\TC_2015\18F4550\encrypt.h"
 void clearCypher(void);
 void encodeCypher(void);
@@ -6401,14 +6442,38 @@ char dia_da_semana(unsigned int ano,char mes, char dia);
 
 void resetar_timer1(char valor_h, char valor_l);
 
+# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.h"
+<<<<<<< HEAD
+
+# 28
+=======
+
+# 178
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+# 186
+<<<<<<< HEAD
+
+=======
+
+# 200
+>>>>>>> parent of 639478b... Versão 1.0.5
+
 # 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.h"
 extern void config_serial(char baud);
-extern void enviar_string_serial(const char *string_a_enviar);
+extern void enviar_string_serial(const char string_a_enviar[]);
 extern void enviar_caractere_serial(char carater_a_enviar);
 void teste_comando_at(void);
 void enviar_comando_at(unsigned char comando,char *novo_parametro);
 
-# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
+# 15 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+<<<<<<< HEAD
+
+# 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
+<<<<<<< HEAD
+
+
+
 extern void CGRAM_goto(char pos);
 
 extern void posicao_atual_lcd(char *linha, char *coluna);
@@ -6419,8 +6484,11 @@ extern char escrever_simbolo_CGRAM(char simbolo);
 
 extern void exibir_simbolo_lcd(char simbolo);
 
-# 25
+# 26
 extern void limpar_linha(unsigned char linha);
+
+=======
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 
 
@@ -6436,18 +6504,19 @@ extern void lcd_puts(const char * s);
 
 
 
-extern void lcd_gotoxy(unsigned char linha,unsigned char coluna);
+extern void lcd_goto(unsigned char pos);
 
 
 
-extern void lcd_init(char tipo_lcd);
+extern void lcd_init(void);
 
 extern void lcd_putch(char);
 
+<<<<<<< HEAD
 
 void substituir_por_asterisco(void);
 
-# 58
+# 63
 extern char linha_lcd;
 extern char linha_lcd_aux_posicao;
 extern char coluna_lcd;
@@ -6457,8 +6526,20 @@ extern char lcd_type;
 extern unsigned char Linha_3;
 extern unsigned char Linha_4;
 
+# 114
+=======
 
-# 15 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+
+
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+# 19 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+=======
+
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+
+
 #pragma config FOSC = XTPLL_XT
 #pragma config PLLDIV = 1
 #pragma config CPUDIV = OSC4_PLL6
@@ -6506,7 +6587,7 @@ unsigned char buffer_teclado_matricial[40];
 unsigned char qtd_caracteres_recebidos_serial=0;
 unsigned char qtd_caracteres_recebidos_teclado=0;
 
-# 68
+# 78
 struct Data{
 unsigned char ano;
 unsigned char mes;
@@ -6524,15 +6605,24 @@ unsigned char FLAGS_2=0;
 unsigned char FLAGS_3=0;
 unsigned char PORTB_SR;
 unsigned char num_interrupt_timer1=0;
-unsigned char num_interrupt_caracter_por_asterisco=0;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
+
 unsigned int endereco_inic_eeprom=5;
 unsigned int endereco_final_eeprom=5;
 
-
 char *ptr_data;
 
-# 106
+<<<<<<< HEAD
+=======
+bit enviar=0;
+bit receber=0;
+bit modo_bluetooth_teclado=0;
+bit debounce=0;
+bit modo_t9=0;
+bit maiuscula=0;
+>>>>>>> parent of 639478b... Versão 1.0.5
+
+# 124
 void zerar_string(char *string_a_zerar){
 
 while(*string_a_zerar != (0)){
@@ -6549,17 +6639,14 @@ TMR1H=0xC0;
 
 if((!((FLAGS_3 & (1<<3))))){
 qtd_caracteres_recebidos_serial=0;
-(FLAGS_1 |= (1<<1));
+(FLAGS_1 |= (1<<7));
 (FLAGS_2 |= (1<<0));
 TMR1ON=0;
 }
 
 
-
 else if((FLAGS_3 & (1<<2)) && ++num_interrupt_timer1==5){
-if((FLAGS_2 & (1<<4))){(FLAGS_2 |= (1<<1));}
-lcd_gotoxy(2,qtd_caracteres_recebidos_teclado);
-printf("*");
+(FLAGS_2 |= (1<<1));
 TMR1ON=0;
 num_interrupt_timer1=0;}
 
@@ -6570,8 +6657,7 @@ TMR0H = 0xC2;
 TMR0L+=0xF7;
 TMR0IF=0;
 LATDbits.LD1^=1;
-(FLAGS_2 |= (1<<7));
-(FLAGS_3 |= (1<<0));
+
 if(++data_atual.segundo>59){
 data_atual.segundo=0;
 
@@ -6627,13 +6713,14 @@ break;}
 
 
 if(RBIE && RBIF){
-char coluna,linha=0;
+char coluna=0;
+char linha=0;
 PORTB_SR=(PORTB&0xF0);
 RBIF=0;
 if(PORTB_SR != 0xF0) {
 RBIE=0;
-(FLAGS_2 |= (1<<3));
-(FLAGS_3 |= (1<<3));
+debounce=1;
+(FLAGS_3 |= (1<<3))
 LATDbits.LD0^=1;
 
 
@@ -6646,6 +6733,7 @@ else if(PORTBbits.RB5==0){coluna=3;}
 else if(PORTBbits.RB4==0){coluna=4;}
 
 else{coluna=0;}
+
 
 
 TRISB&=0x0F;
@@ -6670,6 +6758,18 @@ else if(PORTDbits.RD7==1){linha=4;}
 else{linha=0;}
 
 if(linha && coluna){
+<<<<<<< HEAD
+=======
+TXREG = '\n';
+while(!TRMT){}
+caractere_recebido = teclado_matricial(coluna,linha);
+enviar_caractere_serial(caractere_recebido);
+
+
+if(caractere_recebido == 'A'){
+(FLAGS_2 ^= (1<<4));
+}
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 caractere_recebido = teclado_matricial(coluna,linha);
 
@@ -6720,8 +6820,16 @@ if(temp){}
 (FLAGS_2 |= (1<<0));
 (FLAGS_2 &= ~(1<<1));}
 
+<<<<<<< HEAD
 else{
 resetar_timer1(0xC0,0);
+=======
+else{
+
+
+resetar_timer1(0xC0,0x00);
+
+>>>>>>> parent of 639478b... Versão 1.0.5
 buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
 
 TMR1ON=1;
@@ -6770,10 +6878,15 @@ LATD=0;
 
 
 TRISB=0xF0;
+<<<<<<< HEAD
 TRISA=0x00;
 TRISE=0X04;
 LATB=0x0F;
 TRISC=0xDF;
+=======
+LATB=0x0F;
+TRISC=0xC3;
+>>>>>>> parent of 639478b... Versão 1.0.5
 TRISD=0x00;
 ADCON1=0XFF;
 CMCON=0X07;
@@ -6795,13 +6908,7 @@ qtd_total_contas = verificar_num_contas();
 numero_para_ascii(qtd_total_contas);
 
 for(conta=0;conta<qtd_total_contas;conta++){
-carregar_senha(conta,senha);
-
-enviar_string_serial(&senha[conta][0]);
-numero_para_ascii(senha[conta][16-1]);
-
-(contas_cadastradas |= (1<<conta));
-}
+carregar_senha(conta, senha);}
 
 
 conta=0;
@@ -6821,7 +6928,7 @@ cont=0;
 
 lcd_init(3);
 lcd_gotoxy(1,20);
-printf("%c",!PORTEbits.RE2);
+printf("%c",!PORTAbits.RA0);
 lcd_gotoxy(1,1);
 LATEbits.LE0=1;
 
@@ -6881,6 +6988,7 @@ if(buffer_serial[cont] != 'I') {(FLAGS_1 |= (1<<7));}
 
 else if(etapa == 1){
 
+<<<<<<< HEAD
 funcao = buffer_serial[cont++];
 
 
@@ -6900,6 +7008,15 @@ if(!(conta<16)) (FLAGS_1 |= (1<<2));
 
 else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
 (FLAGS_1 |= (1<<2));}
+=======
+funcao = buffer_serial[cont++];
+
+if(funcao<'0' || funcao>'7') {(FLAGS_1 |= (1<<7));}
+
+conta = ascii_para_numero('0',(buffer_serial[cont++]),(buffer_serial[cont]) );
+
+if(!(conta<16)) (FLAGS_1 |= (1<<2));
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 if(!((senha[conta][16-1] & (1<<ascii_para_numero('0','0',funcao)))) ) {
 (FLAGS_1 |= (1<<3));
@@ -6913,8 +7030,6 @@ numero_para_ascii(senha[conta][16-1]);}
 
 
 else if(etapa == 2){
-
-
 
 for(ordem=0;senha[conta][ordem]!= 0;ordem++){
 
@@ -6950,7 +7065,7 @@ ordem++;
 
 else if(funcao == '4'){
 
-# 529
+# 572
 ptr_data= &data_atual.ano;
 
 for(ordem=0;ordem<6;ordem++){
@@ -6993,37 +7108,35 @@ if(data_atual.segundo>=60){data_atual.segundo = 0;}
 cont--;
 }
 
-else if(funcao == '6' || funcao == '7'){
+else if(funcao == '7'){
 
-if(funcao == '6') conta_a_ser_alterada = buffer_serial[cont] - '0';
-
-else if(funcao == '7') conta_a_ser_alterada = conta;
+conta_a_ser_alterada = buffer_serial[cont] - '0';
 
 
 
 for(ordem=0;ordem<(16-1);ordem++){
+cont++;
 
 
-if(buffer_serial[cont] == '>'){
-(FLAGS_1 |= (1<<7));}
-
-else if(buffer_serial[cont] == '<') {
+if(buffer_serial[cont] == '<') {
 if(ordem<5) (FLAGS_1 |= (1<<7));
 
 else {
-if(ordem<16-2) nova_senha[ordem]= 0;
+if(ordem<16-2) (Busy_eep(), Write_b_eep(((conta_a_ser_alterada*16)+ordem),0));
 break;}
 }
 
 
 else{
-nova_senha[ordem] = buffer_serial[cont];}
 
-cont++;
+nova_senha[ordem] = buffer_serial[cont];
+(Busy_eep(), Write_b_eep(((conta_a_ser_alterada*16)+ordem),buffer_serial[cont]));}
 
 }
-
-enviar_string_serial(nova_senha);
+char i;
+for(i=0; senha[conta_a_ser_alterada][i] != (0);i++){
+char temp = senha[conta_a_ser_alterada][i];
+enviar_caractere_serial(temp);}
 
 (FLAGS_1 |= (1<<0));}
 }
@@ -7050,13 +7163,14 @@ break;
 
 else if((FLAGS_3 & (1<<2))){
 
+
 if((FLAGS_2 & (1<<4))){
 resetar_timer1(0xC0,0);
+enviar_caractere_serial('\n');
+
 
 
 if(qtd_vezes_mesma_tecla_pressionada>0 && ultimo_caractere_recebido >='0' && ultimo_caractere_recebido<='9'){
-
-
 buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]= ('a' -1) + qtd_vezes_mesma_tecla_pressionada + (( ultimo_caractere_recebido - '1') * 3) ;
 qtd_vezes_mesma_tecla_pressionada=0;
 
@@ -7079,6 +7193,7 @@ buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
 
 
 
+<<<<<<< HEAD
 
 else{
 buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;
@@ -7107,14 +7222,23 @@ TMR1ON=1;}
 }
 
 
+=======
+
+else{
+buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = caractere_recebido;}
+
+
+>>>>>>> parent of 639478b... Versão 1.0.5
 if( buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == 'F' || ++qtd_caracteres_recebidos_teclado==(40-1)){
 
 resetar_timer1(0xC0,0);
 buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] = 0;
+(FLAGS_2 |= (1<<0));
 
 
 conta = ( ((buffer_teclado_matricial[0]-'0')*10) + (buffer_teclado_matricial[1]-'0') );
 cont=2;
+<<<<<<< HEAD
 
 if(!(conta<16)) (FLAGS_1 |= (1<<2));
 
@@ -7124,7 +7248,7 @@ if(!(conta<16)) (FLAGS_1 |= (1<<2));
 else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
 (FLAGS_1 |= (1<<2));}
 
-# 706
+# 758
 if(qtd_caracteres_recebidos_teclado<(5+2)){(FLAGS_1 |= (1<<7));}
 limpar_linha(2);
 
@@ -7132,6 +7256,10 @@ while(cont<(16+2) && buffer_teclado_matricial[cont-2] != 0 && FLAGS_1<2){
 
 
 
+=======
+
+while(cont<2+16 && buffer_teclado_matricial[cont-2] != 0){
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
 (FLAGS_1 |= (1<<6));
@@ -7139,6 +7267,7 @@ if(buffer_teclado_matricial[cont] != senha[conta][cont-2]){
 
 cont++;
 }
+<<<<<<< HEAD
 
 (FLAGS_2 |= (1<<7));
 (FLAGS_2 |= (1<<0));
@@ -7170,33 +7299,55 @@ _delay((unsigned long)((49)*(16000000/4000.0)));
 delay_ms(800);
 char tentativas=0;
 
-while(PORTEbits.RE2==0){
+while(PORTAbits.RA0==0){
 if(++tentativas == 6){
 (FLAGS_1 |= (1<<5));
 break;}
 
-LATCbits.LC4=1;
+PORTCbits.RC0=1;
 delay_ms(350);
-if(PORTEbits.RE2==0) delay_ms(100);
-LATCbits.LC4=0;
+if(PORTAbits.RA0==0) delay_ms(100);
+PORTCbits.RC0=0;
 }
 
 
 lcd_gotoxy(1,20);
-printf("%c",PORTEbits.RE2);
+printf("%c",PORTAbits.RA0);
 
 limpar_linha(3);
-if(PORTEbits.RE2==0){
+if(PORTAbits.RA0==0){
 printf("\n\nErro de abertura");}
 
 else{
 printf("\n\nPorta aberta");}
+=======
+if(FLAGS_1<2) {
+char tentativas=0;
+while(PORTAbits.RA0==0){
+if(++tentativas == 6){
+(FLAGS_1 |= (1<<5));
+break;}
+>>>>>>> parent of 639478b... Versão 1.0.5
 
+; PORTCbits.RC0=1;delay_ms(325);PORTCbits.RC0=0;;
+if(PORTAbits.RA0==0) delay_ms(100);
 }
 
+
+
+<<<<<<< HEAD
 else{
 limpar_linha(3);
 if((FLAGS_1 & (1<<7))) printf("\n\nErro de protocolo");
+=======
+}
+}
+
+
+
+enviar_caractere_serial('\n');
+enviar_string_serial(buffer_teclado_matricial);}
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 else if((FLAGS_1 & (1<<2))) printf("\n\nConta nao existente");
 
@@ -7222,14 +7373,19 @@ numero_para_ascii(data_atual.minuto);
 numero_para_ascii(data_atual.segundo);
 numero_para_ascii(qtd_total_contas);
 numero_para_ascii(16);
-numero_para_ascii(PORTEbits.RE2);}
+numero_para_ascii(PORTAbits.RA0);}
 
 
+<<<<<<< HEAD
 else if(funcao == '7' || funcao == '6'){
 
 (contas_cadastradas |= (1<<conta_a_ser_alterada));
 
 char i=0;
+=======
+else if(funcao == '7'){
+char i=0;
+>>>>>>> parent of 639478b... Versão 1.0.5
 do{
 senha[conta_a_ser_alterada][i] = nova_senha[i];
 (Busy_eep(), Write_b_eep(((conta_a_ser_alterada*16) + i),nova_senha[i]));
@@ -7239,19 +7395,18 @@ i++;} while(nova_senha[i-1] && i<16);
 
 else if(funcao == '0'){
 char tentativas=0;
-while(PORTEbits.RE2==0){
+while(PORTAbits.RA0==0){
 if(++tentativas == 6){
 (FLAGS_1 |= (1<<5));
 break;}
-LATCbits.LC4=1;
-delay_ms(325);
-LATCbits.LC4=0;
-if(PORTEbits.RE2==0) delay_ms(100);
+; PORTCbits.RC0=1;delay_ms(325);PORTCbits.RC0=0;;
+if(PORTAbits.RA0 == 0) delay_ms(100);
 }
 }
 
 }
 
+<<<<<<< HEAD
 else{
 
 enviar_caractere_serial('E');
@@ -7284,17 +7439,65 @@ enviar_caractere_serial('F');
 PORTB_SR = PORTB;
 RBIE=1;
 }
+=======
+if(FLAGS_1){
+
+if((FLAGS_1 & (1<<5))){
+enviar_string_serial("EA");
+(FLAGS_1 &= ~(1<<5)); }
+
+if((FLAGS_1 & (1<<3))){
+
+enviar_string_serial("EN");
+(FLAGS_1 &= ~(1<<3));}
+
+if((FLAGS_1 & (1<<7))){
+
+
+enviar_string_serial("EP");
+(FLAGS_1 &= ~(1<<7));}
+
+if((FLAGS_1 & (1<<4))){
+
+enviar_string_serial("EC");
+(FLAGS_1 &= ~(1<<4));}
+
+
+if((FLAGS_1 & (1<<6))){
+enviar_string_serial("ES");
+
+(FLAGS_1 &= ~(1<<6));}
+
+if((FLAGS_1 & (1<<2))){
+enviar_string_serial("EI");
+(FLAGS_1 &= ~(1<<2));}
+}
+
+
+
+enviar_caractere_serial('F');
+PORTB_SR = PORTB;
+RBIE=1;}
+
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 }
 
-if((PORTB&0xF0) == 0xF0 && RBIE==0 && (FLAGS_2 & (1<<3)) && (FLAGS_3 & (1<<2))){
+if((PORTB&0xF0) == 0xF0 && RBIE==0 && debounce==1 && (FLAGS_3 & (1<<2))){
 
+<<<<<<< HEAD
 delay_ms(100);
+=======
+delay_ms(60);
+
+
+>>>>>>> parent of 639478b... Versão 1.0.5
 if(caractere_recebido < '0' || caractere_recebido > '9'){
 
 
 resetar_timer1(0xC0,0);
 ultimo_caractere_recebido = caractere_recebido;
+<<<<<<< HEAD
 
 
 if(caractere_recebido == 'F'){
@@ -7317,26 +7520,33 @@ lcd_gotoxy(2,qtd_caracteres_recebidos_teclado); printf(" ");
 
 }
 
+=======
+}
+>>>>>>> parent of 639478b... Versão 1.0.5
 
 else{
 if((FLAGS_2 & (1<<4))){
 if(ultimo_caractere_recebido == caractere_recebido){
+
 if(++qtd_vezes_mesma_tecla_pressionada == 3 || ((qtd_vezes_mesma_tecla_pressionada==2) && caractere_recebido == '9'))
 (FLAGS_2 |= (1<<1));
 }
-
 
 else {
 if(qtd_vezes_mesma_tecla_pressionada) (FLAGS_2 |= (1<<1));
 
 else ultimo_caractere_recebido = caractere_recebido;
 }
-}
-
-else (FLAGS_2 |= (1<<1));
 
 }
 
+else{
+(FLAGS_2 |= (1<<1));
+}
+}
+
+
+<<<<<<< HEAD
 
 while(PORTB&0xF0 != 0xF0){}
 
@@ -7359,6 +7569,15 @@ printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,d
 }
 
 if( (!(FLAGS_2 & (1<<7)))&& (!(FLAGS_2 & (1<<1))) && (!(FLAGS_2 & (1<<0))) && RBIE && RCIE){
+=======
+
+PORTB_SR=PORTB;
+RBIE=1;
+debounce=0;
+}
+
+if( (!(FLAGS_2 & (1<<1))) && (!(FLAGS_2 & (1<<0))) && RBIE && RCIE){
+>>>>>>> parent of 639478b... Versão 1.0.5
 asm(" sleep");
 __nop();}
 

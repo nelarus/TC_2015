@@ -1,1 +1,1 @@
- LCD_ModSauer.d  LCD_ModSauer.p1:  D:/Dropbox/Micros/2015/TC_2015/18F4550/LCD_ModSauer.c D:/Dropbox/Micros/2015/TC_2015/18F4550/lcd.h D:/Dropbox/Micros/2015/TC_2015/18F4550/main.h
+ LCD_ModSauer.d  LCD_ModSauer.p1:  D:/Dropbox/Micros/2015/TC_2015/18F4550/LCD_ModSauer.c D:/Dropbox/Micros/2015/TC_2015/18F4550/lcd.h

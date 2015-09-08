@@ -3,17 +3,28 @@
 #include "eeprom_interna.h"
 
 
+<<<<<<< HEAD
 void carregar_senha( char conta, char senha_a_carregar[][17]){
 					
+=======
+void carregar_senha(char conta, char senha_a_carregar[][17]){
+					TXREG = '\n';
+					while(!TRMT);
+>>>>>>> parent of 639478b... Versão 1.0.5
 					char i = 0;
 
 							do{
 								senha_a_carregar[conta][i] = eeprom_read((conta*TAMANHO_SENHA) + i);
+								TXREG= senha_a_carregar[conta][i];
+								while(!TRMT);
 								i++;} while( senha_a_carregar[conta][i-1] && i<(TAMANHO_SENHA-1));
 
 
 					
 					senha_a_carregar[conta][TAMANHO_SENHA-1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
+					unsigned char temp;
+					temp = senha_a_carregar[conta][TAMANHO_SENHA-1]; 
+					numero_para_ascii(temp);
 					}
 
 char verificar_num_contas(void){
@@ -38,5 +49,5 @@ void eeprom_config_inicial(void){
 		eeprom_write(TAMANHO_SENHA+i,0);//null da string de cada senha
 
 		eeprom_write(TAMANHO_SENHA-1,255);
-		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111100);
+		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111101);
 		}

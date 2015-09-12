@@ -99,6 +99,10 @@ void numero_para_ascii(char numero){
 }
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1){
+
+		if(caractere3 == NULL) caractere3 = '0'; 
+		if(caractere2 == NULL) caractere2 = '0';
+
 		char numero;
 		numero=((caractere3 - '0')*100);
 		numero+=((caractere2 - '0')*10);

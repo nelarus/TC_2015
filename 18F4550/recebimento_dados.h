@@ -15,9 +15,11 @@
 #define modo_bluetooth() resetar_bit(FLAGS_3,MODO_BT)
 //
 
+
 //CORRESPONDÊNCIA DE CARACTERES NA COMUNICAÇÃO SERIAL E RECEBIMENTO POR TECLADO MATRICIAL
 
 	#define MODO_DEBUG_ON_OFF '^'	//Se o caracter recebido for esse o programa irá ignorar o protocolo e entrar em modo de debug(a ser implementado)
+
 
 	//FUNÇÕES DO SISTEMA
 	#define ABERTURA_PORTA '0'
@@ -28,6 +30,7 @@
 	#define RECONFIGURAR_MODULO '5'
 	#define MUDAR_SENHA_OUTRA_CONTA '6'
 	#define MUDAR_SENHA_PROPRIA_CONTA '7'
+
 	#define REPASSAR_MENSAGEM 'R'
 
 	//OUTROS CARACTERES
@@ -76,3 +79,12 @@
 #define etapa_detalha_funcao 3
 #define etapa_final 4
 //
+
+//Fechadura
+
+#define NUMERO_DESSA_FECHADURA '0'
+
+
+//Nivel de acesso
+
+#define FUNCAO_NAO_AUTORIZADA !testar_bit(nivel_acesso, ascii_para_numero(NULL,NULL,funcao))

@@ -5,7 +5,6 @@
 #define VALOR_INICIAL 0xFF
 
 
-
 char verificar_num_contas(void); //verifica e retorna a quantidade de contas cadastradas, isto é, que possuem uma senha definida
 
 void eeprom_config_inicial(void); //Configuração inicial da eeprom, necessária por causa do apagamento da eeprom ao programar o 18F4550.

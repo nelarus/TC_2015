@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <string.h>
 #include <stdio.h>
 #include "encrypt.h"
 #include "ascii.h"
@@ -136,12 +137,13 @@ void interrupt aux(void){
 			}
 			
 			if(TMR0IE && TMR0IF){
+					
+					setar_bit(FLAGS_2,EXIBIR);
+					setar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY);
 					TMR0H = 0xC2;
 					TMR0L+=0xF7;
 					TMR0IF=0;
 					LATDbits.LD1^=1;
-					setar_bit(FLAGS_2,EXIBIR);//Permite a atualização do display com a data correta.
-					setar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY);
 					if(++data_atual.segundo>59){
 								data_atual.segundo=0; 
 								
@@ -343,7 +345,7 @@ int main(void){
 	TRISA=0x00;
 	TRISE=0X04;
 	LATB=0x0F; 
-	TRISC=0xDF;
+	TRISC=0xCF;
 	TRISD=0x00;
 	ADCON1=0XFF;
 	CMCON=0X07;
@@ -352,6 +354,7 @@ int main(void){
 	T1CON = 0b00001110;
 	TMR1H=0XC0; //TMR1 = 49152 (1 interrupção = 0.5s para cristal de 32,768khz)
 	TMR1L=0;
+	TMR1IE=0;
 
 	//CONFIGURAÇÃO INICIAL DA EEPROM
 	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
@@ -361,6 +364,8 @@ int main(void){
 
 	qtd_total_contas = verificar_num_contas();
 
+	
+	enviar_caractere_serial(NOVA_LINHA);
 
 	numero_para_ascii(qtd_total_contas);
 
@@ -396,6 +401,12 @@ int main(void){
 	LCD_RS=1;
 	printf("%d",PORTE);
 
+	RCIE=0;
+	delay_ms(600);
+	enviar_string_serial("AT");
+	delay_ms(600);
+	enviar_string_serial("AT+NAMEMODULO2_V4");
+	delay_ms(600);
 	while(1){
 
 		if(testar_bit(FLAGS_2,RECEBER)){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
@@ -410,217 +421,87 @@ int main(void){
 
 				enviar_caractere_serial(NOVA_LINHA);
 
-					if(buffer_serial[0] == REPASSAR_MENSAGEM){
-						char i=1;
-						char endereco_modulo_repasse[18];
-							while(buffer_serial[i] != REPASSAR_MENSAGEM){
-									endereco_modulo_repasse[i-1] = buffer_serial[i++];
-									}
+				char *ptr_caractere_recebido_serial = &buffer_serial[0];
 
-							enviar_string_serial("AT");
-							delay_ms(100);
-							enviar_string_serial("AT+");
-							enviar_string_serial(endereco_modulo_repasse);
-							delay_ms(20);
-							enviar_string_serial(&buffer_serial[i]);
+				char i;
+				//Início da análise dos dados recebidos
+				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
+					if(FLAGS_1>1){
+						break;}
 
-						}
-		
-					else{
-							for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
-	
-		
-									if(testar_bit(FLAGS_1,TRANSICAO_ETAPA)){
-		
-											if(buffer_serial[cont] != PROXIMA_ETAPA) {
-																	setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-		
-											else{
-												resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-												ordem=0;
-												etapa++;}
-
-									}
-									
-									else if(etapa == etapa_inicial){//Inicio da comunicação
+					else if(*ptr_caractere_recebido_serial == PROXIMA_ETAPA){
 					
-												if(buffer_serial[cont] != INICIO) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-				
-												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-												}
-											
-									else if(etapa == etapa_recebe_funcao){
-													//cont=2
-											    funcao = buffer_serial[cont++];
+						if(etapa == etapa_login && senha[conta][ordem]!= NULL) setar_bit(FLAGS_1,ERRO_SENHA);
+						etapa++;
+						ordem=0;}
 
-													
-												if(funcao<ABERTURA_PORTA || funcao>MUDAR_SENHA_PROPRIA_CONTA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);} //Função fora do do intervalo
-														
-																							
-												conta = ascii_para_numero('0',(buffer_serial[cont]),(buffer_serial[++cont]) );
+					else if(etapa == etapa_inicial){
+						if( (*ptr_caractere_recebido_serial) != INICIO) setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
-												
-
-
-												if(!(conta<QTD_MAX_CONTAS)) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA); //N° da conta fora do intervalo
-
-												//N° dentro do intervalo, mas a conta não existe.Só é feito exceção a cadastro de contas, que																			
-												//usa a função de mudar senha de outra conta
-
-												else if(funcao != MUDAR_SENHA_OUTRA_CONTA && (!testar_bit(contas_cadastradas,conta)) ){ 
-													setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);} 
-														
-												if(!(testar_bit(nivel_acesso, ascii_para_numero('0','0',funcao)))  ) {
-																setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);
-																numero_para_ascii((testar_bit(nivel_acesso,(funcao-'0') ) ));
-																numero_para_ascii(nivel_acesso);}
-		
-												setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-																	
-									}
-				
-									
+					else if(etapa == etapa_recebe_funcao){//recebe-se a funcao a ser executada, conta a realizar o acesso e confirma-se se essa é a fechadura correta
 					
-									else if(etapa == etapa_login){//executa funcao
-
-											
-				
-											for(ordem=0;senha[conta][ordem]!= 0;ordem++){
-
-													if(senha[conta][ordem] != buffer_serial[cont++]) {
-																	setar_bit(FLAGS_1,ERRO_SENHA);
-													}
-
-											}
-											cont--;
-											setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													
-												}	
-				
-					
-									else if(etapa == etapa_detalha_funcao){//informações necessárias para a execução da função
-												if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){//essas funções não precisam de detalhamento, envia-se NOP
-	
-													for(ordem=0;ordem<2;ordem++){
-														if( buffer_serial[cont++] != ('N'+(ordem))) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-															}
-				
-														setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													}
-									
-												else if(funcao == REQUERIMENTO_HISTORICO){
-																if(ordem==0){
-																		endereco_inic_eeprom = (1794 + (buffer_serial[cont] *26));
-																	
-																ordem++;
-																	}
-				}
-				//Não implementado
-		
-												else if(funcao == RECONFIGURAR_PIC){
-														//ordem 0 ajuste de ano
-														//ordem 1 ajuste de mes
-														//ordem 2 ajuste de dia
-														//ordem 3 ajuste de hora
-														//ordem 4 ajuste de minuto
-														//ordem 5 ajuste de segundo
-	
-														ptr_data= &data_atual.ano;
-	
-														for(ordem=0;ordem<6;ordem++){
-																if(buffer_serial[cont] == IGNORAR) {//Pula para o próximo ajuste
-																				ordem++;
-																				cont+=2;} 
-															
-															*(ptr_data+ordem) = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
-
-															//char temp = *(ptr_data+ordem);
-															//numero_para_ascii(temp);
-															//numero_para_ascii(ordem);
-															cont+=2;}
-	
-															data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
-
-																//Checagem de valores para evitar data fora do intervalo. Ex: Mês 25 ou dia 55//
-
-																if(data_atual.mes > Dezembro) data_atual.mes=Dezembro;
-															
-																else if(data_atual.mes<Janeiro) data_atual.mes=Janeiro;
-
-
-																if(data_atual.dia> qtd_max_dias) data_atual.dia = qtd_max_dias;
-															
-																else if(data_atual.dia<1) data_atual.dia=1;
-
-
-																if(data_atual.hora >= 24){ data_atual.hora=0;}
-
-
-																if(data_atual.minuto>=60){data_atual.minuto= 0;}
-
-																if(data_atual.segundo>=60){data_atual.segundo = 0;}
-											
-															
-																
-
-															setar_bit(FLAGS_1,TRANSICAO_ETAPA);
-															cont--;
-																	}
-		
-												else if(funcao == MUDAR_SENHA_OUTRA_CONTA || funcao == MUDAR_SENHA_PROPRIA_CONTA){
-	
-														if(funcao == MUDAR_SENHA_OUTRA_CONTA) conta_a_ser_alterada = buffer_serial[cont] - '0';
-
-														else if(funcao == MUDAR_SENHA_PROPRIA_CONTA) conta_a_ser_alterada = conta;
-													
-
-
-														for(ordem=0;ordem<(TAMANHO_SENHA-1);ordem++){
-															
-																
-																if(buffer_serial[cont] == PROXIMA_ETAPA){
-																	setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-
-																else if(buffer_serial[cont] == FIM_DE_SENHA) {
-																			if(ordem<TAMANHO_MINIMO_SENHA) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+						funcao = *ptr_caractere_recebido_serial++;
 						
-																			else {
-																				if(ordem<TAMANHO_SENHA-2) 	nova_senha[ordem]= 0; //Final string
-																				break;}
-																}
-																						
-	
-																else{				
-																	nova_senha[ordem] = buffer_serial[cont];}
 
-														 	cont++;
-	
-													   	}	
+						if( (*ptr_caractere_recebido_serial) != NUMERO_DESSA_FECHADURA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
 
-															enviar_string_serial(nova_senha);
+						conta = ascii_para_numero('0', *(++ptr_caractere_recebido_serial),*(++ptr_caractere_recebido_serial));
 
-															setar_bit(FLAGS_1,TRANSICAO_ETAPA);}
-							}
-					
-									else if(etapa == etapa_final){//Fim da comunicação
-												if(buffer_serial[cont] != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
-												setar_bit(FLAGS_2,ENVIAR);
-												qtd_caracteres_recebidos_serial=0;
-												zerar_string(buffer_serial);}
-				
-									
-									
-									if(FLAGS_1>1) { //Transição etapa é o bit 0,os outros sinalizam erros.
+						
+						
 
-													resetar_bit(FLAGS_1,TRANSICAO_ETAPA);
-													etapa = etapa_inicial;	
-													setar_bit(FLAGS_2,ENVIAR);
-													break; //sai do laço for para recebimento de dados
-											}
+						if(conta> QTD_MAX_CONTAS || !(testar_bit(contas_cadastradas,conta)) ) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
+
+						if( FUNCAO_NAO_AUTORIZADA ){ //A conta não está autorizada a realizar essa funcao
+							setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);} 	
+						}
+
+					else if(etapa == etapa_login){		
+						if(*ptr_caractere_recebido_serial !=  senha[conta][ordem]) setar_bit(FLAGS_1,ERRO_SENHA);
 		
-																			}	
-					}				
+						if(++ordem == TAMANHO_SENHA-1) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+
 					}
+
+					else if(etapa == etapa_detalha_funcao){
+
+						if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
+							if(*ptr_caractere_recebido_serial != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+							ordem++;
+						}
+
+						else if(funcao >= MUDAR_SENHA_OUTRA_CONTA){ //Funções '6' e '7'. Função '7' == alterar a senha da própria conta
+
+							if(!ordem) {
+								if(funcao == MUDAR_SENHA_PROPRIA_CONTA) conta_a_ser_alterada=conta; 
+
+								else{ conta_a_ser_alterada = ascii_para_numero(NULL,NULL,*ptr_caractere_recebido_serial++);}
+
+							}
+
+							nova_senha[ordem] = *ptr_caractere_recebido_serial;
+
+							if(++ordem == TAMANHO_SENHA) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+						}
+							
+			
+					}
+
+					else if(etapa == etapa_final){
+						if( (*ptr_caractere_recebido_serial) != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+
+					
+					ptr_caractere_recebido_serial++;
+	
+				
+
+				}//Fim da análise dos dados recebidos
+				
+				
+				qtd_caracteres_recebidos_serial=0;
+				setar_bit(FLAGS_2,ENVIAR);
+				
+			}
 
 				else if(MODO_TECLADO_MATRICIAL){
 							
@@ -815,17 +696,9 @@ int main(void){
 														}
 							
 												else if(funcao == ABERTURA_PORTA){
-														char tentativas=0;
-														while(FECHADURA_TRAVADA){
-															if(++tentativas == 6){ 
-																	setar_bit(FLAGS_1,ERRO_ABERTURA); //A fechadura não abriu após 6 tentativas. Não há como saber, pelo atual software, a causa.
-																	break;}
-															FECHADURA=1;
-															delay_ms(325);
-															FECHADURA=0;
-																if(FECHADURA_TRAVADA) delay_ms(100);
-															}
-												}
+													 RD0=1;
+													 	delay_ms(400);
+													RD0=0;}
 
 										}
 						
@@ -926,7 +799,6 @@ int main(void){
 
 		if(testar_bit(FLAGS_2,EXIBIR)){
 			resetar_bit(FLAGS_2,EXIBIR);
-
 			if(testar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY)){
 				printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
 				resetar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY);

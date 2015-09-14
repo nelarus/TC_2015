@@ -41,25 +41,23 @@ void teste_comando_at(void){
 void enviar_comando_at(unsigned char comando,char *parametro){
 	enviar_string_serial("AT+");
 
-		if(comando<=NOME) { //comandos para perguntar nome(==0) e para alterar nome(==1)
+		if(comando==NOME) { //comandos para perguntar nome(==0) e para alterar nome(==1)
 			enviar_string_serial("NAME");
-			if(PERGUNTAR(NOME))enviar_string_serial(parametro);
-			else enviar_caractere_serial('?');
+			enviar_string_serial(parametro);
 			}
 
-		else if(comando<=BAUD){
+		else if(comando==BAUD){
 			enviar_string_serial("BAUD");
-			if( PERGUNTAR(BAUD) ) enviar_string_serial(parametro);
-			else enviar_caractere_serial('?');
+			enviar_string_serial(parametro);
 			}
 
-		else if(comando<=ROLE){
+		else if(comando==ROLE){
 			enviar_string_serial("ROLE");
-			if( PERGUNTAR(ROLE) ) enviar_string_serial(parametro);
-			else enviar_caractere_serial('?');
+			enviar_string_serial(parametro);
+			 enviar_caractere_serial('?');
 			}
 
-		else if( PERGUNTAR(ENDERECO_MODULO) ){
+		else if(comando == ENDERECO_MODULO){
 			enviar_string_serial("ADDR?");
 			}
 
@@ -72,7 +70,7 @@ void enviar_comando_at(unsigned char comando,char *parametro){
 		else if(comando==START){
 				enviar_string_serial("START");}
 	
-		else if( PERGUNTAR(ENDERECO_ULTIMO_MODULO) ){
+		else if( comando == ENDERECO_ULTIMO_MODULO ){
 				enviar_string_serial("RADD?");}
 
 		else if( comando==MODULO_SLEEP ){

@@ -3,7 +3,7 @@
 #include "eeprom_interna.h"
 
 
-void carregar_senha( char conta, char senha_a_carregar[][17]){
+void carregar_senha( char conta, char senha_a_carregar[][18]){
 					
 					char i = 0;
 
@@ -12,8 +12,8 @@ void carregar_senha( char conta, char senha_a_carregar[][17]){
 								i++;} while( senha_a_carregar[conta][i-1] && i<(TAMANHO_SENHA-1));
 
 
-					
-					senha_a_carregar[conta][TAMANHO_SENHA-1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
+					senha_a_carregar[conta][TAMANHO_SENHA] = 0;
+					senha_a_carregar[conta][TAMANHO_SENHA+1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
 					}
 
 char verificar_num_contas(void){

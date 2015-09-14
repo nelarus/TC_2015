@@ -13,7 +13,7 @@
 #define TAMANHO_SENHA 16
 #define TAMANHO_MINIMO_SENHA 5
 #define conta_admin 0
-#define nivel_acesso senha[conta][TAMANHO_SENHA-1]
+#define nivel_acesso senha[conta][TAMANHO_SENHA+1]
 //
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES

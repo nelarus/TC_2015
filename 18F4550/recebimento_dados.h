@@ -8,6 +8,9 @@
 
 #define TAMANHO_BUFFER_TECLADO_MATRICIAL 40
 
+//TAMANHO DE NOVO PARAMETRO DO MODULO BLUETOOTH(EXEMPLO:NOVO NOME)
+#define TAMANHO_PARAMETRO_BT 16
+
 //MODOS DE RECEPÇÃO DE DADOS
 #define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_3,MODO_BT)
 #define MODO_BLUETOOTH (!(testar_bit(FLAGS_3,MODO_TECLADO)))
@@ -48,8 +51,6 @@
 	
 
 	#define NOVA_LINHA '\n'
-	//RECEBIMENTO DE SENHAS
-	#define FIM_DE_SENHA '<'
 
 	//TECLADO MATRICIAL
 	#define MAIUSCULA_MINUSCULA '*' //alterna entre minuscula e maiuscula no recebimento de letras pelo teclado matricial
@@ -79,6 +80,15 @@
 #define etapa_detalha_funcao 3
 #define etapa_final 4
 //
+
+//RECONFIGURAÇÃO DO PIC
+#define ALTERAR_ANO 0
+#define ALTERAR_MES 1
+#define ALTERAR_DIA 2
+#define ALTERAR_HORA 3
+#define ALTERAR_MINUTO 4
+#define ALTERAR_SEGUNDO 5
+
 
 //Fechadura
 

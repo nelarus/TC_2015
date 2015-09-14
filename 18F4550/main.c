@@ -11,7 +11,7 @@
 #include "flags.h"
 #include "recebimento_dados.h"
 
-//CONFIGURAÇÃO 18F4550
+//INICIO CONFIGURAÇÃO 18F4550
 
 #pragma config FOSC =  XTPLL_XT
 #pragma config PLLDIV = 1
@@ -48,24 +48,28 @@
 #pragma config EBTR2 = OFF 
 #pragma config EBTR3 = OFF 
 #pragma config EBTRB = OFF      //table read protection boot block
+//
 
 
+//VARIÁVEIS GLOBAIS
 
-char qtd_max_dias =31;
+//MATRIZES
 char nova_senha[TAMANHO_SENHA]; //armazena temporariamente a nova senha atribuida a conta para garantir que a senha atual não seja lida no meio do processo de alteração
+char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+2]; //SENHA+2 para compensar o caractere \0 que a string precisa ter(indice=16) e o caractere que representa o nivel de acesso(indice=17)
 
-char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+1]; //SENHA+1 para compensar o caractere \0 que a string precisa ter 
 unsigned char buffer_serial[TAMANHO_BUFFER_SERIAL]; //Usado para receber dados pela porta serial
 unsigned char buffer_teclado_matricial[TAMANHO_BUFFER_TECLADO_MATRICIAL]; // Usado para receber dados pelo teclado matricial
 unsigned char qtd_caracteres_recebidos_serial=0; //contador para caracteres recebidos pela porta serial
 unsigned char qtd_caracteres_recebidos_teclado=0; //contador para caracteres recebidos pelo teclado matricial 
-
 
 //char dados_recebidos[41];
 //char chave_criptografia[17];
 //char texto_critografado[81];
 //char texto_descriptografado[41];
 
+//Fim declaração de matrizes
+
+//Inicio Declaração de structs
 struct Data{
 	unsigned char ano;//0
 	unsigned char mes;//1
@@ -77,6 +81,9 @@ struct Data{
 		}data_atual,data_recebida;
 					//data_recebida não utilizada no momento 
 
+//Fim Declaração de structs
+
+//Inicio declaração de chars
 unsigned char caractere_recebido = 0; //Caractere recebido pelo teclado matricial
 unsigned char FLAGS_1=0; //Vide main.h para ver as flags de cada variável
 unsigned char FLAGS_2=0; //
@@ -84,26 +91,18 @@ unsigned char FLAGS_3=0; //
 unsigned char PORTB_SR;// Shadow register para leitura do PORTB e atualização do LATB
 unsigned char num_interrupt_timer1=0;
 unsigned char num_interrupt_caracter_por_asterisco=0;
+char qtd_max_dias =31;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
+//Fim declaração de chars
+
+//Inicio declaração de inteiros
 unsigned int endereco_inic_eeprom=5;
 unsigned int endereco_final_eeprom=5;
+//Fim declaração de inteiros
 
 
-char *ptr_data;
 
 
-//REPRESENTAÇÃO DO TECLADO MATRICIAL NO MODO_T9
-
-//1-> Seleciona entre 1,a,b e,c(maiusculas ou minusculas)
-//2-> Seleciona entre 2,d,e e,f(maiusculas ou minusculas)
-//3-> Seleciona entre 3,g,h e,i(maiusculas ou minusculas)
-//4-> Seleciona entre 4,j,k e,l(maiusculas ou minusculas)
-//5-> Seleciona entre 5,m,n e,o(maiusculas ou minusculas)
-//6-> Seleciona entre 6,p,q e,r(maiusculas ou minusculas)
-//7-> Seleciona entre 7,s,t e,u(maiusculas ou minusculas)
-//8-> Seleciona entre 8,v,w e,x(maiusculas ou minusculas)
-//9-> Seleciona entre 9,y e z(maiusculas ou minusculas)
-					
 void zerar_string(char *string_a_zerar){
 
 		while(*string_a_zerar != NULL){
@@ -125,8 +124,6 @@ void interrupt aux(void){
 						TMR1ON=0;
 						}
 
-				
-
 				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==5){//Passou-se 2,5s após a primeira vez que o botão foi apertado.
 					if(testar_bit(FLAGS_2,MODO_T9)){setar_bit(FLAGS_2,RECEBER);}
 					lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado);
@@ -146,9 +143,7 @@ void interrupt aux(void){
 					LATDbits.LD1^=1;
 					if(++data_atual.segundo>59){
 								data_atual.segundo=0; 
-								
 									if(++data_atual.minuto>59){
-
 
 									data_atual.minuto=0;
 
@@ -188,15 +183,10 @@ void interrupt aux(void){
 																				data_atual.mes=0;
 																				break;}
 																									}  
-					
 					 												}	
 																}
-											}
-
-						
+											}			
 					}
-
-			
 
 			if(RBIE && RBIF){
 					char coluna,linha=0;
@@ -245,9 +235,7 @@ void interrupt aux(void){
 
 								caractere_recebido = teclado_matricial(coluna,linha);
 								
-											}
-						
-							
+											}						
 					
 						TRISB|=0xF0;//
 						LATD&=0x0F;//
@@ -295,7 +283,7 @@ void interrupt aux(void){
 					else{							
 							resetar_timer1(0xC0,0);
 							buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
-						
+							enviar_caractere_serial(buffer_serial[qtd_caracteres_recebidos_serial]);
 							TMR1ON=1;
 
 							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
@@ -317,10 +305,13 @@ int main(void){
 	unsigned char funcao=0;//utilizada para determinar qual função o PIC vai executar (abrir porta, fornecer histórico, fornecer status atual)
 	unsigned char conta=0;
 	unsigned char conta_a_ser_alterada=0;
+	unsigned char comando_at=0;
 	unsigned char cont=0;
 	unsigned char qtd_total_contas=0;	
 	unsigned char ultimo_caractere_recebido=0;
 	int contas_cadastradas=0; //16bits que correspondem cada um a uma conta cadastrada ou não. Exemplo: bit 7 indica se a conta 7 existe ou ainda não tem uma senha cadastrada
+	char *ptr_data;
+	char parametro_configuracao_modulo_bt[TAMANHO_PARAMETRO_BT+1];
 	//CONFIGURAÇÃO OSCILADOR
 	OSCCON=0XF0;
 
@@ -354,7 +345,7 @@ int main(void){
 	T1CON = 0b00001110;
 	TMR1H=0XC0; //TMR1 = 49152 (1 interrupção = 0.5s para cristal de 32,768khz)
 	TMR1L=0;
-	TMR1IE=0;
+	TMR1IE=1;
 
 	//CONFIGURAÇÃO INICIAL DA EEPROM
 	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
@@ -374,14 +365,13 @@ int main(void){
 
 				enviar_string_serial(&senha[conta][0]);//Envio por serial da senha e nivel de acesso para debug
 				numero_para_ascii(nivel_acesso);
-		
+
 				setar_bit(contas_cadastradas,conta);
 				}
 
 
 	conta=0;
 	RCIE=1;
-	__delay_us(1);
 	data_atual.ano=0;
 	data_atual.mes= Janeiro;
 	data_atual.dia=1;
@@ -389,6 +379,8 @@ int main(void){
 	data_atual.hora=0;
 	data_atual.minuto=0;
 	data_atual.segundo=0;
+
+
 	PORTB_SR=PORTB;//Leitura do PORTB antes de habilitar a interrupção para evitar uma interrupção não desejada.
 	RBIE=1;
 	RBIF=0;
@@ -397,16 +389,7 @@ int main(void){
 	lcd_init(LCD_20X4);
 	lcd_gotoxy(LINHA1,20);
 	printf("%c",SENSOR_ABERTURA_FECHADURA);
-	lcd_gotoxy(LINHA1,1);
-	LCD_RS=1;
-	printf("%d",PORTE);
 
-	RCIE=0;
-	delay_ms(600);
-	enviar_string_serial("AT");
-	delay_ms(600);
-	enviar_string_serial("AT+NAMEMODULO2_V4");
-	delay_ms(600);
 	while(1){
 
 		if(testar_bit(FLAGS_2,RECEBER)){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
@@ -416,14 +399,13 @@ int main(void){
 			if(MODO_BLUETOOTH){
 
 				enviar_caractere_serial(NOVA_LINHA);
-
-				enviar_string_serial(buffer_serial);
-
+				enviar_string_serial(buffer_serial); //Envio dos dados recebidos para debug
 				enviar_caractere_serial(NOVA_LINHA);
 
-				char *ptr_caractere_recebido_serial = &buffer_serial[0];
+				char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
 
 				char i;
+
 				//Início da análise dos dados recebidos
 				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
 					if(FLAGS_1>1){
@@ -440,32 +422,36 @@ int main(void){
 
 					else if(etapa == etapa_recebe_funcao){//recebe-se a funcao a ser executada, conta a realizar o acesso e confirma-se se essa é a fechadura correta
 					
-						funcao = *ptr_caractere_recebido_serial++;
+						funcao = *ptr_caractere_recebido_serial++;//recebe função a ser executada
+						enviar_caractere_serial(funcao);
 						
-
-						if( (*ptr_caractere_recebido_serial) != NUMERO_DESSA_FECHADURA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+						if( (*ptr_caractere_recebido_serial) != NUMERO_DESSA_FECHADURA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);} //Está se enviando uma mensagem a fechadura errada
 
 						conta = ascii_para_numero('0', *(++ptr_caractere_recebido_serial),*(++ptr_caractere_recebido_serial));
-
+						numero_para_ascii(conta);
 						
-						
-
+					
 						if(conta> QTD_MAX_CONTAS || !(testar_bit(contas_cadastradas,conta)) ) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
 
 						if( FUNCAO_NAO_AUTORIZADA ){ //A conta não está autorizada a realizar essa funcao
 							setar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO);} 	
 						}
 
-					else if(etapa == etapa_login){		
-						if(*ptr_caractere_recebido_serial !=  senha[conta][ordem]) setar_bit(FLAGS_1,ERRO_SENHA);
+
+					else if(etapa == etapa_login){
 		
-						if(++ordem == TAMANHO_SENHA-1) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+						if(*ptr_caractere_recebido_serial !=  senha[conta][ordem]) setar_bit(FLAGS_1,ERRO_SENHA);
+						enviar_caractere_serial(NOVA_LINHA);enviar_caractere_serial(senha[conta][ordem]);enviar_caractere_serial(*ptr_caractere_recebido_serial);
+		
+						if(++ordem == TAMANHO_SENHA+1) setar_bit(FLAGS_1,ERRO_PROTOCOLO); //
 
 					}
+
 
 					else if(etapa == etapa_detalha_funcao){
 
 						if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
+							
 							if(*ptr_caractere_recebido_serial != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 							ordem++;
 						}
@@ -475,7 +461,7 @@ int main(void){
 							if(!ordem) {
 								if(funcao == MUDAR_SENHA_PROPRIA_CONTA) conta_a_ser_alterada=conta; 
 
-								else{ conta_a_ser_alterada = ascii_para_numero(NULL,NULL,*ptr_caractere_recebido_serial++);}
+								else{ conta_a_ser_alterada = ascii_para_numero(NULL,NULL,*ptr_caractere_recebido_serial++);} //converte-se para decimal o caractere recebido e avança o ponteiro para o próximo caractere
 
 							}
 
@@ -483,12 +469,48 @@ int main(void){
 
 							if(++ordem == TAMANHO_SENHA) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 						}
-							
+
+						
+						else if(funcao == RECONFIGURAR_PIC){
+								//ordem 0  = ano
+								//ordem 1  = mes
+								//ordem 2  = dia
+								//ordem 3  = hora
+								//ordem 4   = minuto
+								//ordem 5  = segundo
+								if(!ordem) ptr_data = &data_recebida.ano;
+					
+								else ptr_caractere_recebido_serial++;
+											
+																				
+								unsigned char novo_valor = ascii_para_numero(NULL,*ptr_caractere_recebido_serial, *(++ptr_caractere_recebido_serial));
+								//Converte o caractere atual e o próximo de ascii para o valor decimal do parametro. Ex: altera-se hora para 23, recebe-se '2' e '3'
+
+								if( ((ordem<ALTERAR_MINUTO) && novo_valor>60) ||  ((ordem == ALTERAR_MES)&& novo_valor>Dezembro) || ((ordem == ALTERAR_DIA) && novo_valor > qtd_max_dias) ) setar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO);
+
+								else *(ptr_data+ordem) = novo_valor;
+
+								if(ordem>ALTERAR_SEGUNDO && ++ordem>ALTERAR_SEGUNDO) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+						}
+
+					
+						else if(funcao == RECONFIGURAR_MODULO){//Primeiro se recebe o comando a ser executado, depois o parametro
+								if(!ordem){comando_at = *ptr_caractere_recebido_serial++;}
+
+								else ptr_caractere_recebido_serial++;
+
+								parametro_configuracao_modulo_bt[++ordem] = *ptr_caractere_recebido_serial;
+
+								if(ordem> (TAMANHO_PARAMETRO_BT+1)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+								}
 			
-					}
+					}//Fim detalhamento função
 
 					else if(etapa == etapa_final){
-						if( (*ptr_caractere_recebido_serial) != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);}
+						if( (*ptr_caractere_recebido_serial) != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+						
+
+}
 
 					
 					ptr_caractere_recebido_serial++;
@@ -616,7 +638,6 @@ int main(void){
 			zerar_string(buffer_serial);
 			zerar_string(buffer_teclado_matricial);
 			
-
 				if(MODO_TECLADO_MATRICIAL){
 
 						if(FLAGS_1<2) { //Não houve erros
@@ -624,7 +645,6 @@ int main(void){
 
 												limpar_linha(LINHA3);
 												printf("\n\nDestravando...");
-												__delay_ms(49);
 												delay_ms(800);	
 												char tentativas=0;
 
@@ -682,6 +702,19 @@ int main(void){
 														numero_para_ascii(QTD_MAX_CONTAS);
 														numero_para_ascii(SENSOR_ABERTURA_FECHADURA);}
 
+												else if(funcao == RECONFIGURAR_PIC){
+														unsigned char *data_sistema = &data_atual.ano;
+														unsigned char *nova_data = &data_recebida.ano;
+														char i;
+
+														for(i=0;i<ALTERAR_SEGUNDO;i++){
+														*data_sistema++ = *nova_data++;}
+
+												}
+
+												else if(funcao == RECONFIGURAR_MODULO){
+														enviar_string_serial(parametro_configuracao_modulo_bt);}
+
 
 												else if(funcao == MUDAR_SENHA_PROPRIA_CONTA || funcao == MUDAR_SENHA_OUTRA_CONTA){
 													
@@ -705,8 +738,10 @@ int main(void){
 						else{//Houve erros
 							
 							enviar_caractere_serial('E');
+								if(testar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO)){
+											enviar_caractere_serial('V');}
 								if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){
-											enviar_string_serial("SE");}
+											enviar_caractere_serial('X');}
 							
 								if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
 											enviar_caractere_serial('A');}
@@ -810,8 +845,6 @@ int main(void){
 			if( (!testar_bit(FLAGS_2,EXIBIR))&& (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
 				SLEEP();
 				NOP();}
-
-
 
 }
 }

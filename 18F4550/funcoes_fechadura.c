@@ -1,13 +1,7 @@
-#include "main.h"
-#include "time.h"
 #include <xc.h>
+#include "main.h"
+#include "recebimento_dados.h"
 
-void destravar_fechadura(int tempo1, int tempo2){
-		FECHADURA=1;
-		delay_ms(tempo1);
-		FECHADURA=0;
-		
-		if(FECHADURA_TRAVADA){
-					delay_ms(tempo2)}
-		
-		}
+char verificar_nivel_acesso(char funcao){
+
+	return(nivel_acesso & 1<<(funcao-'0');}

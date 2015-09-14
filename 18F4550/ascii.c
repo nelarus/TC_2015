@@ -2,6 +2,20 @@
 #include "ascii.h"
 #include "main.h"
 
+
+//REPRESENTAÇÃO DO TECLADO MATRICIAL NO MODO_T9
+
+//1-> Seleciona entre 1,a,b e,c(maiusculas ou minusculas)
+//2-> Seleciona entre 2,d,e e,f(maiusculas ou minusculas)
+//3-> Seleciona entre 3,g,h e,i(maiusculas ou minusculas)
+//4-> Seleciona entre 4,j,k e,l(maiusculas ou minusculas)
+//5-> Seleciona entre 5,m,n e,o(maiusculas ou minusculas)
+//6-> Seleciona entre 6,p,q e,r(maiusculas ou minusculas)
+//7-> Seleciona entre 7,s,t e,u(maiusculas ou minusculas)
+//8-> Seleciona entre 8,v,w e,x(maiusculas ou minusculas)
+//9-> Seleciona entre 9,y e z(maiusculas ou minusculas)
+					
+
 char teclado_matricial(unsigned char coluna, char linha){
 
 	char temp = ((linha-1)*4) + coluna;

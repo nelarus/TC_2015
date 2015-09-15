@@ -35,3 +35,4 @@
 #define ATUALIZAR_SENHA_DISPLAY 1
 #define MODO_BT 2
 #define MODO_TECLADO 3
+#define MODO_AT 4

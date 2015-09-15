@@ -3,10 +3,10 @@
 #include "serial.h"
 
 
-void config_serial(char baud){
+void config_serial(char baud,char brg16){
 		SYNC=0; //assincrono
 		BRGH=1;
-		BRG16=1;
+		BRG16= brg16;
 		SPBRG=baud;
 		TX9=0;
 		RX9=0;//tx e rx em 8 bits

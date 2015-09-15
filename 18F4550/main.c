@@ -56,11 +56,13 @@
 //MATRIZES
 char nova_senha[TAMANHO_SENHA]; //armazena temporariamente a nova senha atribuida a conta para garantir que a senha atual não seja lida no meio do processo de alteração
 char senha[QTD_MAX_CONTAS][TAMANHO_SENHA+2]; //SENHA+2 para compensar o caractere \0 que a string precisa ter(indice=16) e o caractere que representa o nivel de acesso(indice=17)
+char parametro_configuracao_modulo_bt[TAMANHO_PARAMETRO_BT+1];
 
 unsigned char buffer_serial[TAMANHO_BUFFER_SERIAL]; //Usado para receber dados pela porta serial
 unsigned char buffer_teclado_matricial[TAMANHO_BUFFER_TECLADO_MATRICIAL]; // Usado para receber dados pelo teclado matricial
 unsigned char qtd_caracteres_recebidos_serial=0; //contador para caracteres recebidos pela porta serial
 unsigned char qtd_caracteres_recebidos_teclado=0; //contador para caracteres recebidos pelo teclado matricial 
+char x=0;
 
 //char dados_recebidos[41];
 //char chave_criptografia[17];
@@ -115,20 +117,22 @@ void interrupt aux(void){
 
 			if(TMR1IE && TMR1IF){ 
 				TMR1IF=0;
-				TMR1H=0xC0;//Equivalente a fazer TMR1+=0xC0,´já que se está deixando o TRMR1L correr
+				resetar_timer1(0xC0,0);
 
 				if(MODO_BLUETOOTH){//O dispostivo iniciou comunicação com o PIC mas ficou mais de 500ms sem terminá-la
 						qtd_caracteres_recebidos_serial=0;
 						setar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA);
 						setar_bit(FLAGS_2,ENVIAR);
-						TMR1ON=0;
 						}
+
+				else if(MODO_COMANDO_AT){
+						resetar_bit(FLAGS_3,MODO_COMANDO_AT);
+						qtd_caracteres_recebidos_serial=0;}
 
 				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==5){//Passou-se 2,5s após a primeira vez que o botão foi apertado.
 					if(testar_bit(FLAGS_2,MODO_T9)){setar_bit(FLAGS_2,RECEBER);}
 					lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado);
 					printf("*");
-					TMR1ON=0;
 					num_interrupt_timer1=0;}
 							
 			}
@@ -280,16 +284,35 @@ void interrupt aux(void){
 								setar_bit(FLAGS_2,ENVIAR);
 								resetar_bit(FLAGS_2,RECEBER);}
 					
-					else{							
-							resetar_timer1(0xC0,0);
-							buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
-							enviar_caractere_serial(buffer_serial[qtd_caracteres_recebidos_serial]);
-							TMR1ON=1;
+					else{//Não ocorreu erros, recebe-se o dado					
+							resetar_timer1(0xC0,0); 
+							char RCREG_temp;
+							RCREG_temp = RCREG;
 
-							if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
+//							if(MODO_COMANDO_AT){//No modo comando at o PIC recebe a resposta do módulo Bluetooth 
+//																   //ao comando enviado anteriormente e repassa ao dispostivo sem realizar análise alguma
+//								
+//								TMR1ON=1;
+//								if(++qtd_caracteres_recebidos_serial > 20 || !RCREG_temp) {//Considera o comando como encerrado ao receber 0 pela serial ou a resposta for maior do que 21 caracteres
+//									resetar_bit(FLAGS_3,MODO_COMANDO_AT);
+//									qtd_caracteres_recebidos_serial=0;
+//									resetar_timer1(0xC0,0); 
+//								}
+//
+//								enviar_caractere_serial(RCREG_temp);}
+//								
+//							else{
+								buffer_serial[qtd_caracteres_recebidos_serial] = RCREG_temp;
+								TMR1ON=1;
+	
+								if(++qtd_caracteres_recebidos_serial == TAMANHO_BUFFER_SERIAL || buffer_serial[qtd_caracteres_recebidos_serial-1] == FIM){
 									setar_bit(FLAGS_2,RECEBER);
-									resetar_timer1(0xC0,0);}
-						}
+									resetar_timer1(0xC0,0);
+								}
+						
+							//}
+
+						}//Fim recebimento de dados
 
 					RCIF=0;}
 
@@ -311,7 +334,6 @@ int main(void){
 	unsigned char ultimo_caractere_recebido=0;
 	int contas_cadastradas=0; //16bits que correspondem cada um a uma conta cadastrada ou não. Exemplo: bit 7 indica se a conta 7 existe ou ainda não tem uma senha cadastrada
 	char *ptr_data;
-	char parametro_configuracao_modulo_bt[TAMANHO_PARAMETRO_BT+1];
 	//CONFIGURAÇÃO OSCILADOR
 	OSCCON=0XF0;
 
@@ -349,8 +371,9 @@ int main(void){
 
 	//CONFIGURAÇÃO INICIAL DA EEPROM
 	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
-
-	config_serial(35); //SPBRG(variável para baud rate) = 35;
+ 
+	config_serial(103,0); //SPBRG(variável para baud rate) = 34; //34=114800. 69 = 57971 103= 38462
+	
 
 
 	qtd_total_contas = verificar_num_contas();
@@ -396,10 +419,15 @@ int main(void){
 																																	//CASO DE DÚVIDAS
 			
 			resetar_bit(FLAGS_2,RECEBER);
+			enviar_string_serial("qtd:");
+			numero_para_ascii(qtd_caracteres_recebidos_serial);
+
 			if(MODO_BLUETOOTH){
 
 				enviar_caractere_serial(NOVA_LINHA);
 				enviar_string_serial(buffer_serial); //Envio dos dados recebidos para debug
+				enviar_string_serial("\nqtd2:");
+				numero_para_ascii(qtd_caracteres_recebidos_serial);
 				enviar_caractere_serial(NOVA_LINHA);
 
 				char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
@@ -409,6 +437,7 @@ int main(void){
 				//Início da análise dos dados recebidos
 				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
 					if(FLAGS_1>1){
+						enviar_string_serial("\netapa_e:"); numero_para_ascii(etapa);numero_para_ascii(ordem);
 						break;}
 
 					else if(*ptr_caractere_recebido_serial == PROXIMA_ETAPA){
@@ -423,12 +452,10 @@ int main(void){
 					else if(etapa == etapa_recebe_funcao){//recebe-se a funcao a ser executada, conta a realizar o acesso e confirma-se se essa é a fechadura correta
 					
 						funcao = *ptr_caractere_recebido_serial++;//recebe função a ser executada
-						enviar_caractere_serial(funcao);
 						
 						if( (*ptr_caractere_recebido_serial) != NUMERO_DESSA_FECHADURA) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);} //Está se enviando uma mensagem a fechadura errada
 
 						conta = ascii_para_numero('0', *(++ptr_caractere_recebido_serial),*(++ptr_caractere_recebido_serial));
-						numero_para_ascii(conta);
 						
 					
 						if(conta> QTD_MAX_CONTAS || !(testar_bit(contas_cadastradas,conta)) ) setar_bit(FLAGS_1,ERRO_IDENTIF_CONTA);
@@ -441,9 +468,9 @@ int main(void){
 					else if(etapa == etapa_login){
 		
 						if(*ptr_caractere_recebido_serial !=  senha[conta][ordem]) setar_bit(FLAGS_1,ERRO_SENHA);
-						enviar_caractere_serial(NOVA_LINHA);enviar_caractere_serial(senha[conta][ordem]);enviar_caractere_serial(*ptr_caractere_recebido_serial);
+						//enviar_caractere_serial(senha[conta][ordem]);
 		
-						if(++ordem == TAMANHO_SENHA+1) setar_bit(FLAGS_1,ERRO_PROTOCOLO); //
+						if(++ordem == TAMANHO_SENHA+1) { setar_bit(FLAGS_1,ERRO_PROTOCOLO); numero_para_ascii(ordem);}
 
 					}
 
@@ -479,8 +506,6 @@ int main(void){
 								//ordem 4   = minuto
 								//ordem 5  = segundo
 								if(!ordem) ptr_data = &data_recebida.ano;
-					
-								else ptr_caractere_recebido_serial++;
 											
 																				
 								unsigned char novo_valor = ascii_para_numero(NULL,*ptr_caractere_recebido_serial, *(++ptr_caractere_recebido_serial));
@@ -488,18 +513,22 @@ int main(void){
 
 								if( ((ordem<ALTERAR_MINUTO) && novo_valor>60) ||  ((ordem == ALTERAR_MES)&& novo_valor>Dezembro) || ((ordem == ALTERAR_DIA) && novo_valor > qtd_max_dias) ) setar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO);
 
-								else *(ptr_data+ordem) = novo_valor;
+								else {*ptr_data = novo_valor; numero_para_ascii(*(ptr_data+ordem));  numero_para_ascii(data_recebida.ano);}
 
-								if(ordem>ALTERAR_SEGUNDO && ++ordem>ALTERAR_SEGUNDO) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+								if(++ordem>ALTERAR_SEGUNDO+1) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+								
+								else ptr_data++;
+
+						
 						}
 
 					
 						else if(funcao == RECONFIGURAR_MODULO){//Primeiro se recebe o comando a ser executado, depois o parametro
-								if(!ordem){comando_at = *ptr_caractere_recebido_serial++;}
+								if(!ordem){
+									comando_at = *ptr_caractere_recebido_serial++;
+									zerar_string(parametro_configuracao_modulo_bt);}
 
-								else ptr_caractere_recebido_serial++;
-
-								parametro_configuracao_modulo_bt[++ordem] = *ptr_caractere_recebido_serial;
+								parametro_configuracao_modulo_bt[ordem++] = *ptr_caractere_recebido_serial;
 
 								if(ordem> (TAMANHO_PARAMETRO_BT+1)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 								}
@@ -507,10 +536,10 @@ int main(void){
 					}//Fim detalhamento função
 
 					else if(etapa == etapa_final){
-						if( (*ptr_caractere_recebido_serial) != FIM) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
-						
+						if( (*ptr_caractere_recebido_serial) != FIM) {setar_bit(FLAGS_1,ERRO_PROTOCOLO);enviar_string_serial("F-esp");numero_para_ascii((*ptr_caractere_recebido_serial) ); numero_para_ascii(*(ptr_caractere_recebido_serial-1));}
+						break;//Sai do loop de recebimento de dados
 
-}
+					}
 
 					
 					ptr_caractere_recebido_serial++;
@@ -621,7 +650,7 @@ int main(void){
 										}
 
 										setar_bit(FLAGS_2,EXIBIR);
-										setar_bit(FLAGS_2,ENVIAR);
+										//setar_bit(FLAGS_2,ENVIAR);
 										
 							}				
 						}
@@ -634,13 +663,13 @@ int main(void){
 								
 			resetar_bit(FLAGS_2,ENVIAR);
 			qtd_caracteres_recebidos_serial, qtd_caracteres_recebidos_teclado,cont=0;
-			etapa = etapa_inicial;
+			
 			zerar_string(buffer_serial);
 			zerar_string(buffer_teclado_matricial);
 			
 				if(MODO_TECLADO_MATRICIAL){
 
-						if(FLAGS_1<2) { //Não houve erros
+						if(FLAGS_1<1) { //Não houve erros
 												
 
 												limpar_linha(LINHA3);
@@ -681,38 +710,49 @@ int main(void){
 												else if(testar_bit(FLAGS_1,ERRO_SENHA))	printf("\n\nSenha incorreta");}
 				}				
 
-		else{
+
+
+				
+
+
+				else if(MODO_BLUETOOTH){
 
 					enviar_string_serial("\nI");
 
-						if(!FLAGS_1){//Não houve erros
+						if(!FLAGS_1 && etapa == etapa_final){//Não houve erros
 										etapa = etapa_inicial;
 										LATDbits.LD2^=1;
 										enviar_string_serial("OK");
 
 												if(funcao == REQUERIMENTO_STATUS_ATUAL){
-														numero_para_ascii(data_atual.ano);
-														numero_para_ascii(data_atual.mes);
-														numero_para_ascii(data_atual.dia_da_semana);
-														numero_para_ascii(data_atual.dia);
-														numero_para_ascii(data_atual.hora);
-														numero_para_ascii(data_atual.minuto);
-														numero_para_ascii(data_atual.segundo);
-														numero_para_ascii(qtd_total_contas);
-														numero_para_ascii(QTD_MAX_CONTAS);
+														enviar_string_serial("\nano:");					numero_para_ascii(data_atual.ano);
+														enviar_string_serial("\nmes:");					numero_para_ascii(data_atual.mes);
+														enviar_string_serial("\ndia_semana:");			numero_para_ascii(data_atual.dia_da_semana);
+														enviar_string_serial("\ndia:");					numero_para_ascii(data_atual.dia);
+														enviar_string_serial("\nhora:");				numero_para_ascii(data_atual.hora);
+														enviar_string_serial("\nminuto:");				numero_para_ascii(data_atual.minuto);
+														enviar_string_serial("\nsegundo:");				numero_para_ascii(data_atual.segundo);
+														enviar_string_serial("\nqtd_total_contas:");	numero_para_ascii(qtd_total_contas);
+														enviar_string_serial("\nqtd_max_contas:");		numero_para_ascii(QTD_MAX_CONTAS);
 														numero_para_ascii(SENSOR_ABERTURA_FECHADURA);}
 
 												else if(funcao == RECONFIGURAR_PIC){
-														unsigned char *data_sistema = &data_atual.ano;
-														unsigned char *nova_data = &data_recebida.ano;
-														char i;
-
-														for(i=0;i<ALTERAR_SEGUNDO;i++){
-														*data_sistema++ = *nova_data++;}
+														TMR0IE=0;
+														TMR0H=0xC2; //TMR0=34446(1 interrupção = 1s para FOSC=16MHz)
+														TMR0L= 0xF7;
+														data_atual.ano = data_recebida.ano;
+														data_atual.mes = data_recebida.mes;
+														data_atual.dia = data_recebida.dia;
+														data_atual.hora = data_recebida.hora;
+														data_atual.minuto = data_recebida.minuto;
+														data_atual.segundo = data_recebida.minuto;
+														TMR0IE=1;
+														
 
 												}
 
 												else if(funcao == RECONFIGURAR_MODULO){
+														setar_bit(FLAGS_3,MODO_COMANDO_AT);
 														enviar_string_serial(parametro_configuracao_modulo_bt);}
 
 
@@ -738,6 +778,7 @@ int main(void){
 						else{//Houve erros
 							
 							enviar_caractere_serial('E');
+
 								if(testar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO)){
 											enviar_caractere_serial('V');}
 								if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){

@@ -12,10 +12,12 @@
 #define TAMANHO_PARAMETRO_BT 16
 
 //MODOS DE RECEPÇÃO DE DADOS
-#define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_3,MODO_BT)
-#define MODO_BLUETOOTH (!(testar_bit(FLAGS_3,MODO_TECLADO)))
-#define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO)
-#define modo_bluetooth() resetar_bit(FLAGS_3,MODO_BT)
+#define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_3,MODO_TECLADO)
+#define MODO_BLUETOOTH 	testar_bit(FLAGS_3,MODO_BT)
+#define MODO_COMANDO_AT testar_bit(FLAGS_3,MODO_AT)
+#define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO);
+#define modo_bluetooth() setar_bit(FLAGS_3,MODO_BT);resetar_bit(FLAGS_3,MODO_TECLADO)
+#define modo_comando_at() setar_bit(FLAGS_3,MODO_COMANDO_AT)
 //
 
 

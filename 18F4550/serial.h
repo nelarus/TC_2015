@@ -1,4 +1,4 @@
-extern void config_serial(char baud);
+extern void config_serial(char baud,char brg16);
 extern void enviar_string_serial(const char *string_a_enviar);
 extern void enviar_caractere_serial(char carater_a_enviar);
 
@@ -17,5 +17,9 @@ extern void enviar_comando_at(unsigned char comando,char *novo_parametro);
 #define MODULO_SLEEP 'i'
 #define CONECTAR_AUTOMATICAMENTE 'j'
 #define CONECTAR_MODULO 'k'
+
+#define BAUD_115200 6
+#define BAUD_57600 5
+#define BAUD_9600 0
 
 

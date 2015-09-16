@@ -3,11 +3,37 @@
 #include "serial.h"
 
 
-void config_serial(char baud,char brg16){
+void config_serial(char baud){
+//= 34; //34=114800. 69 = 57971  103  38462 , com brg16=0 9600 
 		SYNC=0; //assincrono
 		BRGH=1;
-		BRG16= brg16;
-		SPBRG=baud;
+		switch(baud){
+				case BAUD_115200:
+				BRG16=1;
+				SPBRG =34;
+				break;
+
+				case BAUD_57600:
+				BRG16=1;
+				SPBRG =69;
+				break;
+
+				case BAUD_38400:
+				BRG16=1;
+				SPBRG =103;
+				break;
+
+				case BAUD_19200:
+				BRG16=1;
+				SPBRG =207;
+				break;
+
+				case BAUD_9600:
+				BRG16=0;
+				SPBRG =103;
+				break;
+		}
+		
 		TX9=0;
 		RX9=0;//tx e rx em 8 bits
 		TXEN=1; //habilita transmissão

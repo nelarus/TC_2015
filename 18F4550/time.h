@@ -22,8 +22,23 @@
 #define Dezembro 12
 //
 
+
+typedef struct{
+	unsigned char ano;//0
+	unsigned char mes;//1
+	unsigned char dia;//2
+	unsigned char hora;//3
+	unsigned char minuto;//4
+	unsigned char segundo;//5
+	unsigned char dia_da_semana;//6
+		}Data;
+
 void delay_ms(unsigned int delay_total);
 
 char dia_da_semana(unsigned int ano,char mes, char dia);
 
+void configurar_data_inicial(Data data_inicial);
+
 void resetar_timer1(char valor_h, char valor_l);
+
+

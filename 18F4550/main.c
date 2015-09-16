@@ -72,17 +72,8 @@ char x=0;
 //Fim declaração de matrizes
 
 //Inicio Declaração de structs
-struct Data{
-	unsigned char ano;//0
-	unsigned char mes;//1
-	unsigned char dia;//2
-	unsigned char hora;//3
-	unsigned char minuto;//4
-	unsigned char segundo;//5
-	unsigned char dia_da_semana;//6
-		}data_atual,data_recebida;
-					//data_recebida não utilizada no momento 
-
+Data data_atual;
+Data data_recebida; //corpo declarado em time.h
 //Fim Declaração de structs
 
 //Inicio declaração de chars
@@ -372,9 +363,7 @@ int main(void){
 	//CONFIGURAÇÃO INICIAL DA EEPROM
 	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
  
-	config_serial(103,0); //SPBRG(variável para baud rate) = 34; //34=114800. 69 = 57971 103= 38462
-	
-
+	config_serial(BAUD_115200);
 
 	qtd_total_contas = verificar_num_contas();
 
@@ -395,14 +384,8 @@ int main(void){
 
 	conta=0;
 	RCIE=1;
-	data_atual.ano=0;
-	data_atual.mes= Janeiro;
-	data_atual.dia=1;
-	data_atual.dia_da_semana= dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
-	data_atual.hora=0;
-	data_atual.minuto=0;
-	data_atual.segundo=0;
 
+	configurar_data_inicial(data_atual);
 
 	PORTB_SR=PORTB;//Leitura do PORTB antes de habilitar a interrupção para evitar uma interrupção não desejada.
 	RBIE=1;
@@ -426,18 +409,27 @@ int main(void){
 
 				enviar_caractere_serial(NOVA_LINHA);
 				enviar_string_serial(buffer_serial); //Envio dos dados recebidos para debug
-				enviar_string_serial("\nqtd2:");
-				numero_para_ascii(qtd_caracteres_recebidos_serial);
 				enviar_caractere_serial(NOVA_LINHA);
 
 				char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
+				
 
-				char i;
+				char i=0;
+				etapa=etapa_inicial;
+				ordem=0;
+				
 
 				//Início da análise dos dados recebidos
 				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
-					if(FLAGS_1>1){
+
+					if(!i) ptr_caractere_recebido_serial = &buffer_serial[0]; //garante que no inicio o ponteiro também esteja apontando para o inicio do buffer serial
+
+					enviar_string_serial("\ni:");numero_para_ascii(i);
+					enviar_caractere_serial(*ptr_caractere_recebido_serial);
+
+					if(FLAGS_1){
 						enviar_string_serial("\netapa_e:"); numero_para_ascii(etapa);numero_para_ascii(ordem);
+						ordem=0;
 						break;}
 
 					else if(*ptr_caractere_recebido_serial == PROXIMA_ETAPA){
@@ -480,6 +472,7 @@ int main(void){
 						if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL){
 							
 							if(*ptr_caractere_recebido_serial != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
+							enviar_caractere_serial('N'+ordem);
 							ordem++;
 						}
 
@@ -722,8 +715,9 @@ int main(void){
 						if(!FLAGS_1 && etapa == etapa_final){//Não houve erros
 										etapa = etapa_inicial;
 										LATDbits.LD2^=1;
-										enviar_string_serial("OK");
-
+										enviar_string_serial("OK");//Indica que o acesso foi bem sucedido
+										
+										//O que será feito depende da função,algumas enviam dados,outras só executam ações
 												if(funcao == REQUERIMENTO_STATUS_ATUAL){
 														enviar_string_serial("\nano:");					numero_para_ascii(data_atual.ano);
 														enviar_string_serial("\nmes:");					numero_para_ascii(data_atual.mes);
@@ -746,6 +740,8 @@ int main(void){
 														data_atual.hora = data_recebida.hora;
 														data_atual.minuto = data_recebida.minuto;
 														data_atual.segundo = data_recebida.minuto;
+
+														data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
 														TMR0IE=1;
 														
 
@@ -753,7 +749,8 @@ int main(void){
 
 												else if(funcao == RECONFIGURAR_MODULO){
 														setar_bit(FLAGS_3,MODO_COMANDO_AT);
-														enviar_string_serial(parametro_configuracao_modulo_bt);}
+														enviar_string_serial(parametro_configuracao_modulo_bt);
+														enviar_comando_at(comando_at,parametro_configuracao_modulo_bt);}
 
 
 												else if(funcao == MUDAR_SENHA_PROPRIA_CONTA || funcao == MUDAR_SENHA_OUTRA_CONTA){
@@ -769,37 +766,38 @@ int main(void){
 														}
 							
 												else if(funcao == ABERTURA_PORTA){
-													 RD0=1;
-													 	delay_ms(400);
-													RD0=0;}
+													 FECHADURA=1;//Alimenta-se da fechadura
+													 	delay_ms(400);//Tempo de abertura
+													 FECHADURA=0;//A alimentação da fechadura é interrompida}
 
 										}
 						
 						else{//Houve erros
-							
-							enviar_caractere_serial('E');
+							etapa=etapa_inicial;
+							enviar_caractere_serial('E');//Indica erro
 
-								if(testar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO)){
+								if(testar_bit(FLAGS_1,ERRO_VALOR_PARAMETRO)){//Um ou mais parametro recebido foi um inválido(fora da faixa aceita,ex: 64 segundos)
 											enviar_caractere_serial('V');}
-								if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){
+
+								if(testar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA)){//Mais de 0,5 segundos sem enviar nenhum caractere
 											enviar_caractere_serial('X');}
 							
-								if(testar_bit(FLAGS_1,ERRO_ABERTURA)){
+								if(testar_bit(FLAGS_1,ERRO_ABERTURA)){//A porta não abriu após 5 tentativas
 											enviar_caractere_serial('A');}
 	
-								if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){
+								if(testar_bit(FLAGS_1,ERRO_NIVEL_DE_ACESSO)){//A conta não tinha autorização para executar a função pedida
 											enviar_caractere_serial('N');}
 	
-								if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)){ 		
+								if(testar_bit(FLAGS_1,ERRO_PROTOCOLO)){ //O PIC recebeu um caractere fora do esperado pelo protocolo	
 											enviar_caractere_serial('P');}
 	
-								if(testar_bit(FLAGS_1,ERRO_COMUNICACAO)){
+								if(testar_bit(FLAGS_1,ERRO_COMUNICACAO)){//Erro de overrun ou frame
 											enviar_caractere_serial('C');}
 							
-								if(testar_bit(FLAGS_1,ERRO_SENHA)){
+								if(testar_bit(FLAGS_1,ERRO_SENHA)){//Senha incorreta
 											enviar_caractere_serial('S');}
 					
-								if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ 
+								if(testar_bit(FLAGS_1,ERRO_IDENTIF_CONTA)){ //A conta que tentou acessar o sistema não existe
 											enviar_caractere_serial('I');}
 							
 						 FLAGS_1=0;}
@@ -887,5 +885,7 @@ int main(void){
 				SLEEP();
 				NOP();}
 
+
+}
 }
 }

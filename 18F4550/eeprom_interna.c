@@ -16,13 +16,13 @@ void carregar_senha( char conta, char senha_a_carregar[][18]){
 					senha_a_carregar[conta][TAMANHO_SENHA+1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
 					}
 
-char verificar_num_contas(void){
+void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas){
 		char i;
-		unsigned char qtd_contas=0;
 		for(i=0;i<QTD_MAX_CONTAS;i++){
-			if(eeprom_read(i*TAMANHO_SENHA) != VALOR_INICIAL) {qtd_contas++;}
+			if(eeprom_read(i*TAMANHO_SENHA) != VALOR_INICIAL) {
+					*qtd_contas++;
+					setar_bit(*contas_cadastradas,i);}
 				}
-		return (qtd_contas);
 }
 
 

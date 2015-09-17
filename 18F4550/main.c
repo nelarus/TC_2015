@@ -333,7 +333,6 @@ int main(void){
 	INTCON2 =0b00000000;
 	PIE1=0b00100001;
 	RCONbits.IPEN = 0;
-
 	
 	//CONFIGURAÇÃO TIMER0(CONTAGEM HORAS)
 	T0CON = 0b10000111;
@@ -360,14 +359,20 @@ int main(void){
 	TMR1L=0;
 	TMR1IE=1;
 
+	
+
 	//CONFIGURAÇÃO INICIAL DA EEPROM
-	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL)	eeprom_config_inicial(); 
+	if(eeprom_read(ENDERECO_INICIAL) == VALOR_INICIAL) eeprom_config_inicial(); 
+	//
  
+	
 	config_serial(BAUD_115200);
 
-	qtd_total_contas = verificar_num_contas();
+	verificar_num_contas(&contas_cadastradas,&qtd_total_contas);
 
-	
+	contas_cadastradas=3;
+	qtd_total_contas=2;
+
 	enviar_caractere_serial(NOVA_LINHA);
 
 	numero_para_ascii(qtd_total_contas);
@@ -768,7 +773,8 @@ int main(void){
 												else if(funcao == ABERTURA_PORTA){
 													 FECHADURA=1;//Alimenta-se da fechadura
 													 	delay_ms(400);//Tempo de abertura
-													 FECHADURA=0;//A alimentação da fechadura é interrompida}
+													 FECHADURA=0;//A alimentação da fechadura é interrompida
+													}
 
 										}
 						
@@ -871,7 +877,7 @@ int main(void){
 		}
 
 
-		if(testar_bit(FLAGS_2,EXIBIR)){
+		if(testar_bit(FLAGS_2,EXIBIR)){//exibir algo no display lcd
 			resetar_bit(FLAGS_2,EXIBIR);
 			if(testar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY)){
 				printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
@@ -881,11 +887,11 @@ int main(void){
 
 			}
 
-			if( (!testar_bit(FLAGS_2,EXIBIR))&& (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
-				SLEEP();
-				NOP();}
+		if( (!testar_bit(FLAGS_2,EXIBIR))&& (!testar_bit(FLAGS_2,RECEBER)) && (!testar_bit(FLAGS_2,ENVIAR)) && RBIE && RCIE){ //garante que o 18F4550 entre em modo idle com as interrupções ativadas(RBIE pode estar zerado pelo tratamento de debounce)
+			SLEEP();
+			NOP();}
 
 
 }
-}
+
 }

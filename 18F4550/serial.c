@@ -33,11 +33,12 @@ void config_serial(char baud){
 				SPBRG =103;
 				break;
 		}
-		
+		BRG16=1;
+		SPBRG =34;
 		TX9=0;
 		RX9=0;//tx e rx em 8 bits
 		TXEN=1; //habilita transmissão
-		RCIE=0; // interrupção por recepção
+		RCIE=1; // interrupção por recepção
 		CREN=1;
 		SPEN=1;
 		TXCKP = 0;

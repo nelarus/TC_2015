@@ -4809,175 +4809,175 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic18.h: 161: extern __nonreentrant void _delay(unsigned long);
 [; ;pic18.h: 163: extern __nonreentrant void _delaywdt(unsigned long);
 [; ;pic18.h: 165: extern __nonreentrant void _delay3(unsigned char);
-[; ;ascii.h: 1: char teclado_matricial(char coluna, char linha);
-[; ;ascii.h: 3: void numero_para_ascii(char numero);
-[; ;ascii.h: 5: char ascii_para_numero(char caractere3, char caractere2, char caractere1);
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
+[; ;ascii.h: 4: char teclado_matricial(char coluna, char linha);
+[; ;ascii.h: 6: void numero_para_ascii(char numero);
+[; ;ascii.h: 8: char ascii_para_numero(char caractere3, char caractere2, char caractere1);
+"19 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
 [v _teclado_matricial `(uc ~T0 @X0 1 ef2`uc`uc ]
 {
-[; ;ascii.c: 5: char teclado_matricial(unsigned char coluna, char linha){
+[; ;ascii.c: 19: char teclado_matricial(unsigned char coluna, char linha){
 [e :U _teclado_matricial ]
 [v _coluna `uc ~T0 @X0 1 r1 ]
 [v _linha `uc ~T0 @X0 1 r2 ]
 [f ]
-"7
+"21
 [v _temp `uc ~T0 @X0 1 a ]
-[; ;ascii.c: 7: char temp = ((linha-1)*4) + coluna;
+[; ;ascii.c: 21: char temp = ((linha-1)*4) + coluna;
 [e = _temp -> + * - -> _linha `i -> 1 `i -> 4 `i -> _coluna `i `uc ]
-"8
+"22
 [v _caractere `uc ~T0 @X0 1 a ]
-[; ;ascii.c: 8: char caractere;
-[; ;ascii.c: 10: switch(temp){
-"10
+[; ;ascii.c: 22: char caractere;
+[; ;ascii.c: 24: switch(temp){
+"24
 [e $U 595  ]
 {
-[; ;ascii.c: 11: case 1:
-"11
-[e :U 596 ]
-[; ;ascii.c: 12: caractere = '*';
-"12
-[e = _caractere -> -> 42 `ui `uc ]
-[; ;ascii.c: 13: break;
-"13
-[e $U 594  ]
-[; ;ascii.c: 15: case 2:
-"15
-[e :U 597 ]
-[; ;ascii.c: 16: caractere = '0';
-"16
-[e = _caractere -> -> 48 `ui `uc ]
-[; ;ascii.c: 17: break;
-"17
-[e $U 594  ]
-[; ;ascii.c: 19: case 3:
-"19
-[e :U 598 ]
-[; ;ascii.c: 20: caractere = 'F';
-"20
-[e = _caractere -> -> 70 `ui `uc ]
-[; ;ascii.c: 21: break;
-"21
-[e $U 594  ]
-[; ;ascii.c: 23: case 4:
-"23
-[e :U 599 ]
-[; ;ascii.c: 24: caractere = 'D';
-"24
-[e = _caractere -> -> 68 `ui `uc ]
-[; ;ascii.c: 25: break;
+[; ;ascii.c: 25: case 1:
 "25
-[e $U 594  ]
-[; ;ascii.c: 27: case 5:
+[e :U 596 ]
+[; ;ascii.c: 26: caractere = '*';
+"26
+[e = _caractere -> -> 42 `ui `uc ]
+[; ;ascii.c: 27: break;
 "27
-[e :U 600 ]
-[; ;ascii.c: 28: caractere = '7';
-"28
-[e = _caractere -> -> 55 `ui `uc ]
-[; ;ascii.c: 29: break;
+[e $U 594  ]
+[; ;ascii.c: 29: case 2:
 "29
-[e $U 594  ]
-[; ;ascii.c: 31: case 6:
+[e :U 597 ]
+[; ;ascii.c: 30: caractere = '0';
+"30
+[e = _caractere -> -> 48 `ui `uc ]
+[; ;ascii.c: 31: break;
 "31
-[e :U 601 ]
-[; ;ascii.c: 32: caractere = '8';
-"32
-[e = _caractere -> -> 56 `ui `uc ]
-[; ;ascii.c: 33: break;
+[e $U 594  ]
+[; ;ascii.c: 33: case 3:
 "33
-[e $U 594  ]
-[; ;ascii.c: 35: case 7:
+[e :U 598 ]
+[; ;ascii.c: 34: caractere = 'F';
+"34
+[e = _caractere -> -> 70 `ui `uc ]
+[; ;ascii.c: 35: break;
 "35
-[e :U 602 ]
-[; ;ascii.c: 36: caractere = '9';
-"36
-[e = _caractere -> -> 57 `ui `uc ]
-[; ;ascii.c: 37: break;
+[e $U 594  ]
+[; ;ascii.c: 37: case 4:
 "37
-[e $U 594  ]
-[; ;ascii.c: 39: case 8:
+[e :U 599 ]
+[; ;ascii.c: 38: caractere = 'D';
+"38
+[e = _caractere -> -> 68 `ui `uc ]
+[; ;ascii.c: 39: break;
 "39
-[e :U 603 ]
-[; ;ascii.c: 40: caractere = 'C';
-"40
-[e = _caractere -> -> 67 `ui `uc ]
-[; ;ascii.c: 41: break;
+[e $U 594  ]
+[; ;ascii.c: 41: case 5:
 "41
-[e $U 594  ]
-[; ;ascii.c: 43: case 9:
+[e :U 600 ]
+[; ;ascii.c: 42: caractere = '7';
+"42
+[e = _caractere -> -> 55 `ui `uc ]
+[; ;ascii.c: 43: break;
 "43
-[e :U 604 ]
-[; ;ascii.c: 44: caractere = '4';
-"44
-[e = _caractere -> -> 52 `ui `uc ]
-[; ;ascii.c: 45: break;
+[e $U 594  ]
+[; ;ascii.c: 45: case 6:
 "45
-[e $U 594  ]
-[; ;ascii.c: 47: case 10:
+[e :U 601 ]
+[; ;ascii.c: 46: caractere = '8';
+"46
+[e = _caractere -> -> 56 `ui `uc ]
+[; ;ascii.c: 47: break;
 "47
-[e :U 605 ]
-[; ;ascii.c: 48: caractere = '5';
-"48
-[e = _caractere -> -> 53 `ui `uc ]
-[; ;ascii.c: 49: break;
+[e $U 594  ]
+[; ;ascii.c: 49: case 7:
 "49
-[e $U 594  ]
-[; ;ascii.c: 51: case 11:
+[e :U 602 ]
+[; ;ascii.c: 50: caractere = '9';
+"50
+[e = _caractere -> -> 57 `ui `uc ]
+[; ;ascii.c: 51: break;
 "51
-[e :U 606 ]
-[; ;ascii.c: 52: caractere = '6';
-"52
-[e = _caractere -> -> 54 `ui `uc ]
-[; ;ascii.c: 53: break;
+[e $U 594  ]
+[; ;ascii.c: 53: case 8:
 "53
-[e $U 594  ]
-[; ;ascii.c: 55: case 12:
+[e :U 603 ]
+[; ;ascii.c: 54: caractere = 'C';
+"54
+[e = _caractere -> -> 67 `ui `uc ]
+[; ;ascii.c: 55: break;
 "55
-[e :U 607 ]
-[; ;ascii.c: 56: caractere = 'B';
-"56
-[e = _caractere -> -> 66 `ui `uc ]
-[; ;ascii.c: 57: break;
+[e $U 594  ]
+[; ;ascii.c: 57: case 9:
 "57
-[e $U 594  ]
-[; ;ascii.c: 59: case 13:
+[e :U 604 ]
+[; ;ascii.c: 58: caractere = '4';
+"58
+[e = _caractere -> -> 52 `ui `uc ]
+[; ;ascii.c: 59: break;
 "59
-[e :U 608 ]
-[; ;ascii.c: 60: caractere = '1';
-"60
-[e = _caractere -> -> 49 `ui `uc ]
-[; ;ascii.c: 61: break;
+[e $U 594  ]
+[; ;ascii.c: 61: case 10:
 "61
-[e $U 594  ]
-[; ;ascii.c: 63: case 14:
+[e :U 605 ]
+[; ;ascii.c: 62: caractere = '5';
+"62
+[e = _caractere -> -> 53 `ui `uc ]
+[; ;ascii.c: 63: break;
 "63
-[e :U 609 ]
-[; ;ascii.c: 64: caractere = '2';
-"64
-[e = _caractere -> -> 50 `ui `uc ]
-[; ;ascii.c: 65: break;
+[e $U 594  ]
+[; ;ascii.c: 65: case 11:
 "65
-[e $U 594  ]
-[; ;ascii.c: 67: case 15:
+[e :U 606 ]
+[; ;ascii.c: 66: caractere = '6';
+"66
+[e = _caractere -> -> 54 `ui `uc ]
+[; ;ascii.c: 67: break;
 "67
-[e :U 610 ]
-[; ;ascii.c: 68: caractere = '3';
-"68
-[e = _caractere -> -> 51 `ui `uc ]
-[; ;ascii.c: 69: break;
-"69
 [e $U 594  ]
-[; ;ascii.c: 71: case 16:
+[; ;ascii.c: 69: case 12:
+"69
+[e :U 607 ]
+[; ;ascii.c: 70: caractere = 'B';
+"70
+[e = _caractere -> -> 66 `ui `uc ]
+[; ;ascii.c: 71: break;
 "71
-[e :U 611 ]
-[; ;ascii.c: 72: caractere = 'A';
-"72
-[e = _caractere -> -> 65 `ui `uc ]
-[; ;ascii.c: 73: break;}
+[e $U 594  ]
+[; ;ascii.c: 73: case 13:
 "73
+[e :U 608 ]
+[; ;ascii.c: 74: caractere = '1';
+"74
+[e = _caractere -> -> 49 `ui `uc ]
+[; ;ascii.c: 75: break;
+"75
+[e $U 594  ]
+[; ;ascii.c: 77: case 14:
+"77
+[e :U 609 ]
+[; ;ascii.c: 78: caractere = '2';
+"78
+[e = _caractere -> -> 50 `ui `uc ]
+[; ;ascii.c: 79: break;
+"79
+[e $U 594  ]
+[; ;ascii.c: 81: case 15:
+"81
+[e :U 610 ]
+[; ;ascii.c: 82: caractere = '3';
+"82
+[e = _caractere -> -> 51 `ui `uc ]
+[; ;ascii.c: 83: break;
+"83
+[e $U 594  ]
+[; ;ascii.c: 85: case 16:
+"85
+[e :U 611 ]
+[; ;ascii.c: 86: caractere = 'A';
+"86
+[e = _caractere -> -> 65 `ui `uc ]
+[; ;ascii.c: 87: break;}
+"87
 [e $U 594  ]
 }
 [e $U 594  ]
-"10
+"24
 [e :U 595 ]
 [e [\ _temp , $ -> -> 1 `i `uc 596
  , $ -> -> 2 `i `uc 597
@@ -4996,34 +4996,34 @@ Version 3.2 HI-TECH Software Intermediate Code
  , $ -> -> 15 `i `uc 610
  , $ -> -> 16 `i `uc 611
  594 ]
-"73
+"87
 [e :U 594 ]
-[; ;ascii.c: 75: return caractere;
-"75
+[; ;ascii.c: 89: return caractere;
+"89
 [e ) _caractere ]
 [e $UE 593  ]
-[; ;ascii.c: 76: }
-"76
+[; ;ascii.c: 90: }
+"90
 [e :UE 593 ]
 }
-"79
+"93
 [v _numero_para_ascii `(v ~T0 @X0 1 ef1`uc ]
 {
-[; ;ascii.c: 79: void numero_para_ascii(char numero){
+[; ;ascii.c: 93: void numero_para_ascii(char numero){
 [e :U _numero_para_ascii ]
 [v _numero `uc ~T0 @X0 1 r1 ]
 [f ]
-"80
+"94
 [v _temp1 `i ~T0 @X0 1 a ]
-"81
+"95
 [v _temp2 `i ~T0 @X0 1 a ]
-[; ;ascii.c: 80: int temp1;
-[; ;ascii.c: 81: int temp2;
-[; ;ascii.c: 83: TXREG = '+';
-"83
+[; ;ascii.c: 94: int temp1;
+[; ;ascii.c: 95: int temp2;
+[; ;ascii.c: 97: TXREG = '+';
+"97
 [e = _TXREG -> -> 43 `ui `uc ]
-[; ;ascii.c: 84: while(!TRMT){}
-"84
+[; ;ascii.c: 98: while(!TRMT){}
+"98
 [e $U 613  ]
 [e :U 614 ]
 {
@@ -5031,14 +5031,14 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 613 ]
 [e $ ! _TRMT 614  ]
 [e :U 615 ]
-[; ;ascii.c: 86: temp1 = numero/100;
-"86
+[; ;ascii.c: 100: temp1 = numero/100;
+"100
 [e = _temp1 / -> _numero `i -> 100 `i ]
-[; ;ascii.c: 87: TXREG = '0'+ temp1;
-"87
+[; ;ascii.c: 101: TXREG = '0'+ temp1;
+"101
 [e = _TXREG -> + -> 48 `ui -> _temp1 `ui `uc ]
-[; ;ascii.c: 88: while(!TRMT){}
-"88
+[; ;ascii.c: 102: while(!TRMT){}
+"102
 [e $U 616  ]
 [e :U 617 ]
 {
@@ -5046,14 +5046,14 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 616 ]
 [e $ ! _TRMT 617  ]
 [e :U 618 ]
-[; ;ascii.c: 90: temp2 = ((numero - temp1*100)/10);
-"90
+[; ;ascii.c: 104: temp2 = ((numero - temp1*100)/10);
+"104
 [e = _temp2 / - -> _numero `i * _temp1 -> 100 `i -> 10 `i ]
-[; ;ascii.c: 91: TXREG = '0'+ temp2;
-"91
+[; ;ascii.c: 105: TXREG = '0'+ temp2;
+"105
 [e = _TXREG -> + -> 48 `ui -> _temp2 `ui `uc ]
-[; ;ascii.c: 92: while(!TRMT){}
-"92
+[; ;ascii.c: 106: while(!TRMT){}
+"106
 [e $U 619  ]
 [e :U 620 ]
 {
@@ -5061,11 +5061,11 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 619 ]
 [e $ ! _TRMT 620  ]
 [e :U 621 ]
-[; ;ascii.c: 94: TXREG = '0'+ (numero - (temp2*10) - (temp1*100));
-"94
+[; ;ascii.c: 108: TXREG = '0'+ (numero - (temp2*10) - (temp1*100));
+"108
 [e = _TXREG -> + -> 48 `ui -> - - -> _numero `i * _temp2 -> 10 `i * _temp1 -> 100 `i `ui `uc ]
-[; ;ascii.c: 95: while(!TRMT){}
-"95
+[; ;ascii.c: 109: while(!TRMT){}
+"109
 [e $U 622  ]
 [e :U 623 ]
 {
@@ -5073,11 +5073,11 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 622 ]
 [e $ ! _TRMT 623  ]
 [e :U 624 ]
-[; ;ascii.c: 97: TXREG = '+';
-"97
+[; ;ascii.c: 111: TXREG = '+';
+"111
 [e = _TXREG -> -> 43 `ui `uc ]
-[; ;ascii.c: 98: while(!TRMT){}
-"98
+[; ;ascii.c: 112: while(!TRMT){}
+"112
 [e $U 625  ]
 [e :U 626 ]
 {
@@ -5085,33 +5085,43 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 625 ]
 [e $ ! _TRMT 626  ]
 [e :U 627 ]
-[; ;ascii.c: 99: }
-"99
+[; ;ascii.c: 113: }
+"113
 [e :UE 612 ]
 }
-"101
+"115
 [v _ascii_para_numero `(uc ~T0 @X0 1 ef3`uc`uc`uc ]
 {
-[; ;ascii.c: 101: char ascii_para_numero(char caractere3, char caractere2, char caractere1){
+[; ;ascii.c: 115: char ascii_para_numero(char caractere3, char caractere2, char caractere1){
 [e :U _ascii_para_numero ]
 [v _caractere3 `uc ~T0 @X0 1 r1 ]
 [v _caractere2 `uc ~T0 @X0 1 r2 ]
 [v _caractere1 `uc ~T0 @X0 1 r3 ]
 [f ]
-"102
+[; ;ascii.c: 117: if(caractere3 == (0)) caractere3 = '0';
+"117
+[e $ ! == -> _caractere3 `i -> 0 `i 629  ]
+[e = _caractere3 -> -> 48 `ui `uc ]
+[e :U 629 ]
+[; ;ascii.c: 118: if(caractere2 == (0)) caractere2 = '0';
+"118
+[e $ ! == -> _caractere2 `i -> 0 `i 630  ]
+[e = _caractere2 -> -> 48 `ui `uc ]
+[e :U 630 ]
+"120
 [v _numero `uc ~T0 @X0 1 a ]
-[; ;ascii.c: 102: char numero;
-[; ;ascii.c: 103: numero=((caractere3 - '0')*100);
-"103
+[; ;ascii.c: 120: char numero;
+[; ;ascii.c: 121: numero=((caractere3 - '0')*100);
+"121
 [e = _numero -> * - -> _caractere3 `ui -> 48 `ui -> -> 100 `i `ui `uc ]
-[; ;ascii.c: 104: numero+=((caractere2 - '0')*10);
-"104
+[; ;ascii.c: 122: numero+=((caractere2 - '0')*10);
+"122
 [e =+ _numero -> * - -> _caractere2 `ui -> 48 `ui -> -> 10 `i `ui `uc ]
-[; ;ascii.c: 105: numero+=(caractere1 - '0');
-"105
+[; ;ascii.c: 123: numero+=(caractere1 - '0');
+"123
 [e =+ _numero -> - -> _caractere1 `ui -> 48 `ui `uc ]
-[; ;ascii.c: 106: return numero;}
-"106
+[; ;ascii.c: 124: return numero;}
+"124
 [e ) _numero ]
 [e $UE 628  ]
 [e :UE 628 ]

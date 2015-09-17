@@ -1,5 +1,5 @@
 Version 3.2 HI-TECH Software Intermediate Code
-[v F5263 `uc ~T0 @X0 -> 17 `i t ]
+[v F5264 `uc ~T0 @X0 -> 18 `i t ]
 "37 C:\Program Files (x86)\Microchip\xc8\v1.34\include\plib\EEP.h
 [v _Read_b_eep `(uc ~T0 @X0 0 ef1`ui ]
 "36
@@ -4812,17 +4812,17 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic18.h: 161: extern __nonreentrant void _delay(unsigned long);
 [; ;pic18.h: 163: extern __nonreentrant void _delaywdt(unsigned long);
 [; ;pic18.h: 165: extern __nonreentrant void _delay3(unsigned char);
-[; ;eeprom_interna.h: 7: char verificar_num_contas(void);
-[; ;eeprom_interna.h: 9: void eeprom_config_inicial(void);
-[; ;eeprom_interna.h: 11: void carregar_senha(char conta, char senha_a_carregar[][17]);
+[; ;eeprom_interna.h: 8: void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas);
+[; ;eeprom_interna.h: 10: extern void eeprom_config_inicial(void);
+[; ;eeprom_interna.h: 13: void carregar_senha(char conta, char senha_a_carregar[][18]);
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
-[v _carregar_senha `(v ~T0 @X0 1 ef2`uc`*F5263 ]
+[v _carregar_senha `(v ~T0 @X0 1 ef2`uc`*F5264 ]
 {
-[; ;eeprom_interna.c: 6: void carregar_senha( char conta, char senha_a_carregar[][17]){
+[; ;eeprom_interna.c: 6: void carregar_senha( char conta, char senha_a_carregar[][18]){
 [e :U _carregar_senha ]
 [v _conta `uc ~T0 @X0 1 r1 ]
-[v F5266 `uc ~T0 @X0 -> 17 `i t ]
-[v _senha_a_carregar `*F5266 ~T0 @X0 1 r2 ]
+[v F5267 `uc ~T0 @X0 -> 18 `i t ]
+[v _senha_a_carregar `*F5267 ~T0 @X0 1 r2 ]
 [f ]
 "8
 [v _i `uc ~T0 @X0 1 a ]
@@ -4834,61 +4834,63 @@ Version 3.2 HI-TECH Software Intermediate Code
 {
 [; ;eeprom_interna.c: 11: senha_a_carregar[conta][i] = Read_b_eep((conta*16) + i);
 "11
-[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> _i `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> + * -> _conta `i -> 16 `i -> _i `i `ui ]
+[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux * -> _i `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> + * -> _conta `i -> 16 `i -> _i `i `ui ]
 [; ;eeprom_interna.c: 12: i++;} while( senha_a_carregar[conta][i-1] && i<(16-1));
 "12
 [e ++ _i -> -> 1 `i `uc ]
 }
-[e $ && != -> *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> - -> _i `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux `i -> -> -> 0 `i `uc `i < -> _i `i - -> 16 `i -> 1 `i 596  ]
+[e $ && != -> *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux * -> -> - -> _i `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux `ui `ux `i -> -> -> 0 `i `uc `i < -> _i `i - -> 16 `i -> 1 `i 596  ]
 [e :U 595 ]
-[; ;eeprom_interna.c: 16: senha_a_carregar[conta][16-1] = Read_b_eep((16*(conta+1))-1);
+[; ;eeprom_interna.c: 15: senha_a_carregar[conta][16] = 0;
+"15
+[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux * -> -> -> 16 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux `ui `ux -> -> 0 `i `uc ]
+[; ;eeprom_interna.c: 16: senha_a_carregar[conta][16+1] = Read_b_eep((16*(conta+1))-1);
 "16
-[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux * -> -> - -> 16 `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 17 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> - * -> 16 `i + -> _conta `i -> 1 `i -> 1 `i `ui ]
+[e = *U + &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux * -> -> + -> 16 `i -> 1 `i `ui `ux -> -> # *U &U *U + _senha_a_carregar * -> _conta `ux -> * -> # *U &U *U _senha_a_carregar `ui -> -> 18 `i `ui `ux `ui `ux ( _Read_b_eep (1 -> - * -> 16 `i + -> _conta `i -> 1 `i -> 1 `i `ui ]
 [; ;eeprom_interna.c: 17: }
 "17
 [e :UE 593 ]
 }
 "19
-[v _verificar_num_contas `(uc ~T0 @X0 1 ef ]
+[v _verificar_num_contas `(v ~T0 @X0 1 ef2`*i`*uc ]
 {
-[; ;eeprom_interna.c: 19: char verificar_num_contas(void){
+[; ;eeprom_interna.c: 19: void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas){
 [e :U _verificar_num_contas ]
+[v _contas_cadastradas `*i ~T0 @X0 1 r1 ]
+[v _qtd_contas `*uc ~T0 @X0 1 r2 ]
 [f ]
 "20
 [v _i `uc ~T0 @X0 1 a ]
-"21
-[v _qtd_contas `uc ~T0 @X0 1 a ]
 [; ;eeprom_interna.c: 20: char i;
-[; ;eeprom_interna.c: 21: unsigned char qtd_contas=0;
-[e = _qtd_contas -> -> 0 `i `uc ]
-[; ;eeprom_interna.c: 22: for(i=0;i<16;i++){
-"22
+[; ;eeprom_interna.c: 21: for(i=0;i<16;i++){
+"21
 {
 [e = _i -> -> 0 `i `uc ]
 [e $ < -> _i `i -> 16 `i 598  ]
 [e $U 599  ]
 [e :U 598 ]
 {
-[; ;eeprom_interna.c: 23: if(Read_b_eep(i*16) != 0xFF) {qtd_contas++;}
-"23
+[; ;eeprom_interna.c: 22: if(Read_b_eep(i*16) != 0xFF) {
+"22
 [e $ ! != -> ( _Read_b_eep (1 -> * -> _i `i -> 16 `i `ui `i -> 255 `i 601  ]
 {
-[e ++ _qtd_contas -> -> 1 `i `uc ]
+[; ;eeprom_interna.c: 23: *qtd_contas++;
+"23
+[e *U ++ _qtd_contas * -> -> 1 `i `x -> -> # *U _qtd_contas `i `x ]
+[; ;eeprom_interna.c: 24: (*contas_cadastradas |= (1<<i));}
+"24
+[e =| *U _contas_cadastradas << -> 1 `i _i ]
 }
 [e :U 601 ]
-"24
+"25
 }
-"22
+"21
 [e ++ _i -> -> 1 `i `uc ]
 [e $ < -> _i `i -> 16 `i 598  ]
 [e :U 599 ]
-"24
-}
-[; ;eeprom_interna.c: 24: }
-[; ;eeprom_interna.c: 25: return (qtd_contas);
 "25
-[e ) _qtd_contas ]
-[e $UE 597  ]
+}
+[; ;eeprom_interna.c: 25: }
 [; ;eeprom_interna.c: 26: }
 "26
 [e :UE 597 ]

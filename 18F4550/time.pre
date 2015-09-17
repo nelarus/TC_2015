@@ -6304,7 +6304,26 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 5 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c"
+# 26 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h"
+typedef struct{
+unsigned char ano;
+unsigned char mes;
+unsigned char dia;
+unsigned char hora;
+unsigned char minuto;
+unsigned char segundo;
+unsigned char dia_da_semana;
+}Data;
+
+void delay_ms(unsigned int delay_total);
+
+char dia_da_semana(unsigned int ano,char mes, char dia);
+
+void configurar_data_inicial(Data data_inicial);
+
+void resetar_timer1(char valor_h, char valor_l);
+
+# 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c"
 void delay_ms(unsigned int delay_total){
 unsigned int temp = 0;
 while(temp < delay_total){
@@ -6319,7 +6338,7 @@ unsigned char seculo;
 
 ano+=15;
 seculo = ano/100;
-ano-= (ano/100);
+ano-= (seculo*100);
 
 if(! ((ano+3)%4) ){
 if (mes==1) tabela_mes[mes-1]=6;
@@ -6329,6 +6348,16 @@ return (( (6 - seculo*2) + dia + tabela_mes[mes-1] + ano + (ano/4))%7);
 
 
 }
+
+void configurar_data_inicial(Data data_inicial){
+data_inicial.ano=0;
+data_inicial.mes= 1;
+data_inicial.dia=1;
+data_inicial.dia_da_semana= dia_da_semana( data_inicial.ano, data_inicial.mes, data_inicial.dia);
+data_inicial.hora=0;
+data_inicial.minuto=0;
+data_inicial.segundo=0;}
+
 
 void resetar_timer1(char valor_h, char valor_l){
 TMR1ON=0;

@@ -6304,15 +6304,16 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 7 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
-char verificar_num_contas(void);
+# 8 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
+void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas);
 
-void eeprom_config_inicial(void);
+extern void eeprom_config_inicial(void);
 
-void carregar_senha(char conta, char senha_a_carregar[][17]);
+
+void carregar_senha(char conta, char senha_a_carregar[][18]);
 
 # 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c"
-void carregar_senha( char conta, char senha_a_carregar[][17]){
+void carregar_senha( char conta, char senha_a_carregar[][18]){
 
 char i = 0;
 
@@ -6321,17 +6322,17 @@ senha_a_carregar[conta][i] = Read_b_eep((conta*16) + i);
 i++;} while( senha_a_carregar[conta][i-1] && i<(16-1));
 
 
-
-senha_a_carregar[conta][16-1] = Read_b_eep((16*(conta+1))-1);
+senha_a_carregar[conta][16] = 0;
+senha_a_carregar[conta][16+1] = Read_b_eep((16*(conta+1))-1);
 }
 
-char verificar_num_contas(void){
+void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas){
 char i;
-unsigned char qtd_contas=0;
 for(i=0;i<16;i++){
-if(Read_b_eep(i*16) != 0xFF) {qtd_contas++;}
+if(Read_b_eep(i*16) != 0xFF) {
+*qtd_contas++;
+(*contas_cadastradas |= (1<<i));}
 }
-return (qtd_contas);
 }
 
 

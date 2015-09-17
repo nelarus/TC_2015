@@ -6304,6 +6304,38 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
+# 22 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\string.h"
+extern void * memcpy(void *, const void *, size_t);
+extern void * memmove(void *, const void *, size_t);
+extern void * memset(void *, int, size_t);
+
+# 42
+extern char * strcat(char *, const char *);
+extern char * strcpy(char *, const char *);
+extern char * strncat(char *, const char *, size_t);
+extern char * strncpy(char *, const char *, size_t);
+extern char * strdup(const char *);
+extern char * strtok(char *, const char *);
+
+
+extern int memcmp(const void *, const void *, size_t);
+extern int strcmp(const char *, const char *);
+extern int stricmp(const char *, const char *);
+extern int strncmp(const char *, const char *, size_t);
+extern int strnicmp(const char *, const char *, size_t);
+extern void * memchr(const void *, int, size_t);
+extern size_t strcspn(const char *, const char *);
+extern char * strpbrk(const char *, const char *);
+extern size_t strspn(const char *, const char *);
+extern char * strstr(const char *, const char *);
+extern char * stristr(const char *, const char *);
+extern char * strerror(int);
+extern size_t strlen(const char *);
+extern char * strchr(const char *, int);
+extern char * strichr(const char *, int);
+extern char * strrchr(const char *, int);
+extern char * strrichr(const char *, int);
+
 # 7 "C:\Program Files (x86)\Microchip\xc8\v1.34\include\stdarg.h"
 typedef void * va_list[1];
 
@@ -6385,19 +6417,30 @@ void numero_para_ascii(char numero);
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1);
 
-# 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
-char verificar_num_contas(void);
+# 8 "D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.h"
+void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas);
 
-void eeprom_config_inicial(void);
+extern void eeprom_config_inicial(void);
 
 
+void carregar_senha(char conta, char senha_a_carregar[][18]);
 
-void carregar_senha(char conta, char senha_a_carregar[][17]);
+# 26 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h"
+typedef struct{
+unsigned char ano;
+unsigned char mes;
+unsigned char dia;
+unsigned char hora;
+unsigned char minuto;
+unsigned char segundo;
+unsigned char dia_da_semana;
+}Data;
 
-# 25 "D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h"
 void delay_ms(unsigned int delay_total);
 
 char dia_da_semana(unsigned int ano,char mes, char dia);
+
+void configurar_data_inicial(Data data_inicial);
 
 void resetar_timer1(char valor_h, char valor_l);
 
@@ -6405,6 +6448,9 @@ void resetar_timer1(char valor_h, char valor_l);
 extern void config_serial(char baud);
 extern void enviar_string_serial(const char *string_a_enviar);
 extern void enviar_caractere_serial(char carater_a_enviar);
+
+extern void teste_comando_at(void);
+extern void enviar_comando_at(unsigned char comando,char *novo_parametro);
 
 # 9 "D:\Dropbox\Micros\2015\TC_2015\18F4550\lcd.h"
 extern void CGRAM_goto(char pos);
@@ -6456,7 +6502,7 @@ extern unsigned char Linha_3;
 extern unsigned char Linha_4;
 
 
-# 15 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
+# 16 "D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c"
 #pragma config FOSC = XTPLL_XT
 #pragma config PLLDIV = 1
 #pragma config CPUDIV = OSC4_PLL6
@@ -6493,27 +6539,21 @@ extern unsigned char Linha_4;
 #pragma config EBTR3 = OFF
 #pragma config EBTRB = OFF
 
-
-
-char qtd_max_dias =31;
+# 57
 char nova_senha[16];
+char senha[16][16+2];
+char parametro_configuracao_modulo_bt[16+1];
 
-char senha[16][16+1];
 unsigned char buffer_serial[80];
 unsigned char buffer_teclado_matricial[40];
 unsigned char qtd_caracteres_recebidos_serial=0;
 unsigned char qtd_caracteres_recebidos_teclado=0;
+char x=0;
 
-# 68
-struct Data{
-unsigned char ano;
-unsigned char mes;
-unsigned char dia;
-unsigned char hora;
-unsigned char minuto;
-unsigned char segundo;
-unsigned char dia_da_semana;
-}data_atual,data_recebida;
+# 75
+Data data_atual;
+Data data_recebida;
+
 
 
 unsigned char caractere_recebido = 0;
@@ -6523,14 +6563,15 @@ unsigned char FLAGS_3=0;
 unsigned char PORTB_SR;
 unsigned char num_interrupt_timer1=0;
 unsigned char num_interrupt_caracter_por_asterisco=0;
+char qtd_max_dias =31;
 unsigned char qtd_vezes_mesma_tecla_pressionada=0;
+
+
+
 unsigned int endereco_inic_eeprom=5;
 unsigned int endereco_final_eeprom=5;
 
-
-char *ptr_data;
-
-# 106
+# 99
 void zerar_string(char *string_a_zerar){
 
 while(*string_a_zerar != (0)){
@@ -6543,38 +6584,37 @@ void interrupt aux(void){
 
 if(TMR1IE && TMR1IF){
 TMR1IF=0;
-TMR1H=0xC0;
+resetar_timer1(0xC0,0);
 
-if((!((FLAGS_3 & (1<<3))))){
+if((FLAGS_3 & (1<<2))){
 qtd_caracteres_recebidos_serial=0;
 (FLAGS_1 |= (1<<1));
 (FLAGS_2 |= (1<<0));
-TMR1ON=0;
 }
 
+else if((FLAGS_3 & (1<<4))){
+(FLAGS_3 &= ~(1<<(FLAGS_3 & (1<<4))));
+qtd_caracteres_recebidos_serial=0;}
 
-
-else if((FLAGS_3 & (1<<2)) && ++num_interrupt_timer1==5){
+else if((FLAGS_3 & (1<<3)) && ++num_interrupt_timer1==5){
 if((FLAGS_2 & (1<<4))){(FLAGS_2 |= (1<<1));}
 lcd_gotoxy(2,qtd_caracteres_recebidos_teclado);
 printf("*");
-TMR1ON=0;
 num_interrupt_timer1=0;}
 
 }
 
 if(TMR0IE && TMR0IF){
+
+(FLAGS_2 |= (1<<7));
+(FLAGS_3 |= (1<<0));
 TMR0H = 0xC2;
 TMR0L+=0xF7;
 TMR0IF=0;
 LATDbits.LD1^=1;
-(FLAGS_2 |= (1<<7));
-(FLAGS_3 |= (1<<0));
 if(++data_atual.segundo>59){
 data_atual.segundo=0;
-
 if(++data_atual.minuto>59){
-
 
 data_atual.minuto=0;
 
@@ -6614,15 +6654,10 @@ data_atual.ano++;
 data_atual.mes=0;
 break;}
 }
-
 }
 }
 }
-
-
 }
-
-
 
 if(RBIE && RBIF){
 char coluna,linha=0;
@@ -6631,7 +6666,7 @@ RBIF=0;
 if(PORTB_SR != 0xF0) {
 RBIE=0;
 (FLAGS_2 |= (1<<3));
-(FLAGS_3 |= (1<<3));
+(FLAGS_3 |= (1<<3));;
 LATDbits.LD0^=1;
 
 
@@ -6673,8 +6708,6 @@ caractere_recebido = teclado_matricial(coluna,linha);
 
 }
 
-
-
 TRISB|=0xF0;
 LATD&=0x0F;
 TRISD&=0X0F;
@@ -6687,7 +6720,7 @@ while( (PORTB&0xF0) != 0xF0){}
 PORTB_SR=(PORTB&0xF0);}
 
 if(RCIE && RCIF){
-(FLAGS_3 &= ~(1<<2));
+(FLAGS_3 |= (1<<2));(FLAGS_3 &= ~(1<<3));
 
 if(OERR==1){
 (FLAGS_1 |= (1<<4));
@@ -6720,13 +6753,20 @@ if(temp){}
 
 else{
 resetar_timer1(0xC0,0);
-buffer_serial[qtd_caracteres_recebidos_serial] = RCREG;
+char RCREG_temp;
+RCREG_temp = RCREG;
 
+# 296
+buffer_serial[qtd_caracteres_recebidos_serial] = RCREG_temp;
 TMR1ON=1;
 
 if(++qtd_caracteres_recebidos_serial == 80 || buffer_serial[qtd_caracteres_recebidos_serial-1] == 'F'){
 (FLAGS_2 |= (1<<1));
-resetar_timer1(0xC0,0);}
+resetar_timer1(0xC0,0);
+}
+
+
+
 }
 
 RCIF=0;}
@@ -6743,10 +6783,12 @@ unsigned char etapa=0;
 unsigned char funcao=0;
 unsigned char conta=0;
 unsigned char conta_a_ser_alterada=0;
+unsigned char comando_at=0;
 unsigned char cont=0;
 unsigned char qtd_total_contas=0;
 unsigned char ultimo_caractere_recebido=0;
 int contas_cadastradas=0;
+char *ptr_data;
 
 OSCCON=0XF0;
 
@@ -6755,7 +6797,6 @@ INTCON = 0b11100000;
 INTCON2 =0b00000000;
 PIE1=0b00100001;
 RCONbits.IPEN = 0;
-
 
 
 T0CON = 0b10000111;
@@ -6771,7 +6812,7 @@ TRISB=0xF0;
 TRISA=0x00;
 TRISE=0X04;
 LATB=0x0F;
-TRISC=0xDF;
+TRISC=0xCF;
 TRISD=0x00;
 ADCON1=0XFF;
 CMCON=0X07;
@@ -6780,15 +6821,23 @@ CMCON=0X07;
 T1CON = 0b00001110;
 TMR1H=0XC0;
 TMR1L=0;
+TMR1IE=1;
+
+
 
 
 if(Read_b_eep(0) == 0xFF) eeprom_config_inicial();
 
-config_serial(35);
 
 
-qtd_total_contas = verificar_num_contas();
+config_serial(4);
 
+verificar_num_contas(&contas_cadastradas,&qtd_total_contas);
+
+contas_cadastradas=3;
+qtd_total_contas=2;
+
+enviar_caractere_serial('\n');
 
 numero_para_ascii(qtd_total_contas);
 
@@ -6796,7 +6845,7 @@ for(conta=0;conta<qtd_total_contas;conta++){
 carregar_senha(conta,senha);
 
 enviar_string_serial(&senha[conta][0]);
-numero_para_ascii(senha[conta][16-1]);
+numero_para_ascii(senha[conta][16+1]);
 
 (contas_cadastradas |= (1<<conta));
 }
@@ -6804,14 +6853,9 @@ numero_para_ascii(senha[conta][16-1]);
 
 conta=0;
 RCIE=1;
-_delay((unsigned long)((1)*(16000000/4000000.0)));
-data_atual.ano=0;
-data_atual.mes= 1;
-data_atual.dia=1;
-data_atual.dia_da_semana= dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
-data_atual.hora=0;
-data_atual.minuto=0;
-data_atual.segundo=0;
+
+configurar_data_inicial(data_atual);
+
 PORTB_SR=PORTB;
 RBIE=1;
 RBIF=0;
@@ -6820,9 +6864,6 @@ cont=0;
 lcd_init(3);
 lcd_gotoxy(1,20);
 printf("%c",PORTEbits.RE2);
-lcd_gotoxy(1,1);
-LATEbits.LE0=1;
-printf("%d",PORTE);
 
 while(1){
 
@@ -6830,222 +6871,148 @@ if((FLAGS_2 & (1<<1))){
 
 
 (FLAGS_2 &= ~(1<<1));
-if((!((FLAGS_3 & (1<<3))))){
+enviar_string_serial("qtd:");
+numero_para_ascii(qtd_caracteres_recebidos_serial);
+
+if((FLAGS_3 & (1<<2))){
 
 enviar_caractere_serial('\n');
-
 enviar_string_serial(buffer_serial);
-
 enviar_caractere_serial('\n');
 
-if(buffer_serial[0] == 'R'){
-char i=1;
-char endereco_modulo_repasse[18];
-while(buffer_serial[i] != 'R'){
-endereco_modulo_repasse[i-1] = buffer_serial[i++];
-}
-
-enviar_string_serial("AT");
-delay_ms(100);
-enviar_string_serial("AT+");
-enviar_string_serial(endereco_modulo_repasse);
-delay_ms(20);
-enviar_string_serial(&buffer_serial[i]);
-
-}
-
-else{
-for(cont=0;cont<qtd_caracteres_recebidos_serial;cont++){
+char *ptr_caractere_recebido_serial = &buffer_serial[0];
 
 
-if((FLAGS_1 & (1<<0))){
-
-if(buffer_serial[cont] != '>') {
-(FLAGS_1 |= (1<<7));}
-
-else{
-(FLAGS_1 &= ~(1<<0));
+char i=0;
+etapa=0;
 ordem=0;
-etapa++;}
 
-}
+
+
+for(i=0;i<qtd_caracteres_recebidos_serial;i++){
+
+if(!i) ptr_caractere_recebido_serial = &buffer_serial[0];
+
+enviar_string_serial("\ni:");numero_para_ascii(i);
+enviar_caractere_serial(*ptr_caractere_recebido_serial);
+
+if(FLAGS_1){
+enviar_string_serial("\netapa_e:"); numero_para_ascii(etapa);numero_para_ascii(ordem);
+ordem=0;
+break;}
+
+else if(*ptr_caractere_recebido_serial == '>'){
+
+if(etapa == 2 && senha[conta][ordem]!= (0)) (FLAGS_1 |= (1<<6));
+etapa++;
+ordem=0;}
 
 else if(etapa == 0){
-
-if(buffer_serial[cont] != 'I') {(FLAGS_1 |= (1<<7));}
-
-(FLAGS_1 |= (1<<0));
-}
+if( (*ptr_caractere_recebido_serial) != 'I') (FLAGS_1 |= (1<<7));}
 
 else if(etapa == 1){
 
-funcao = buffer_serial[cont++];
+funcao = *ptr_caractere_recebido_serial++;
+
+if( (*ptr_caractere_recebido_serial) != '0') {(FLAGS_1 |= (1<<7));}
+
+conta = ascii_para_numero('0', *(++ptr_caractere_recebido_serial),*(++ptr_caractere_recebido_serial));
 
 
-if(funcao<'0' || funcao>'7') {(FLAGS_1 |= (1<<7));}
+if(conta> 16 || !((contas_cadastradas & (1<<conta))) ) (FLAGS_1 |= (1<<2));
 
-
-conta = ascii_para_numero('0',(buffer_serial[cont]),(buffer_serial[++cont]) );
-
-
-
-
-if(!(conta<16)) (FLAGS_1 |= (1<<2));
-
-
-
-
-else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
-(FLAGS_1 |= (1<<2));}
-
-if(!((senha[conta][16-1] & (1<<ascii_para_numero('0','0',funcao)))) ) {
-(FLAGS_1 |= (1<<3));
-numero_para_ascii(((senha[conta][16-1] & (1<<(funcao-'0'))) ));
-numero_para_ascii(senha[conta][16-1]);}
-
-(FLAGS_1 |= (1<<0));
-
+if( !(senha[conta][16+1] & (1<<ascii_para_numero((0),(0),funcao))) ){
+(FLAGS_1 |= (1<<3));}
 }
-
 
 
 else if(etapa == 2){
 
+if(*ptr_caractere_recebido_serial != senha[conta][ordem]) (FLAGS_1 |= (1<<6));
 
 
-for(ordem=0;senha[conta][ordem]!= 0;ordem++){
-
-if(senha[conta][ordem] != buffer_serial[cont++]) {
-(FLAGS_1 |= (1<<6));
-}
-
-}
-cont--;
-(FLAGS_1 |= (1<<0));
+if(++ordem == 16+1) { (FLAGS_1 |= (1<<7)); numero_para_ascii(ordem);}
 
 }
 
 
 else if(etapa == 3){
+
 if(funcao == '0' || funcao == '2'){
 
-for(ordem=0;ordem<2;ordem++){
-if( buffer_serial[cont++] != ('N'+(ordem))) {(FLAGS_1 |= (1<<7));}
-}
-
-(FLAGS_1 |= (1<<0));
-}
-
-else if(funcao == '1'){
-if(ordem==0){
-endereco_inic_eeprom = (1794 + (buffer_serial[cont] *26));
-
+if(*ptr_caractere_recebido_serial != ('N'+ordem)) (FLAGS_1 |= (1<<7));
+enviar_caractere_serial('N'+ordem);
 ordem++;
 }
+
+else if(funcao >= '6'){
+
+if(!ordem) {
+if(funcao == '7') conta_a_ser_alterada=conta;
+
+else{ conta_a_ser_alterada = ascii_para_numero((0),(0),*ptr_caractere_recebido_serial++);}
+
+}
+
+nova_senha[ordem] = *ptr_caractere_recebido_serial;
+
+if(++ordem == 16) (FLAGS_1 |= (1<<7));
 }
 
 
 else if(funcao == '4'){
 
-# 528
-ptr_data= &data_atual.ano;
-
-for(ordem=0;ordem<6;ordem++){
-if(buffer_serial[cont] == 'X') {
-ordem++;
-cont+=2;}
-
-*(ptr_data+ordem) = ascii_para_numero('0',buffer_serial[cont],buffer_serial[cont+1]);
+# 506
+if(!ordem) ptr_data = &data_recebida.ano;
 
 
+unsigned char novo_valor = ascii_para_numero((0),*ptr_caractere_recebido_serial, *(++ptr_caractere_recebido_serial));
 
 
-cont+=2;}
+if( ((ordem<4) && novo_valor>60) || ((ordem == 1)&& novo_valor>12) || ((ordem == 2) && novo_valor > qtd_max_dias) ) (FLAGS_1 |= (1<<0));
 
-data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
+else {*ptr_data = novo_valor; numero_para_ascii(*(ptr_data+ordem)); numero_para_ascii(data_recebida.ano);}
 
+if(++ordem>5+1) (FLAGS_1 |= (1<<7));
 
-
-if(data_atual.mes > 12) data_atual.mes=12;
-
-else if(data_atual.mes<1) data_atual.mes=1;
+else ptr_data++;
 
 
-if(data_atual.dia> qtd_max_dias) data_atual.dia = qtd_max_dias;
-
-else if(data_atual.dia<1) data_atual.dia=1;
-
-
-if(data_atual.hora >= 24){ data_atual.hora=0;}
-
-
-if(data_atual.minuto>=60){data_atual.minuto= 0;}
-
-if(data_atual.segundo>=60){data_atual.segundo = 0;}
-
-
-
-
-(FLAGS_1 |= (1<<0));
-cont--;
-}
-
-else if(funcao == '6' || funcao == '7'){
-
-if(funcao == '6') conta_a_ser_alterada = buffer_serial[cont] - '0';
-
-else if(funcao == '7') conta_a_ser_alterada = conta;
-
-
-
-for(ordem=0;ordem<(16-1);ordem++){
-
-
-if(buffer_serial[cont] == '>'){
-(FLAGS_1 |= (1<<7));}
-
-else if(buffer_serial[cont] == '<') {
-if(ordem<5) (FLAGS_1 |= (1<<7));
-
-else {
-if(ordem<16-2) nova_senha[ordem]= 0;
-break;}
 }
 
 
-else{
-nova_senha[ordem] = buffer_serial[cont];}
+else if(funcao == '5'){
+if(!ordem){
+comando_at = *ptr_caractere_recebido_serial++;
+zerar_string(parametro_configuracao_modulo_bt);}
 
-cont++;
+parametro_configuracao_modulo_bt[ordem++] = *ptr_caractere_recebido_serial;
 
+if(ordem> (16+1)) (FLAGS_1 |= (1<<7));
 }
 
-enviar_string_serial(nova_senha);
-
-(FLAGS_1 |= (1<<0));}
 }
 
 else if(etapa == 4){
-if(buffer_serial[cont] != 'F') {(FLAGS_1 |= (1<<7));}
-(FLAGS_2 |= (1<<0));
-qtd_caracteres_recebidos_serial=0;
-zerar_string(buffer_serial);}
-
-
-
-if(FLAGS_1>1) {
-
-(FLAGS_1 &= ~(1<<0));
-etapa = 0;
-(FLAGS_2 |= (1<<0));
+if( (*ptr_caractere_recebido_serial) != 'F') {(FLAGS_1 |= (1<<7));enviar_string_serial("F-esp");numero_para_ascii((*ptr_caractere_recebido_serial) ); numero_para_ascii(*(ptr_caractere_recebido_serial-1));}
 break;
-}
 
 }
-}
+
+
+ptr_caractere_recebido_serial++;
+
+
+
 }
 
-else if((FLAGS_3 & (1<<2))){
+
+qtd_caracteres_recebidos_serial=0;
+(FLAGS_2 |= (1<<0));
+
+}
+
+else if((FLAGS_3 & (1<<3))){
 
 if((FLAGS_2 & (1<<4))){
 resetar_timer1(0xC0,0);
@@ -7121,7 +7088,7 @@ if(!(conta<16)) (FLAGS_1 |= (1<<2));
 else if(funcao != '6' && (!(contas_cadastradas & (1<<conta))) ){
 (FLAGS_1 |= (1<<2));}
 
-# 705
+# 635
 if(qtd_caracteres_recebidos_teclado<(5+2)){(FLAGS_1 |= (1<<7));}
 limpar_linha(2);
 
@@ -7138,7 +7105,7 @@ cont++;
 }
 
 (FLAGS_2 |= (1<<7));
-(FLAGS_2 |= (1<<0));
+
 
 }
 }
@@ -7151,19 +7118,17 @@ if((FLAGS_2 & (1<<0))){
 
 (FLAGS_2 &= ~(1<<0));
 qtd_caracteres_recebidos_serial, qtd_caracteres_recebidos_teclado,cont=0;
-etapa = 0;
+
 zerar_string(buffer_serial);
 zerar_string(buffer_teclado_matricial);
 
+if((FLAGS_3 & (1<<3))){
 
-if((FLAGS_3 & (1<<2))){
-
-if(FLAGS_1<2) {
+if(FLAGS_1<1) {
 
 
 limpar_linha(3);
 printf("\n\nDestravando...");
-_delay((unsigned long)((49)*(16000000/4000.0)));
 delay_ms(800);
 char tentativas=0;
 
@@ -7200,26 +7165,50 @@ else if((FLAGS_1 & (1<<2))) printf("\n\nConta nao existente");
 else if((FLAGS_1 & (1<<6))) printf("\n\nSenha incorreta");}
 }
 
-else{
+# 716
+else if((FLAGS_3 & (1<<2))){
 
 enviar_string_serial("\nI");
 
-if(!FLAGS_1){
+if(!FLAGS_1 && etapa == 4){
 etapa = 0;
 LATDbits.LD2^=1;
 enviar_string_serial("OK");
 
+
 if(funcao == '2'){
-numero_para_ascii(data_atual.ano);
-numero_para_ascii(data_atual.mes);
-numero_para_ascii(data_atual.dia_da_semana);
-numero_para_ascii(data_atual.dia);
-numero_para_ascii(data_atual.hora);
-numero_para_ascii(data_atual.minuto);
-numero_para_ascii(data_atual.segundo);
-numero_para_ascii(qtd_total_contas);
-numero_para_ascii(16);
+enviar_string_serial("\nano:"); numero_para_ascii(data_atual.ano);
+enviar_string_serial("\nmes:"); numero_para_ascii(data_atual.mes);
+enviar_string_serial("\ndia_semana:"); numero_para_ascii(data_atual.dia_da_semana);
+enviar_string_serial("\ndia:"); numero_para_ascii(data_atual.dia);
+enviar_string_serial("\nhora:"); numero_para_ascii(data_atual.hora);
+enviar_string_serial("\nminuto:"); numero_para_ascii(data_atual.minuto);
+enviar_string_serial("\nsegundo:"); numero_para_ascii(data_atual.segundo);
+enviar_string_serial("\nqtd_total_contas:"); numero_para_ascii(qtd_total_contas);
+enviar_string_serial("\nqtd_max_contas:"); numero_para_ascii(16);
 numero_para_ascii(PORTEbits.RE2);}
+
+else if(funcao == '4'){
+TMR0IE=0;
+TMR0H=0xC2;
+TMR0L= 0xF7;
+data_atual.ano = data_recebida.ano;
+data_atual.mes = data_recebida.mes;
+data_atual.dia = data_recebida.dia;
+data_atual.hora = data_recebida.hora;
+data_atual.minuto = data_recebida.minuto;
+data_atual.segundo = data_recebida.minuto;
+
+data_atual.dia_da_semana = dia_da_semana(data_atual.ano,data_atual.mes,data_atual.dia);
+TMR0IE=1;
+
+
+}
+
+else if(funcao == '5'){
+(FLAGS_3 |= (1<<(FLAGS_3 & (1<<4))));
+enviar_string_serial(parametro_configuracao_modulo_bt);
+enviar_comando_at(comando_at,parametro_configuracao_modulo_bt);}
 
 
 else if(funcao == '7' || funcao == '6'){
@@ -7235,25 +7224,22 @@ i++;} while(nova_senha[i-1] && i<16);
 }
 
 else if(funcao == '0'){
-char tentativas=0;
-while(PORTEbits.RE2==0){
-if(++tentativas == 6){
-(FLAGS_1 |= (1<<5));
-break;}
 LATCbits.LC4=1;
-delay_ms(325);
+delay_ms(400);
 LATCbits.LC4=0;
-if(PORTEbits.RE2==0) delay_ms(100);
-}
 }
 
 }
 
 else{
-
+etapa=0;
 enviar_caractere_serial('E');
+
+if((FLAGS_1 & (1<<0))){
+enviar_caractere_serial('V');}
+
 if((FLAGS_1 & (1<<1))){
-enviar_string_serial("SE");}
+enviar_caractere_serial('X');}
 
 if((FLAGS_1 & (1<<5))){
 enviar_caractere_serial('A');}
@@ -7284,7 +7270,7 @@ RBIE=1;
 
 }
 
-if((PORTB&0xF0) == 0xF0 && RBIE==0 && (FLAGS_2 & (1<<3)) && (FLAGS_3 & (1<<2))){
+if((PORTB&0xF0) == 0xF0 && RBIE==0 && (FLAGS_2 & (1<<3)) && (FLAGS_3 & (1<<3))){
 
 delay_ms(100);
 if(caractere_recebido < '0' || caractere_recebido > '9'){
@@ -7346,7 +7332,6 @@ RBIE=1;
 
 if((FLAGS_2 & (1<<7))){
 (FLAGS_2 &= ~(1<<7));
-
 if((FLAGS_3 & (1<<0))){
 printf("\n\n\n%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
 (FLAGS_3 &= ~(1<<0));
@@ -7360,6 +7345,6 @@ asm(" sleep");
 __nop();}
 
 
-
 }
+
 }

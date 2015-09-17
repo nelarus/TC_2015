@@ -3,6 +3,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 "161 C:\Program Files (x86)\Microchip\xc8\v1.34\include\pic18.h
 [v __delay `JF5249 ~T0 @X0 0 e ]
 [p i __delay ]
+"26 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.h
+[s S593 `uc 1 `uc 1 `uc 1 `uc 1 `uc 1 `uc 1 `uc 1 ]
+[n S593 . ano mes dia hora minuto segundo dia_da_semana ]
 "10815 C:\Program Files (x86)\Microchip\xc8\v1.34\include\pic18f4550.h
 [v _TMR1ON `Vb ~T0 @X0 0 e@32360 ]
 "8139
@@ -4815,50 +4818,63 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;pic18.h: 161: extern __nonreentrant void _delay(unsigned long);
 [; ;pic18.h: 163: extern __nonreentrant void _delaywdt(unsigned long);
 [; ;pic18.h: 165: extern __nonreentrant void _delay3(unsigned char);
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+[; ;time.h: 26: typedef struct{
+[; ;time.h: 27: unsigned char ano;
+[; ;time.h: 28: unsigned char mes;
+[; ;time.h: 29: unsigned char dia;
+[; ;time.h: 30: unsigned char hora;
+[; ;time.h: 31: unsigned char minuto;
+[; ;time.h: 32: unsigned char segundo;
+[; ;time.h: 33: unsigned char dia_da_semana;
+[; ;time.h: 34: }Data;
+[; ;time.h: 36: void delay_ms(unsigned int delay_total);
+[; ;time.h: 38: char dia_da_semana(unsigned int ano,char mes, char dia);
+[; ;time.h: 40: void configurar_data_inicial(Data data_inicial);
+[; ;time.h: 42: void resetar_timer1(char valor_h, char valor_l);
+"6 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
 [v _delay_ms `(v ~T0 @X0 1 ef1`ui ]
 {
-[; ;time.c: 5: void delay_ms(unsigned int delay_total){
+[; ;time.c: 6: void delay_ms(unsigned int delay_total){
 [e :U _delay_ms ]
 [v _delay_total `ui ~T0 @X0 1 r1 ]
 [f ]
-"6
-[v _temp `ui ~T0 @X0 1 a ]
-[; ;time.c: 6: unsigned int temp = 0;
-[e = _temp -> -> 0 `i `ui ]
-[; ;time.c: 7: while(temp < delay_total){
 "7
-[e $U 594  ]
-[e :U 595 ]
-{
-[; ;time.c: 8: _delay((unsigned long)((1)*(16000000/4000.0)));
+[v _temp `ui ~T0 @X0 1 a ]
+[; ;time.c: 7: unsigned int temp = 0;
+[e = _temp -> -> 0 `i `ui ]
+[; ;time.c: 8: while(temp < delay_total){
 "8
-[e ( __delay (1 -> * -> -> 1 `i `d / -> -> 16000000 `l `d .4000.0 `ul ]
-[; ;time.c: 9: temp++;}
+[e $U 595  ]
+[e :U 596 ]
+{
+[; ;time.c: 9: _delay((unsigned long)((1)*(16000000/4000.0)));
 "9
+[e ( __delay (1 -> * -> -> 1 `i `d / -> -> 16000000 `l `d .4000.0 `ul ]
+[; ;time.c: 10: temp++;}
+"10
 [e ++ _temp -> -> 1 `i `ui ]
 }
-[e :U 594 ]
-"7
-[e $ < _temp _delay_total 595  ]
-[e :U 596 ]
-[; ;time.c: 10: }
-"10
-[e :UE 593 ]
+[e :U 595 ]
+"8
+[e $ < _temp _delay_total 596  ]
+[e :U 597 ]
+[; ;time.c: 11: }
+"11
+[e :UE 594 ]
 }
-"12
+"13
 [v _dia_da_semana `(uc ~T0 @X0 1 ef3`ui`uc`uc ]
 {
-[; ;time.c: 12: char dia_da_semana(unsigned int ano,char mes, char dia){
+[; ;time.c: 13: char dia_da_semana(unsigned int ano,char mes, char dia){
 [e :U _dia_da_semana ]
 [v _ano `ui ~T0 @X0 1 r1 ]
 [v _mes `uc ~T0 @X0 1 r2 ]
 [v _dia `uc ~T0 @X0 1 r3 ]
 [f ]
-[v F5265 `uc ~T0 @X0 -> 0 `x s ]
-[i F5265
+[v F5283 `uc ~T0 @X0 -> 0 `x s ]
+[i F5283
 :U ..
-"14
+"15
 -> -> 0 `i `uc
 -> -> 3 `i `uc
 -> -> 3 `i `uc
@@ -4874,64 +4890,94 @@ Version 3.2 HI-TECH Software Intermediate Code
 ..
 ]
 [v _tabela_mes `uc ~T0 @X0 12  a ]
-[; ;time.c: 14: char tabela_mes[]= {0,3,3,6,1,4,6,2,5,0,3,5};
-[e = _tabela_mes F5265 ]
-"15
+[; ;time.c: 15: char tabela_mes[]= {0,3,3,6,1,4,6,2,5,0,3,5};
+[e = _tabela_mes F5283 ]
+"16
 [v _seculo `uc ~T0 @X0 1 a ]
-[; ;time.c: 15: unsigned char seculo;
-[; ;time.c: 17: ano+=15;
-"17
-[e =+ _ano -> -> 15 `i `ui ]
-[; ;time.c: 18: seculo = ano/100;
+[; ;time.c: 16: unsigned char seculo;
+[; ;time.c: 18: ano+=15;
 "18
-[e = _seculo -> / _ano -> -> 100 `i `ui `uc ]
-[; ;time.c: 19: ano-= (ano/100);
+[e =+ _ano -> -> 15 `i `ui ]
+[; ;time.c: 19: seculo = ano/100;
 "19
-[e =- _ano / _ano -> -> 100 `i `ui ]
-[; ;time.c: 21: if(! ((ano+3)%4) ){
-"21
-[e $ ! ! != % + _ano -> -> 3 `i `ui -> -> 4 `i `ui -> -> 0 `i `ui 598  ]
-{
-[; ;time.c: 22: if (mes==1) tabela_mes[mes-1]=6;
+[e = _seculo -> / _ano -> -> 100 `i `ui `uc ]
+[; ;time.c: 20: ano-= (seculo*100);
+"20
+[e =- _ano -> * -> _seculo `i -> 100 `i `ui ]
+[; ;time.c: 22: if(! ((ano+3)%4) ){
 "22
-[e $ ! == -> _mes `i -> 1 `i 599  ]
-[e = *U + &U _tabela_mes * -> -> - -> _mes `i -> 1 `i `ui `ux -> -> # *U &U _tabela_mes `ui `ux -> -> 6 `i `uc ]
-[e $U 600  ]
+[e $ ! ! != % + _ano -> -> 3 `i `ui -> -> 4 `i `ui -> -> 0 `i `ui 599  ]
+{
+[; ;time.c: 23: if (mes==1) tabela_mes[mes-1]=6;
 "23
-[e :U 599 ]
-[; ;time.c: 23: else if(mes==2) tabela_mes[mes-1]=2;}
-[e $ ! == -> _mes `i -> 2 `i 601  ]
-[e = *U + &U _tabela_mes * -> -> - -> _mes `i -> 1 `i `ui `ux -> -> # *U &U _tabela_mes `ui `ux -> -> 2 `i `uc ]
-[e :U 601 ]
+[e $ ! == -> _mes `i -> 1 `i 600  ]
+[e = *U + &U _tabela_mes * -> -> - -> _mes `i -> 1 `i `ui `ux -> -> # *U &U _tabela_mes `ui `ux -> -> 6 `i `uc ]
+[e $U 601  ]
+"24
 [e :U 600 ]
+[; ;time.c: 24: else if(mes==2) tabela_mes[mes-1]=2;}
+[e $ ! == -> _mes `i -> 2 `i 602  ]
+[e = *U + &U _tabela_mes * -> -> - -> _mes `i -> 1 `i `ui `ux -> -> # *U &U _tabela_mes `ui `ux -> -> 2 `i `uc ]
+[e :U 602 ]
+[e :U 601 ]
 }
-[e :U 598 ]
-[; ;time.c: 25: return (( (6 - seculo*2) + dia + tabela_mes[mes-1] + ano + (ano/4))%7);
-"25
+[e :U 599 ]
+[; ;time.c: 26: return (( (6 - seculo*2) + dia + tabela_mes[mes-1] + ano + (ano/4))%7);
+"26
 [e ) -> % + + -> + + - -> 6 `i * -> _seculo `i -> 2 `i -> _dia `i -> *U + &U _tabela_mes * -> -> - -> _mes `i -> 1 `i `ui `ux -> -> # *U &U _tabela_mes `ui `ux `i `ui _ano / _ano -> -> 4 `i `ui -> -> 7 `i `ui `uc ]
-[e $UE 597  ]
-[; ;time.c: 28: }
-"28
-[e :UE 597 ]
+[e $UE 598  ]
+[; ;time.c: 29: }
+"29
+[e :UE 598 ]
 }
-"30
+"31
+[v _configurar_data_inicial `(v ~T0 @X0 1 ef1`S593 ]
+{
+[; ;time.c: 31: void configurar_data_inicial(Data data_inicial){
+[e :U _configurar_data_inicial ]
+[v _data_inicial `S593 ~T0 @X0 1 r1 ]
+[f ]
+[; ;time.c: 32: data_inicial.ano=0;
+"32
+[e = . _data_inicial 0 -> -> 0 `i `uc ]
+[; ;time.c: 33: data_inicial.mes= 1;
+"33
+[e = . _data_inicial 1 -> -> 1 `i `uc ]
+[; ;time.c: 34: data_inicial.dia=1;
+"34
+[e = . _data_inicial 2 -> -> 1 `i `uc ]
+[; ;time.c: 35: data_inicial.dia_da_semana= dia_da_semana( data_inicial.ano, data_inicial.mes, data_inicial.dia);
+"35
+[e = . _data_inicial 6 ( _dia_da_semana (3 , , -> . _data_inicial 0 `ui . _data_inicial 1 . _data_inicial 2 ]
+[; ;time.c: 36: data_inicial.hora=0;
+"36
+[e = . _data_inicial 3 -> -> 0 `i `uc ]
+[; ;time.c: 37: data_inicial.minuto=0;
+"37
+[e = . _data_inicial 4 -> -> 0 `i `uc ]
+[; ;time.c: 38: data_inicial.segundo=0;}
+"38
+[e = . _data_inicial 5 -> -> 0 `i `uc ]
+[e :UE 603 ]
+}
+"41
 [v _resetar_timer1 `(v ~T0 @X0 1 ef2`uc`uc ]
 {
-[; ;time.c: 30: void resetar_timer1(char valor_h, char valor_l){
+[; ;time.c: 41: void resetar_timer1(char valor_h, char valor_l){
 [e :U _resetar_timer1 ]
 [v _valor_h `uc ~T0 @X0 1 r1 ]
 [v _valor_l `uc ~T0 @X0 1 r2 ]
 [f ]
-[; ;time.c: 31: TMR1ON=0;
-"31
+[; ;time.c: 42: TMR1ON=0;
+"42
 [e = _TMR1ON -> -> 0 `i `b ]
-[; ;time.c: 32: TMR1H=valor_h;
-"32
+[; ;time.c: 43: TMR1H=valor_h;
+"43
 [e = _TMR1H _valor_h ]
-[; ;time.c: 33: TMR1L=valor_l;
-"33
+[; ;time.c: 44: TMR1L=valor_l;
+"44
 [e = _TMR1L _valor_l ]
-[; ;time.c: 34: }
-"34
-[e :UE 602 ]
+[; ;time.c: 45: }
+"45
+[e :UE 604 ]
 }

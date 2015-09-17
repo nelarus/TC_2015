@@ -52,16 +52,16 @@
 [v _Read_b_eep Read_b_eep `(uc  1 e 1 0 ]
 "30 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\pic18\plib\EEP\write_B.c
 [v _Write_b_eep Write_b_eep `(v  1 e 0 0 ]
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
+"19 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
 [v _teclado_matricial teclado_matricial `(uc  1 e 1 0 ]
-"79
+"93
 [v _numero_para_ascii numero_para_ascii `(v  1 e 0 0 ]
-"101
+"115
 [v _ascii_para_numero ascii_para_numero `(uc  1 e 1 0 ]
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
 [v _carregar_senha carregar_senha `(v  1 e 0 0 ]
 "19
-[v _verificar_num_contas verificar_num_contas `(uc  1 e 1 0 ]
+[v _verificar_num_contas verificar_num_contas `(v  1 e 0 0 ]
 "29
 [v _eeprom_config_inicial eeprom_config_inicial `(v  1 e 0 0 ]
 "64 D:\Dropbox\Micros\2015\TC_2015\18F4550\encrypt.c
@@ -91,28 +91,32 @@
 "244
 [v _putch putch `(v  1 e 0 0 ]
 [v i2_putch putch `(v  1 e 0 0 ]
-"106 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
+"99 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
 [v _zerar_string zerar_string `(v  1 e 0 0 ]
-"114
+"107
 [v _aux aux `II(v  1 e 0 0 ]
-"309
+"313
 [v _main main `(i  1 e 2 0 ]
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
 [v _config_serial config_serial `(v  1 e 0 0 ]
-"22
+"49
 [v _enviar_caractere_serial enviar_caractere_serial `(v  1 e 0 0 ]
-"27
+"54
 [v _enviar_string_serial enviar_string_serial `(v  1 e 0 0 ]
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+"68
+[v _enviar_comando_at enviar_comando_at `(v  1 e 0 0 ]
+"6 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
 [v _delay_ms delay_ms `(v  1 e 0 0 ]
-"12
+"13
 [v _dia_da_semana dia_da_semana `(uc  1 e 1 0 ]
-"30
+"31
+[v _configurar_data_inicial configurar_data_inicial `(v  1 e 0 0 ]
+"41
 [v _resetar_timer1 resetar_timer1 `(v  1 e 0 0 ]
 [v i2_resetar_timer1 resetar_timer1 `(v  1 e 0 0 ]
 "2727 C:\Program Files (x86)\Microchip\xc8\v1.34\include\pic18f4550.h
 [v _PORTB PORTB `VEuc  1 e 1 @3969 ]
-[s S126 . 1 `uc 1 RB0 1 0 :1:0 
+[s S130 . 1 `uc 1 RB0 1 0 :1:0 
 `uc 1 RB1 1 0 :1:1 
 `uc 1 RB2 1 0 :1:2 
 `uc 1 RB3 1 0 :1:3 
@@ -122,7 +126,7 @@
 `uc 1 RB7 1 0 :1:7 
 ]
 "2757
-[s S135 . 1 `uc 1 INT0 1 0 :1:0 
+[s S139 . 1 `uc 1 INT0 1 0 :1:0 
 `uc 1 INT1 1 0 :1:1 
 `uc 1 INT2 1 0 :1:2 
 `uc 1 . 1 0 :2:3 
@@ -130,14 +134,14 @@
 `uc 1 PGC 1 0 :1:6 
 `uc 1 PGD 1 0 :1:7 
 ]
-[s S143 . 1 `uc 1 . 1 0 :3:0 
+[s S147 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 CCP2_PA2 1 0 :1:3 
 ]
-[u S146 . 1 `S126 1 . 1 0 `S135 1 . 1 0 `S143 1 . 1 0 ]
-[v _PORTBbits PORTBbits `VES146  1 e 1 @3969 ]
+[u S150 . 1 `S130 1 . 1 0 `S139 1 . 1 0 `S147 1 . 1 0 ]
+[v _PORTBbits PORTBbits `VES150  1 e 1 @3969 ]
 "2989
 [v _PORTD PORTD `VEuc  1 e 1 @3971 ]
-[s S175 . 1 `uc 1 RD0 1 0 :1:0 
+[s S179 . 1 `uc 1 RD0 1 0 :1:0 
 `uc 1 RD1 1 0 :1:1 
 `uc 1 RD2 1 0 :1:2 
 `uc 1 RD3 1 0 :1:3 
@@ -147,7 +151,7 @@
 `uc 1 RD7 1 0 :1:7 
 ]
 "3020
-[s S184 . 1 `uc 1 SPP0 1 0 :1:0 
+[s S188 . 1 `uc 1 SPP0 1 0 :1:0 
 `uc 1 SPP1 1 0 :1:1 
 `uc 1 SPP2 1 0 :1:2 
 `uc 1 SPP3 1 0 :1:3 
@@ -156,14 +160,12 @@
 `uc 1 SPP6 1 0 :1:6 
 `uc 1 SPP7 1 0 :1:7 
 ]
-[s S193 . 1 `uc 1 . 1 0 :7:0 
+[s S197 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 SS2 1 0 :1:7 
 ]
-[u S196 . 1 `S175 1 . 1 0 `S184 1 . 1 0 `S193 1 . 1 0 ]
-[v _PORTDbits PORTDbits `VES196  1 e 1 @3971 ]
-"3109
-[v _PORTE PORTE `VEuc  1 e 1 @3972 ]
-[s S385 . 1 `uc 1 RE0 1 0 :1:0 
+[u S200 . 1 `S179 1 . 1 0 `S188 1 . 1 0 `S197 1 . 1 0 ]
+[v _PORTDbits PORTDbits `VES200  1 e 1 @3971 ]
+[s S384 . 1 `uc 1 RE0 1 0 :1:0 
 `uc 1 RE1 1 0 :1:1 
 `uc 1 RE2 1 0 :1:2 
 `uc 1 RE3 1 0 :1:3 
@@ -171,78 +173,78 @@
 `uc 1 RDPU 1 0 :1:7 
 ]
 "3211
-[s S392 . 1 `uc 1 CK1SPP 1 0 :1:0 
+[s S391 . 1 `uc 1 CK1SPP 1 0 :1:0 
 `uc 1 CK2SPP 1 0 :1:1 
 `uc 1 OESPP 1 0 :1:2 
 ]
-[s S396 . 1 `uc 1 . 1 0 :2:0 
+[s S395 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 CCP10 1 0 :1:2 
 ]
-[s S399 . 1 `uc 1 . 1 0 :7:0 
+[s S398 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 CCP2E 1 0 :1:7 
 ]
-[s S402 . 1 `uc 1 . 1 0 :6:0 
+[s S401 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 CCP6E 1 0 :1:6 
 ]
-[s S405 . 1 `uc 1 . 1 0 :5:0 
+[s S404 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 CCP7E 1 0 :1:5 
 ]
-[s S408 . 1 `uc 1 . 1 0 :4:0 
+[s S407 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 CCP8E 1 0 :1:4 
 ]
-[s S411 . 1 `uc 1 . 1 0 :3:0 
+[s S410 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 CCP9E 1 0 :1:3 
 ]
-[s S414 . 1 `uc 1 . 1 0 :2:0 
+[s S413 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 CS 1 0 :1:2 
 ]
-[s S417 . 1 `uc 1 . 1 0 :7:0 
+[s S416 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 PA2E 1 0 :1:7 
 ]
-[s S420 . 1 `uc 1 . 1 0 :6:0 
+[s S419 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 PB1E 1 0 :1:6 
 ]
-[s S423 . 1 `uc 1 . 1 0 :2:0 
+[s S422 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 PB2 1 0 :1:2 
 ]
-[s S426 . 1 `uc 1 . 1 0 :4:0 
+[s S425 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 PB3E 1 0 :1:4 
 ]
-[s S429 . 1 `uc 1 . 1 0 :5:0 
+[s S428 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 PC1E 1 0 :1:5 
 ]
-[s S432 . 1 `uc 1 . 1 0 :1:0 
+[s S431 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 PC2 1 0 :1:1 
 ]
-[s S435 . 1 `uc 1 . 1 0 :3:0 
+[s S434 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 PC3E 1 0 :1:3 
 ]
-[s S438 . 1 `uc 1 PD2 1 0 :1:0 
+[s S437 . 1 `uc 1 PD2 1 0 :1:0 
 ]
-[s S440 . 1 `uc 1 RDE 1 0 :1:0 
+[s S439 . 1 `uc 1 RDE 1 0 :1:0 
 ]
-[s S442 . 1 `uc 1 . 1 0 :4:0 
+[s S441 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 RE4 1 0 :1:4 
 ]
-[s S445 . 1 `uc 1 . 1 0 :5:0 
+[s S444 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 RE5 1 0 :1:5 
 ]
-[s S448 . 1 `uc 1 . 1 0 :6:0 
+[s S447 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 RE6 1 0 :1:6 
 ]
-[s S451 . 1 `uc 1 . 1 0 :7:0 
+[s S450 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 RE7 1 0 :1:7 
 ]
-[s S454 . 1 `uc 1 . 1 0 :1:0 
+[s S453 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 WRE 1 0 :1:1 
 ]
-[u S457 . 1 `S385 1 . 1 0 `S392 1 . 1 0 `S396 1 . 1 0 `S399 1 . 1 0 `S402 1 . 1 0 `S405 1 . 1 0 `S408 1 . 1 0 `S411 1 . 1 0 `S414 1 . 1 0 `S417 1 . 1 0 `S420 1 . 1 0 `S423 1 . 1 0 `S426 1 . 1 0 `S429 1 . 1 0 `S432 1 . 1 0 `S435 1 . 1 0 `S438 1 . 1 0 `S440 1 . 1 0 `S442 1 . 1 0 `S445 1 . 1 0 `S448 1 . 1 0 `S451 1 . 1 0 `S454 1 . 1 0 ]
-[v _PORTEbits PORTEbits `VES457  1 e 1 @3972 ]
+[u S456 . 1 `S384 1 . 1 0 `S391 1 . 1 0 `S395 1 . 1 0 `S398 1 . 1 0 `S401 1 . 1 0 `S404 1 . 1 0 `S407 1 . 1 0 `S410 1 . 1 0 `S413 1 . 1 0 `S416 1 . 1 0 `S419 1 . 1 0 `S422 1 . 1 0 `S425 1 . 1 0 `S428 1 . 1 0 `S431 1 . 1 0 `S434 1 . 1 0 `S437 1 . 1 0 `S439 1 . 1 0 `S441 1 . 1 0 `S444 1 . 1 0 `S447 1 . 1 0 `S450 1 . 1 0 `S453 1 . 1 0 ]
+[v _PORTEbits PORTEbits `VES456  1 e 1 @3972 ]
 "3360
 [v _LATA LATA `VEuc  1 e 1 @3977 ]
 "3495
 [v _LATB LATB `VEuc  1 e 1 @3978 ]
-[s S642 . 1 `uc 1 LATC0 1 0 :1:0 
+[s S570 . 1 `uc 1 LATC0 1 0 :1:0 
 `uc 1 LATC1 1 0 :1:1 
 `uc 1 LATC2 1 0 :1:2 
 `uc 1 . 1 0 :3:3 
@@ -250,34 +252,34 @@
 `uc 1 LATC7 1 0 :1:7 
 ]
 "3673
-[s S649 . 1 `uc 1 LC0 1 0 :1:0 
+[s S577 . 1 `uc 1 LC0 1 0 :1:0 
 ]
-[s S651 . 1 `uc 1 . 1 0 :1:0 
+[s S579 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 LC1 1 0 :1:1 
 ]
-[s S654 . 1 `uc 1 . 1 0 :2:0 
+[s S582 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 LC2 1 0 :1:2 
 ]
-[s S657 . 1 `uc 1 . 1 0 :3:0 
+[s S585 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 LC3 1 0 :1:3 
 ]
-[s S660 . 1 `uc 1 . 1 0 :4:0 
+[s S588 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 LC4 1 0 :1:4 
 ]
-[s S663 . 1 `uc 1 . 1 0 :5:0 
+[s S591 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 LC5 1 0 :1:5 
 ]
-[s S666 . 1 `uc 1 . 1 0 :6:0 
+[s S594 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 LC6 1 0 :1:6 
 ]
-[s S669 . 1 `uc 1 . 1 0 :7:0 
+[s S597 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 LC7 1 0 :1:7 
 ]
-[u S672 . 1 `S642 1 . 1 0 `S649 1 . 1 0 `S651 1 . 1 0 `S654 1 . 1 0 `S657 1 . 1 0 `S660 1 . 1 0 `S663 1 . 1 0 `S666 1 . 1 0 `S669 1 . 1 0 ]
-[v _LATCbits LATCbits `VES672  1 e 1 @3979 ]
+[u S600 . 1 `S570 1 . 1 0 `S577 1 . 1 0 `S579 1 . 1 0 `S582 1 . 1 0 `S585 1 . 1 0 `S588 1 . 1 0 `S591 1 . 1 0 `S594 1 . 1 0 `S597 1 . 1 0 ]
+[v _LATCbits LATCbits `VES600  1 e 1 @3979 ]
 "3742
 [v _LATD LATD `VEuc  1 e 1 @3980 ]
-[s S48 . 1 `uc 1 LATD0 1 0 :1:0 
+[s S52 . 1 `uc 1 LATD0 1 0 :1:0 
 `uc 1 LATD1 1 0 :1:1 
 `uc 1 LATD2 1 0 :1:2 
 `uc 1 LATD3 1 0 :1:3 
@@ -287,61 +289,61 @@
 `uc 1 LATD7 1 0 :1:7 
 ]
 "3790
-[s S57 . 1 `uc 1 LD0 1 0 :1:0 
+[s S61 . 1 `uc 1 LD0 1 0 :1:0 
 ]
-[s S59 . 1 `uc 1 . 1 0 :1:0 
+[s S63 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 LD1 1 0 :1:1 
 ]
-[s S62 . 1 `uc 1 . 1 0 :2:0 
+[s S66 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 LD2 1 0 :1:2 
 ]
-[s S65 . 1 `uc 1 . 1 0 :3:0 
+[s S69 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 LD3 1 0 :1:3 
 ]
-[s S68 . 1 `uc 1 . 1 0 :4:0 
+[s S72 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 LD4 1 0 :1:4 
 ]
-[s S71 . 1 `uc 1 . 1 0 :5:0 
+[s S75 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 LD5 1 0 :1:5 
 ]
-[s S74 . 1 `uc 1 . 1 0 :6:0 
+[s S78 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 LD6 1 0 :1:6 
 ]
-[s S77 . 1 `uc 1 . 1 0 :7:0 
+[s S81 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 LD7 1 0 :1:7 
 ]
-[u S80 . 1 `S48 1 . 1 0 `S57 1 . 1 0 `S59 1 . 1 0 `S62 1 . 1 0 `S65 1 . 1 0 `S68 1 . 1 0 `S71 1 . 1 0 `S74 1 . 1 0 `S77 1 . 1 0 ]
-[v _LATDbits LATDbits `VES80  1 e 1 @3980 ]
-[s S554 . 1 `uc 1 LATE0 1 0 :1:0 
+[u S84 . 1 `S52 1 . 1 0 `S61 1 . 1 0 `S63 1 . 1 0 `S66 1 . 1 0 `S69 1 . 1 0 `S72 1 . 1 0 `S75 1 . 1 0 `S78 1 . 1 0 `S81 1 . 1 0 ]
+[v _LATDbits LATDbits `VES84  1 e 1 @3980 ]
+[s S946 . 1 `uc 1 LATE0 1 0 :1:0 
 `uc 1 LATE1 1 0 :1:1 
 `uc 1 LATE2 1 0 :1:2 
 ]
 "3917
-[s S558 . 1 `uc 1 LE0 1 0 :1:0 
+[s S950 . 1 `uc 1 LE0 1 0 :1:0 
 ]
-[s S560 . 1 `uc 1 . 1 0 :1:0 
+[s S952 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 LE1 1 0 :1:1 
 ]
-[s S563 . 1 `uc 1 . 1 0 :2:0 
+[s S955 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 LE2 1 0 :1:2 
 ]
-[s S566 . 1 `uc 1 . 1 0 :3:0 
+[s S958 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 LE3 1 0 :1:3 
 ]
-[s S569 . 1 `uc 1 . 1 0 :4:0 
+[s S961 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 LE4 1 0 :1:4 
 ]
-[s S572 . 1 `uc 1 . 1 0 :5:0 
+[s S964 . 1 `uc 1 . 1 0 :5:0 
 `uc 1 LE5 1 0 :1:5 
 ]
-[s S575 . 1 `uc 1 . 1 0 :6:0 
+[s S967 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 LE6 1 0 :1:6 
 ]
-[s S578 . 1 `uc 1 . 1 0 :7:0 
+[s S970 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 LE7 1 0 :1:7 
 ]
-[u S581 . 1 `S554 1 . 1 0 `S558 1 . 1 0 `S560 1 . 1 0 `S563 1 . 1 0 `S566 1 . 1 0 `S569 1 . 1 0 `S572 1 . 1 0 `S575 1 . 1 0 `S578 1 . 1 0 ]
-[v _LATEbits LATEbits `VES581  1 e 1 @3981 ]
+[u S973 . 1 `S946 1 . 1 0 `S950 1 . 1 0 `S952 1 . 1 0 `S955 1 . 1 0 `S958 1 . 1 0 `S961 1 . 1 0 `S964 1 . 1 0 `S967 1 . 1 0 `S970 1 . 1 0 ]
+[v _LATEbits LATEbits `VES973  1 e 1 @3981 ]
 "3976
 [v _TRISA TRISA `VEuc  1 e 1 @3986 ]
 "4173
@@ -354,7 +356,7 @@
 [v _TRISE TRISE `VEuc  1 e 1 @3990 ]
 "4945
 [v _PIE1 PIE1 `VEuc  1 e 1 @3997 ]
-[s S1080 . 1 `uc 1 RD 1 0 :1:0 
+[s S1099 . 1 `uc 1 RD 1 0 :1:0 
 `uc 1 WR 1 0 :1:1 
 `uc 1 WREN 1 0 :1:2 
 `uc 1 WRERR 1 0 :1:3 
@@ -364,11 +366,11 @@
 `uc 1 EEPGD 1 0 :1:7 
 ]
 "5440
-[s S1089 . 1 `uc 1 . 1 0 :6:0 
+[s S1108 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 EEFS 1 0 :1:6 
 ]
-[u S1092 . 1 `S1080 1 . 1 0 `S1089 1 . 1 0 ]
-[v _EECON1bits EECON1bits `VES1092  1 e 1 @4006 ]
+[u S1111 . 1 `S1099 1 . 1 0 `S1108 1 . 1 0 ]
+[v _EECON1bits EECON1bits `VES1111  1 e 1 @4006 ]
 "5484
 [v _EECON2 EECON2 `VEuc  1 e 1 @4007 ]
 "5490
@@ -391,22 +393,22 @@
 [v _TMR1L TMR1L `VEuc  1 e 1 @4046 ]
 "8139
 [v _TMR1H TMR1H `VEuc  1 e 1 @4047 ]
-[s S246 . 1 `uc 1 NOT_BOR 1 0 :1:0 
+[s S245 . 1 `uc 1 NOT_BOR 1 0 :1:0 
 ]
 "8194
-[s S248 . 1 `uc 1 . 1 0 :1:0 
+[s S247 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 NOT_POR 1 0 :1:1 
 ]
-[s S251 . 1 `uc 1 . 1 0 :2:0 
+[s S250 . 1 `uc 1 . 1 0 :2:0 
 `uc 1 NOT_PD 1 0 :1:2 
 ]
-[s S254 . 1 `uc 1 . 1 0 :3:0 
+[s S253 . 1 `uc 1 . 1 0 :3:0 
 `uc 1 NOT_TO 1 0 :1:3 
 ]
-[s S257 . 1 `uc 1 . 1 0 :4:0 
+[s S256 . 1 `uc 1 . 1 0 :4:0 
 `uc 1 NOT_RI 1 0 :1:4 
 ]
-[s S260 . 1 `uc 1 nBOR 1 0 :1:0 
+[s S259 . 1 `uc 1 nBOR 1 0 :1:0 
 `uc 1 nPOR 1 0 :1:1 
 `uc 1 nPD 1 0 :1:2 
 `uc 1 nTO 1 0 :1:3 
@@ -415,10 +417,10 @@
 `uc 1 SBOREN 1 0 :1:6 
 `uc 1 IPEN 1 0 :1:7 
 ]
-[s S269 . 1 `uc 1 . 1 0 :7:0 
+[s S268 . 1 `uc 1 . 1 0 :7:0 
 `uc 1 NOT_IPEN 1 0 :1:7 
 ]
-[s S272 . 1 `uc 1 BOR 1 0 :1:0 
+[s S271 . 1 `uc 1 BOR 1 0 :1:0 
 `uc 1 POR 1 0 :1:1 
 `uc 1 PD 1 0 :1:2 
 `uc 1 TO 1 0 :1:3 
@@ -426,8 +428,8 @@
 `uc 1 . 1 0 :2:5 
 `uc 1 nIPEN 1 0 :1:7 
 ]
-[u S280 . 1 `S246 1 . 1 0 `S248 1 . 1 0 `S251 1 . 1 0 `S254 1 . 1 0 `S257 1 . 1 0 `S260 1 . 1 0 `S269 1 . 1 0 `S272 1 . 1 0 ]
-[v _RCONbits RCONbits `VES280  1 e 1 @4048 ]
+[u S279 . 1 `S245 1 . 1 0 `S247 1 . 1 0 `S250 1 . 1 0 `S253 1 . 1 0 `S256 1 . 1 0 `S259 1 . 1 0 `S268 1 . 1 0 `S271 1 . 1 0 ]
+[v _RCONbits RCONbits `VES279  1 e 1 @4048 ]
 "8589
 [v _OSCCON OSCCON `VEuc  1 e 1 @4051 ]
 "8671
@@ -440,7 +442,7 @@
 [v _INTCON2 INTCON2 `VEuc  1 e 1 @4081 ]
 "9159
 [v _INTCON INTCON `VEuc  1 e 1 @4082 ]
-[s S1156 . 1 `uc 1 RBIF 1 0 :1:0 
+[s S1175 . 1 `uc 1 RBIF 1 0 :1:0 
 `uc 1 INT0IF 1 0 :1:1 
 `uc 1 TMR0IF 1 0 :1:2 
 `uc 1 RBIE 1 0 :1:3 
@@ -450,7 +452,7 @@
 `uc 1 GIE_GIEH 1 0 :1:7 
 ]
 "9211
-[s S1165 . 1 `uc 1 RBIF 1 0 :1:0 
+[s S1184 . 1 `uc 1 RBIF 1 0 :1:0 
 `uc 1 INT0IF 1 0 :1:1 
 `uc 1 TMR0IF 1 0 :1:2 
 `uc 1 RBIE 1 0 :1:3 
@@ -459,7 +461,7 @@
 `uc 1 PEIE 1 0 :1:6 
 `uc 1 GIE 1 0 :1:7 
 ]
-[s S1174 . 1 `uc 1 RBIF 1 0 :1:0 
+[s S1193 . 1 `uc 1 RBIF 1 0 :1:0 
 `uc 1 INT0IF 1 0 :1:1 
 `uc 1 TMR0IF 1 0 :1:2 
 `uc 1 RBIE 1 0 :1:3 
@@ -468,7 +470,7 @@
 `uc 1 GIEL 1 0 :1:6 
 `uc 1 GIEH 1 0 :1:7 
 ]
-[s S1183 . 1 `uc 1 . 1 0 :1:0 
+[s S1202 . 1 `uc 1 . 1 0 :1:0 
 `uc 1 INT0F 1 0 :1:1 
 `uc 1 T0IF 1 0 :1:2 
 `uc 1 . 1 0 :1:3 
@@ -477,12 +479,12 @@
 `uc 1 PEIE 1 0 :1:6 
 `uc 1 GIE 1 0 :1:7 
 ]
-[s S1192 . 1 `uc 1 . 1 0 :6:0 
+[s S1211 . 1 `uc 1 . 1 0 :6:0 
 `uc 1 GIEL 1 0 :1:6 
 `uc 1 GIEH 1 0 :1:7 
 ]
-[u S1196 . 1 `S1156 1 . 1 0 `S1165 1 . 1 0 `S1174 1 . 1 0 `S1183 1 . 1 0 `S1192 1 . 1 0 ]
-[v _INTCONbits INTCONbits `VES1196  1 e 1 @4082 ]
+[u S1215 . 1 `S1175 1 . 1 0 `S1184 1 . 1 0 `S1193 1 . 1 0 `S1202 1 . 1 0 `S1211 1 . 1 0 ]
+[v _INTCONbits INTCONbits `VES1215  1 e 1 @4082 ]
 "9559
 [v _BRG16 BRG16 `VEb  1 e 0 @32195 ]
 "9561
@@ -541,120 +543,127 @@
 [v _Linha_3 Linha_3 `uc  1 e 1 0 ]
 "13
 [v _Linha_4 Linha_4 `uc  1 e 1 0 ]
-"53 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
-[v _qtd_max_dias qtd_max_dias `uc  1 e 1 0 ]
-"54
+"57 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
 [v _nova_senha nova_senha `[16]uc  1 e 16 0 ]
-"56
-[v _senha senha `[16][17]uc  1 e 272 0 ]
-"57
-[v _buffer_serial buffer_serial `[80]uc  1 e 80 0 ]
 "58
-[v _buffer_teclado_matricial buffer_teclado_matricial `[40]uc  1 e 40 0 ]
+[v _senha senha `[16][18]uc  1 e 288 0 ]
 "59
+[v _parametro_configuracao_modulo_bt parametro_configuracao_modulo_bt `[17]uc  1 e 17 0 ]
+"61
+[v _buffer_serial buffer_serial `[80]uc  1 e 80 0 ]
+"62
+[v _buffer_teclado_matricial buffer_teclado_matricial `[40]uc  1 e 40 0 ]
+"63
 [v _qtd_caracteres_recebidos_serial qtd_caracteres_recebidos_serial `uc  1 e 1 0 ]
-"60
+"64
 [v _qtd_caracteres_recebidos_teclado qtd_caracteres_recebidos_teclado `uc  1 e 1 0 ]
-[s S21 Data 7 `uc 1 ano 1 0 `uc 1 mes 1 1 `uc 1 dia 1 2 `uc 1 hora 1 3 `uc 1 minuto 1 4 `uc 1 segundo 1 5 `uc 1 dia_da_semana 1 6 ]
-"76
+[s S21 . 7 `uc 1 ano 1 0 `uc 1 mes 1 1 `uc 1 dia 1 2 `uc 1 hora 1 3 `uc 1 minuto 1 4 `uc 1 segundo 1 5 `uc 1 dia_da_semana 1 6 ]
+"75
 [v _data_atual data_atual `S21  1 e 7 0 ]
-"79
-[v _caractere_recebido caractere_recebido `uc  1 e 1 0 ]
+"76
+[v _data_recebida data_recebida `S21  1 e 7 0 ]
 "80
-[v _FLAGS_1 FLAGS_1 `uc  1 e 1 0 ]
+[v _caractere_recebido caractere_recebido `uc  1 e 1 0 ]
 "81
-[v _FLAGS_2 FLAGS_2 `uc  1 e 1 0 ]
+[v _FLAGS_1 FLAGS_1 `uc  1 e 1 0 ]
 "82
-[v _FLAGS_3 FLAGS_3 `uc  1 e 1 0 ]
+[v _FLAGS_2 FLAGS_2 `uc  1 e 1 0 ]
 "83
-[v _PORTB_SR PORTB_SR `uc  1 e 1 0 ]
+[v _FLAGS_3 FLAGS_3 `uc  1 e 1 0 ]
 "84
+[v _PORTB_SR PORTB_SR `uc  1 e 1 0 ]
+"85
 [v _num_interrupt_timer1 num_interrupt_timer1 `uc  1 e 1 0 ]
-"86
+"87
+[v _qtd_max_dias qtd_max_dias `uc  1 e 1 0 ]
+"88
 [v _qtd_vezes_mesma_tecla_pressionada qtd_vezes_mesma_tecla_pressionada `uc  1 e 1 0 ]
-"91
-[v _ptr_data ptr_data `*.39uc  1 e 2 0 ]
-"309
+"313
 [v _main main `(i  1 e 2 0 ]
 {
-"818
-[v main@tentativas_841 tentativas `uc  1 a 1 66 ]
-"809
-[v main@i_840 i `uc  1 a 1 74 ]
-"748
-[v main@tentativas tentativas `uc  1 a 1 65 ]
-"415
-[v main@endereco_modulo_repasse endereco_modulo_repasse `[18]uc  1 a 18 47 ]
-"414
-[v main@i i `uc  1 a 1 71 ]
-"321
-[v main@contas_cadastradas contas_cadastradas `i  1 a 2 67 ]
-"318
-[v main@cont cont `uc  1 a 1 78 ]
-"315
-[v main@funcao funcao `uc  1 a 1 77 ]
-"313
-[v main@ordem ordem `uc  1 a 1 76 ]
-"316
-[v main@conta conta `uc  1 a 1 75 ]
-"320
-[v main@ultimo_caractere_recebido ultimo_caractere_recebido `uc  1 a 1 73 ]
-"314
-[v main@etapa etapa `uc  1 a 1 72 ]
+"509
+[v main@novo_valor novo_valor `uc  1 a 1 53 ]
+"765
+[v main@i_795 i `uc  1 a 1 59 ]
+"676
+[v main@tentativas tentativas `uc  1 a 1 48 ]
+"419
+[v main@ptr_caractere_recebido_serial ptr_caractere_recebido_serial `*.39uc  1 a 2 63 ]
+"422
+[v main@i i `uc  1 a 1 52 ]
+"326
+[v main@contas_cadastradas contas_cadastradas `i  1 a 2 54 ]
 "317
-[v main@conta_a_ser_alterada conta_a_ser_alterada `uc  1 a 1 70 ]
+[v main@ordem ordem `uc  1 a 1 65 ]
+"320
+[v main@conta conta `uc  1 a 1 62 ]
 "319
-[v main@qtd_total_contas qtd_total_contas `uc  1 a 1 69 ]
-"945
+[v main@funcao funcao `uc  1 a 1 61 ]
+"318
+[v main@etapa etapa `uc  1 a 1 60 ]
+"325
+[v main@ultimo_caractere_recebido ultimo_caractere_recebido `uc  1 a 1 58 ]
+"323
+[v main@cont cont `uc  1 a 1 57 ]
+"324
+[v main@qtd_total_contas qtd_total_contas `uc  1 a 1 56 ]
+"321
+[v main@conta_a_ser_alterada conta_a_ser_alterada `uc  1 a 1 51 ]
+"327
+[v main@ptr_data ptr_data `*.30uc  1 a 1 50 ]
+"322
+[v main@comando_at comando_at `uc  1 a 1 49 ]
+"897
 } 0
-"106
+"99
 [v _zerar_string zerar_string `(v  1 e 0 0 ]
 {
 [v zerar_string@string_a_zerar string_a_zerar `*.39uc  1 p 2 0 ]
-"112
+"105
 } 0
 "19 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
-[v _verificar_num_contas verificar_num_contas `(uc  1 e 1 0 ]
+[v _verificar_num_contas verificar_num_contas `(v  1 e 0 0 ]
 {
+[v verificar_num_contas@contas_cadastradas contas_cadastradas `*.30i  1 a 1 wreg ]
 "20
-[v verificar_num_contas@i i `uc  1 a 1 3 ]
+[v verificar_num_contas@i i `uc  1 a 1 7 ]
+"19
+[v verificar_num_contas@contas_cadastradas contas_cadastradas `*.30i  1 a 1 wreg ]
+[v verificar_num_contas@qtd_contas qtd_contas `*.30uc  1 p 1 2 ]
 "21
-[v verificar_num_contas@qtd_contas qtd_contas `uc  1 a 1 2 ]
+[v verificar_num_contas@contas_cadastradas contas_cadastradas `*.30i  1 a 1 6 ]
 "26
 } 0
-"30 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+"41 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
 [v _resetar_timer1 resetar_timer1 `(v  1 e 0 0 ]
 {
 [v resetar_timer1@valor_h valor_h `uc  1 a 1 wreg ]
 [v resetar_timer1@valor_h valor_h `uc  1 a 1 wreg ]
 [v resetar_timer1@valor_l valor_l `uc  1 p 1 0 ]
 [v resetar_timer1@valor_h valor_h `uc  1 a 1 1 ]
-"34
+"45
 } 0
 "464 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\common\doprnt.c
 [v _printf printf `(i  1 e 2 0 ]
 {
-[v printf@f f `*.31Cuc  1 a 1 wreg ]
 "501
-[v printf@width width `i  1 a 2 38 ]
+[v printf@width width `i  1 a 2 39 ]
 "529
-[v printf@len len `ui  1 a 2 34 ]
+[v printf@len len `ui  1 a 2 36 ]
 "528
-[v printf@val val `ui  1 a 2 32 ]
+[v printf@val val `ui  1 a 2 34 ]
 "530
-[v printf@cp cp `*.35Cuc  1 a 2 29 ]
+[v printf@cp cp `*.35Cuc  1 a 2 31 ]
 "499
-[v printf@c c `c  1 a 1 40 ]
+[v printf@c c `c  1 a 1 41 ]
 "508
-[v printf@flag flag `uc  1 a 1 36 ]
+[v printf@flag flag `uc  1 a 1 38 ]
 "466
-[v printf@ap ap `[1]*.30v  1 a 1 31 ]
+[v printf@ap ap `[1]*.30v  1 a 1 33 ]
 "506
-[v printf@prec prec `c  1 a 1 28 ]
+[v printf@prec prec `c  1 a 1 30 ]
 "464
-[v printf@f f `*.31Cuc  1 a 1 wreg ]
-"533
-[v printf@f f `*.31Cuc  1 a 1 37 ]
+[v printf@f f `*.25Cuc  1 p 2 12 ]
 "1541
 } 0
 "244 D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c
@@ -683,19 +692,19 @@
 [v isdigit@c c `uc  1 a 1 2 ]
 "15
 } 0
-"79 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
+"93 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
 [v _numero_para_ascii numero_para_ascii `(v  1 e 0 0 ]
 {
 [v numero_para_ascii@numero numero `uc  1 a 1 wreg ]
-"80
+"94
 [v numero_para_ascii@temp1 temp1 `i  1 a 2 18 ]
-"81
+"95
 [v numero_para_ascii@temp2 temp2 `i  1 a 2 15 ]
-"79
+"93
 [v numero_para_ascii@numero numero `uc  1 a 1 wreg ]
-"83
+"97
 [v numero_para_ascii@numero numero `uc  1 a 1 17 ]
-"99
+"113
 } 0
 "4 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\common\lbdiv.c
 [v ___lbdiv __lbdiv `(uc  1 e 1 0 ]
@@ -774,19 +783,28 @@
 [v lcd_write@c c `uc  1 a 1 0 ]
 "133
 } 0
-"27 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
+"68 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
+[v _enviar_comando_at enviar_comando_at `(v  1 e 0 0 ]
+{
+[v enviar_comando_at@comando comando `uc  1 a 1 wreg ]
+[v enviar_comando_at@comando comando `uc  1 a 1 wreg ]
+[v enviar_comando_at@parametro parametro `*.30uc  1 p 1 2 ]
+[v enviar_comando_at@comando comando `uc  1 a 1 3 ]
+"112
+} 0
+"54
 [v _enviar_string_serial enviar_string_serial `(v  1 e 0 0 ]
 {
 [v enviar_string_serial@string_a_enviar string_a_enviar `*.35Cuc  1 p 2 0 ]
-"34
+"61
 } 0
-"22
+"49
 [v _enviar_caractere_serial enviar_caractere_serial `(v  1 e 0 0 ]
 {
 [v enviar_caractere_serial@carater_a_enviar carater_a_enviar `uc  1 a 1 wreg ]
 [v enviar_caractere_serial@carater_a_enviar carater_a_enviar `uc  1 a 1 wreg ]
 [v enviar_caractere_serial@carater_a_enviar carater_a_enviar `uc  1 a 1 0 ]
-"25
+"52
 } 0
 "29 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
 [v _eeprom_config_inicial eeprom_config_inicial `(v  1 e 0 0 ]
@@ -810,19 +828,35 @@
 {
 "15
 } 0
-"12 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+"6 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+[v _delay_ms delay_ms `(v  1 e 0 0 ]
+{
+"7
+[v delay_ms@temp temp `ui  1 a 2 3 ]
+"6
+[v delay_ms@delay_total delay_total `ui  1 p 2 0 ]
+"11
+} 0
+"31
+[v _configurar_data_inicial configurar_data_inicial `(v  1 e 0 0 ]
+{
+[s S21 . 7 `uc 1 ano 1 0 `uc 1 mes 1 1 `uc 1 dia 1 2 `uc 1 hora 1 3 `uc 1 minuto 1 4 `uc 1 segundo 1 5 `uc 1 dia_da_semana 1 6 ]
+[v configurar_data_inicial@data_inicial data_inicial `S21  1 p 7 34 ]
+"38
+} 0
+"13
 [v _dia_da_semana dia_da_semana `(uc  1 e 1 0 ]
 {
-"14
-[v dia_da_semana@tabela_mes tabela_mes `[12]uc  1 a 12 21 ]
 "15
+[v dia_da_semana@tabela_mes tabela_mes `[12]uc  1 a 12 21 ]
+"16
 [v dia_da_semana@seculo seculo `uc  1 a 1 33 ]
-"12
+"13
 [v dia_da_semana@ano ano `ui  1 p 2 12 ]
 [v dia_da_semana@mes mes `uc  1 p 1 14 ]
 [v dia_da_semana@dia dia `uc  1 p 1 15 ]
-[v dia_da_semana@F5265 F5265 `[12]uc  1 s 12 F5265 ]
-"28
+[v dia_da_semana@F5283 F5283 `[12]uc  1 s 12 F5283 ]
+"29
 } 0
 "15 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\common\Umul16.c
 [v ___wmul __wmul `(ui  1 e 2 0 ]
@@ -856,22 +890,14 @@
 [v ___lwdiv@divisor divisor `ui  1 p 2 2 ]
 "31
 } 0
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
-[v _delay_ms delay_ms `(v  1 e 0 0 ]
-{
-"6
-[v delay_ms@temp temp `ui  1 a 2 3 ]
-"5
-[v delay_ms@delay_total delay_total `ui  1 p 2 0 ]
-"10
-} 0
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
 [v _config_serial config_serial `(v  1 e 0 0 ]
 {
 [v config_serial@baud baud `uc  1 a 1 wreg ]
 [v config_serial@baud baud `uc  1 a 1 wreg ]
+"8
 [v config_serial@baud baud `uc  1 a 1 0 ]
-"20
+"47
 } 0
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\eeprom_interna.c
 [v _carregar_senha carregar_senha `(v  1 e 0 0 ]
@@ -881,7 +907,7 @@
 [v carregar_senha@i i `uc  1 a 1 8 ]
 "6
 [v carregar_senha@conta conta `uc  1 a 1 wreg ]
-[v carregar_senha@senha_a_carregar senha_a_carregar `*.39[17]uc  1 p 2 2 ]
+[v carregar_senha@senha_a_carregar senha_a_carregar `*.39[18]uc  1 p 2 2 ]
 "8
 [v carregar_senha@conta conta `uc  1 a 1 9 ]
 "17
@@ -892,19 +918,19 @@
 [v Read_b_eep@badd badd `ui  1 p 2 0 ]
 "32
 } 0
-"101 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
+"115 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
 [v _ascii_para_numero ascii_para_numero `(uc  1 e 1 0 ]
 {
 [v ascii_para_numero@caractere3 caractere3 `uc  1 a 1 wreg ]
-"102
-[v ascii_para_numero@numero numero `uc  1 a 1 3 ]
-"101
+"120
+[v ascii_para_numero@numero numero `uc  1 a 1 2 ]
+"115
 [v ascii_para_numero@caractere3 caractere3 `uc  1 a 1 wreg ]
 [v ascii_para_numero@caractere2 caractere2 `uc  1 p 1 0 ]
 [v ascii_para_numero@caractere1 caractere1 `uc  1 p 1 1 ]
-"103
-[v ascii_para_numero@caractere3 caractere3 `uc  1 a 1 2 ]
-"106
+"117
+[v ascii_para_numero@caractere3 caractere3 `uc  1 a 1 3 ]
+"124
 } 0
 "8 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\common\awmod.c
 [v ___awmod __awmod `(i  1 e 2 0 ]
@@ -917,38 +943,37 @@
 [v ___awmod@divisor divisor `i  1 p 2 2 ]
 "35
 } 0
-"114 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
+"107 D:\Dropbox\Micros\2015\TC_2015\18F4550\main.c
 [v _aux aux `II(v  1 e 0 0 ]
 {
-"200
-[v aux@linha linha `uc  1 a 1 43 ]
-[v aux@coluna coluna `uc  1 a 1 42 ]
-"306
+"280
+[v aux@RCREG_temp RCREG_temp `uc  1 a 1 44 ]
+"187
+[v aux@linha linha `uc  1 a 1 46 ]
+[v aux@coluna coluna `uc  1 a 1 45 ]
+"310
 } 0
-"30 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
+"41 D:\Dropbox\Micros\2015\TC_2015\18F4550\time.c
 [v i2_resetar_timer1 resetar_timer1 `(v  1 e 0 0 ]
 {
 [v i2resetar_timer1@valor_h valor_h `uc  1 a 1 wreg ]
 [v i2resetar_timer1@valor_h valor_h `uc  1 a 1 wreg ]
 [v i2resetar_timer1@valor_l valor_l `uc  1 p 1 0 ]
 [v i2resetar_timer1@valor_h valor_h `uc  1 a 1 1 ]
-"34
+"45
 } 0
 "464 C:\Program Files (x86)\Microchip\xc8\v1.34\sources\common\doprnt.c
 [v i2_printf printf `(i  1 e 2 0 ]
 {
-[v i2printf@f f `*.31Cuc  1 a 1 wreg ]
-[v i2printf@width printf `i  1 a 2 26 ]
-[v i2printf@len printf `ui  1 a 2 23 ]
-[v i2printf@val printf `ui  1 a 2 21 ]
-[v i2printf@cp printf `*.35Cuc  1 a 2 18 ]
-[v i2printf@c printf `c  1 a 1 28 ]
-[v i2printf@flag printf `uc  1 a 1 25 ]
-[v i2printf@ap printf `[1]*.30v  1 a 1 20 ]
-[v i2printf@prec printf `c  1 a 1 17 ]
-[v i2printf@f f `*.31Cuc  1 a 1 wreg ]
-"533
-[v i2printf@f f `*.31Cuc  1 a 1 16 ]
+[v i2printf@width printf `i  1 a 2 27 ]
+[v i2printf@len printf `ui  1 a 2 24 ]
+[v i2printf@val printf `ui  1 a 2 22 ]
+[v i2printf@cp printf `*.35Cuc  1 a 2 19 ]
+[v i2printf@c printf `c  1 a 1 29 ]
+[v i2printf@flag printf `uc  1 a 1 26 ]
+[v i2printf@ap printf `[1]*.30v  1 a 1 21 ]
+[v i2printf@prec printf `c  1 a 1 18 ]
+[v i2printf@f f `*.25Cuc  1 p 2 12 ]
 "1541
 } 0
 "244 D:\Dropbox\Micros\2015\TC_2015\18F4550\LCD_ModSauer.c
@@ -1026,18 +1051,18 @@
 [v i2___lwdiv@divisor divisor `ui  1 p 2 2 ]
 "31
 } 0
-"5 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
+"19 D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c
 [v _teclado_matricial teclado_matricial `(uc  1 e 1 0 ]
 {
 [v teclado_matricial@coluna coluna `uc  1 a 1 wreg ]
-"8
+"22
 [v teclado_matricial@caractere caractere `uc  1 a 1 3 ]
-"7
+"21
 [v teclado_matricial@temp temp `uc  1 a 1 2 ]
-"5
+"19
 [v teclado_matricial@coluna coluna `uc  1 a 1 wreg ]
 [v teclado_matricial@linha linha `uc  1 p 1 0 ]
-"7
+"21
 [v teclado_matricial@coluna coluna `uc  1 a 1 1 ]
-"76
+"90
 } 0

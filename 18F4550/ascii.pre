@@ -6304,14 +6304,14 @@ extern __nonreentrant void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __nonreentrant void _delay3(unsigned char);
 
-# 1 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.h"
+# 4 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.h"
 char teclado_matricial(char coluna, char linha);
 
 void numero_para_ascii(char numero);
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1);
 
-# 5 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c"
+# 19 "D:\Dropbox\Micros\2015\TC_2015\18F4550\ascii.c"
 char teclado_matricial(unsigned char coluna, char linha){
 
 char temp = ((linha-1)*4) + coluna;
@@ -6409,6 +6409,10 @@ while(!TRMT){}
 }
 
 char ascii_para_numero(char caractere3, char caractere2, char caractere1){
+
+if(caractere3 == (0)) caractere3 = '0';
+if(caractere2 == (0)) caractere2 = '0';
+
 char numero;
 numero=((caractere3 - '0')*100);
 numero+=((caractere2 - '0')*10);

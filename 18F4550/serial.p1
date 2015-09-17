@@ -4836,6 +4836,8 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;serial.h: 1: extern void config_serial(char baud);
 [; ;serial.h: 2: extern void enviar_string_serial(const char *string_a_enviar);
 [; ;serial.h: 3: extern void enviar_caractere_serial(char carater_a_enviar);
+[; ;serial.h: 5: extern void teste_comando_at(void);
+[; ;serial.h: 6: extern void enviar_comando_at(unsigned char comando,char *novo_parametro);
 "6 D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c
 [v _config_serial `(v ~T0 @X0 1 ef1`uc ]
 {
@@ -4843,89 +4845,139 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U _config_serial ]
 [v _baud `uc ~T0 @X0 1 r1 ]
 [f ]
-[; ;serial.c: 7: SYNC=0;
-"7
-[e = _SYNC -> -> 0 `i `b ]
-[; ;serial.c: 8: BRGH=1;
+[; ;serial.c: 8: SYNC=0;
 "8
-[e = _BRGH -> -> 1 `i `b ]
-[; ;serial.c: 9: BRG16=1;
+[e = _SYNC -> -> 0 `i `b ]
+[; ;serial.c: 9: BRGH=1;
 "9
-[e = _BRG16 -> -> 1 `i `b ]
-[; ;serial.c: 10: SPBRG=baud;
+[e = _BRGH -> -> 1 `i `b ]
+[; ;serial.c: 10: switch(baud){
 "10
-[e = _SPBRG _baud ]
-[; ;serial.c: 11: TX9=0;
+[e $U 595  ]
+{
+[; ;serial.c: 11: case 4:
 "11
-[e = _TX9 -> -> 0 `i `b ]
-[; ;serial.c: 12: RX9=0;
+[e :U 596 ]
+[; ;serial.c: 12: BRG16=1;
 "12
-[e = _RX9 -> -> 0 `i `b ]
-[; ;serial.c: 13: TXEN=1;
+[e = _BRG16 -> -> 1 `i `b ]
+[; ;serial.c: 13: SPBRG =34;
 "13
-[e = _TXEN -> -> 1 `i `b ]
-[; ;serial.c: 14: RCIE=0;
+[e = _SPBRG -> -> 34 `i `uc ]
+[; ;serial.c: 14: break;
 "14
-[e = _RCIE -> -> 0 `i `b ]
-[; ;serial.c: 15: CREN=1;
-"15
-[e = _CREN -> -> 1 `i `b ]
-[; ;serial.c: 16: SPEN=1;
+[e $U 594  ]
+[; ;serial.c: 16: case 3:
 "16
-[e = _SPEN -> -> 1 `i `b ]
-[; ;serial.c: 17: TXCKP = 0;
+[e :U 597 ]
+[; ;serial.c: 17: BRG16=1;
 "17
-[e = _TXCKP -> -> 0 `i `b ]
-[; ;serial.c: 18: TXIE = 0;
+[e = _BRG16 -> -> 1 `i `b ]
+[; ;serial.c: 18: SPBRG =69;
 "18
-[e = _TXIE -> -> 0 `i `b ]
-[; ;serial.c: 19: TX9 = 0;
+[e = _SPBRG -> -> 69 `i `uc ]
+[; ;serial.c: 19: break;
 "19
+[e $U 594  ]
+[; ;serial.c: 21: case 2:
+"21
+[e :U 598 ]
+[; ;serial.c: 22: BRG16=1;
+"22
+[e = _BRG16 -> -> 1 `i `b ]
+[; ;serial.c: 23: SPBRG =103;
+"23
+[e = _SPBRG -> -> 103 `i `uc ]
+[; ;serial.c: 24: break;
+"24
+[e $U 594  ]
+[; ;serial.c: 26: case 1:
+"26
+[e :U 599 ]
+[; ;serial.c: 27: BRG16=1;
+"27
+[e = _BRG16 -> -> 1 `i `b ]
+[; ;serial.c: 28: SPBRG =207;
+"28
+[e = _SPBRG -> -> 207 `i `uc ]
+[; ;serial.c: 29: break;
+"29
+[e $U 594  ]
+[; ;serial.c: 31: case 0:
+"31
+[e :U 600 ]
+[; ;serial.c: 32: BRG16=0;
+"32
+[e = _BRG16 -> -> 0 `i `b ]
+[; ;serial.c: 33: SPBRG =103;
+"33
+[e = _SPBRG -> -> 103 `i `uc ]
+[; ;serial.c: 34: break;
+"34
+[e $U 594  ]
+"35
+}
+[; ;serial.c: 35: }
+[e $U 594  ]
+"10
+[e :U 595 ]
+[e [\ _baud , $ -> -> 4 `i `uc 596
+ , $ -> -> 3 `i `uc 597
+ , $ -> -> 2 `i `uc 598
+ , $ -> -> 1 `i `uc 599
+ , $ -> -> 0 `i `uc 600
+ 594 ]
+"35
+[e :U 594 ]
+[; ;serial.c: 36: BRG16=1;
+"36
+[e = _BRG16 -> -> 1 `i `b ]
+[; ;serial.c: 37: SPBRG =34;
+"37
+[e = _SPBRG -> -> 34 `i `uc ]
+[; ;serial.c: 38: TX9=0;
+"38
 [e = _TX9 -> -> 0 `i `b ]
-[; ;serial.c: 20: }
-"20
+[; ;serial.c: 39: RX9=0;
+"39
+[e = _RX9 -> -> 0 `i `b ]
+[; ;serial.c: 40: TXEN=1;
+"40
+[e = _TXEN -> -> 1 `i `b ]
+[; ;serial.c: 41: RCIE=1;
+"41
+[e = _RCIE -> -> 1 `i `b ]
+[; ;serial.c: 42: CREN=1;
+"42
+[e = _CREN -> -> 1 `i `b ]
+[; ;serial.c: 43: SPEN=1;
+"43
+[e = _SPEN -> -> 1 `i `b ]
+[; ;serial.c: 44: TXCKP = 0;
+"44
+[e = _TXCKP -> -> 0 `i `b ]
+[; ;serial.c: 45: TXIE = 0;
+"45
+[e = _TXIE -> -> 0 `i `b ]
+[; ;serial.c: 46: TX9 = 0;
+"46
+[e = _TX9 -> -> 0 `i `b ]
+[; ;serial.c: 47: }
+"47
 [e :UE 593 ]
 }
-"22
+"49
 [v _enviar_caractere_serial `(v ~T0 @X0 1 ef1`uc ]
 {
-[; ;serial.c: 22: void enviar_caractere_serial(char carater_a_enviar){
+[; ;serial.c: 49: void enviar_caractere_serial(char carater_a_enviar){
 [e :U _enviar_caractere_serial ]
 [v _carater_a_enviar `uc ~T0 @X0 1 r1 ]
 [f ]
-[; ;serial.c: 23: TXREG = carater_a_enviar;
-"23
+[; ;serial.c: 50: TXREG = carater_a_enviar;
+"50
 [e = _TXREG _carater_a_enviar ]
-[; ;serial.c: 24: while(!TRMT){}
-"24
-[e $U 595  ]
-[e :U 596 ]
-{
-}
-[e :U 595 ]
-[e $ ! _TRMT 596  ]
-[e :U 597 ]
-[; ;serial.c: 25: }
-"25
-[e :UE 594 ]
-}
-"27
-[v _enviar_string_serial `(v ~T0 @X0 1 ef1`*Cuc ]
-{
-[; ;serial.c: 27: void enviar_string_serial(const char *string_a_enviar){
-[e :U _enviar_string_serial ]
-[v _string_a_enviar `*Cuc ~T0 @X0 1 r1 ]
-[f ]
-[; ;serial.c: 28: while(*string_a_enviar != (0)){
-"28
-[e $U 599  ]
-[e :U 600 ]
-{
-[; ;serial.c: 29: TXREG = *string_a_enviar;
-"29
-[e = _TXREG *U _string_a_enviar ]
-[; ;serial.c: 30: while(!TRMT){}
-"30
+[; ;serial.c: 51: while(!TRMT){}
+"51
 [e $U 602  ]
 [e :U 603 ]
 {
@@ -4933,15 +4985,212 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U 602 ]
 [e $ ! _TRMT 603  ]
 [e :U 604 ]
-[; ;serial.c: 31: string_a_enviar++;}
-"31
+[; ;serial.c: 52: }
+"52
+[e :UE 601 ]
+}
+"54
+[v _enviar_string_serial `(v ~T0 @X0 1 ef1`*Cuc ]
+{
+[; ;serial.c: 54: void enviar_string_serial(const char *string_a_enviar){
+[e :U _enviar_string_serial ]
+[v _string_a_enviar `*Cuc ~T0 @X0 1 r1 ]
+[f ]
+[; ;serial.c: 55: while(*string_a_enviar != (0)){
+"55
+[e $U 606  ]
+[e :U 607 ]
+{
+[; ;serial.c: 56: TXREG = *string_a_enviar;
+"56
+[e = _TXREG *U _string_a_enviar ]
+[; ;serial.c: 57: while(!TRMT){}
+"57
+[e $U 609  ]
+[e :U 610 ]
+{
+}
+[e :U 609 ]
+[e $ ! _TRMT 610  ]
+[e :U 611 ]
+[; ;serial.c: 58: string_a_enviar++;}
+"58
 [e ++ _string_a_enviar * -> -> 1 `i `x -> -> # *U _string_a_enviar `i `x ]
 }
-[e :U 599 ]
-"28
-[e $ != -> *U _string_a_enviar `i -> 0 `i 600  ]
-[e :U 601 ]
-[; ;serial.c: 34: }
-"34
-[e :UE 598 ]
+[e :U 606 ]
+"55
+[e $ != -> *U _string_a_enviar `i -> 0 `i 607  ]
+[e :U 608 ]
+[; ;serial.c: 61: }
+"61
+[e :UE 605 ]
 }
+"63
+[v _teste_comando_at `(v ~T0 @X0 1 ef ]
+{
+[; ;serial.c: 63: void teste_comando_at(void){
+[e :U _teste_comando_at ]
+[f ]
+[; ;serial.c: 64: enviar_string_serial("AT");}
+"64
+[e ( _enviar_string_serial (1 :s 1C ]
+[e :UE 612 ]
+}
+"68
+[v _enviar_comando_at `(v ~T0 @X0 1 ef2`uc`*uc ]
+{
+[; ;serial.c: 68: void enviar_comando_at(unsigned char comando,char *parametro){
+[e :U _enviar_comando_at ]
+[v _comando `uc ~T0 @X0 1 r1 ]
+[v _parametro `*uc ~T0 @X0 1 r2 ]
+[f ]
+[; ;serial.c: 69: enviar_string_serial("AT+");
+"69
+[e ( _enviar_string_serial (1 :s 2C ]
+[; ;serial.c: 71: if(comando=='a') {
+"71
+[e $ ! == -> _comando `ui -> 97 `ui 614  ]
+{
+[; ;serial.c: 72: enviar_string_serial("NAME");
+"72
+[e ( _enviar_string_serial (1 :s 3C ]
+[; ;serial.c: 73: enviar_string_serial(parametro);
+"73
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+"74
+}
+[; ;serial.c: 74: }
+[e $U 615  ]
+"76
+[e :U 614 ]
+[; ;serial.c: 76: else if(comando=='b'){
+[e $ ! == -> _comando `ui -> 98 `ui 616  ]
+{
+[; ;serial.c: 77: enviar_string_serial("BAUD");
+"77
+[e ( _enviar_string_serial (1 :s 4C ]
+[; ;serial.c: 78: enviar_string_serial(parametro);
+"78
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+"79
+}
+[; ;serial.c: 79: }
+[e $U 617  ]
+"81
+[e :U 616 ]
+[; ;serial.c: 81: else if(comando=='c'){
+[e $ ! == -> _comando `ui -> 99 `ui 618  ]
+{
+[; ;serial.c: 82: enviar_string_serial("ROLE");
+"82
+[e ( _enviar_string_serial (1 :s 5C ]
+[; ;serial.c: 83: enviar_string_serial(parametro);
+"83
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+[; ;serial.c: 84: enviar_caractere_serial('?');
+"84
+[e ( _enviar_caractere_serial (1 -> -> 63 `ui `uc ]
+"85
+}
+[; ;serial.c: 85: }
+[e $U 619  ]
+"87
+[e :U 618 ]
+[; ;serial.c: 87: else if(comando == 'd'){
+[e $ ! == -> _comando `ui -> 100 `ui 620  ]
+{
+[; ;serial.c: 88: enviar_string_serial("ADDR?");
+"88
+[e ( _enviar_string_serial (1 :s 6C ]
+"89
+}
+[; ;serial.c: 89: }
+[e $U 621  ]
+"91
+[e :U 620 ]
+[; ;serial.c: 91: else if( comando=='e' ){
+[e $ ! == -> _comando `ui -> 101 `ui 622  ]
+{
+[; ;serial.c: 92: enviar_string_serial("DISC?");}
+"92
+[e ( _enviar_string_serial (1 :s 7C ]
+}
+[e $U 623  ]
+"94
+[e :U 622 ]
+[; ;serial.c: 94: else if(comando=='f'){
+[e $ ! == -> _comando `ui -> 102 `ui 624  ]
+{
+[; ;serial.c: 95: enviar_string_serial("RESET");}
+"95
+[e ( _enviar_string_serial (1 :s 8C ]
+}
+[e $U 625  ]
+"97
+[e :U 624 ]
+[; ;serial.c: 97: else if(comando=='g'){
+[e $ ! == -> _comando `ui -> 103 `ui 626  ]
+{
+[; ;serial.c: 98: enviar_string_serial("START");}
+"98
+[e ( _enviar_string_serial (1 :s 9C ]
+}
+[e $U 627  ]
+"100
+[e :U 626 ]
+[; ;serial.c: 100: else if( comando == 'h' ){
+[e $ ! == -> _comando `ui -> 104 `ui 628  ]
+{
+[; ;serial.c: 101: enviar_string_serial("RADD?");}
+"101
+[e ( _enviar_string_serial (1 :s 10C ]
+}
+[e $U 629  ]
+"103
+[e :U 628 ]
+[; ;serial.c: 103: else if( comando=='i' ){
+[e $ ! == -> _comando `ui -> 105 `ui 630  ]
+{
+[; ;serial.c: 104: enviar_string_serial("SLEEP");}
+"104
+[e ( _enviar_string_serial (1 :s 11C ]
+}
+[e $U 631  ]
+"106
+[e :U 630 ]
+[; ;serial.c: 106: else if(comando == 'k'){
+[e $ ! == -> _comando `ui -> 107 `ui 632  ]
+{
+[; ;serial.c: 107: enviar_string_serial("CON");
+"107
+[e ( _enviar_string_serial (1 :s 12C ]
+[; ;serial.c: 108: enviar_string_serial(parametro);}
+"108
+[e ( _enviar_string_serial (1 -> _parametro `*Cuc ]
+}
+[e :U 632 ]
+"112
+[e :U 631 ]
+[e :U 629 ]
+[e :U 627 ]
+[e :U 625 ]
+[e :U 623 ]
+[e :U 621 ]
+[e :U 619 ]
+[e :U 617 ]
+[e :U 615 ]
+[; ;serial.c: 112: }
+[e :UE 613 ]
+}
+[a 9C 83 84 65 82 84 0 ]
+[a 8C 82 69 83 69 84 0 ]
+[a 1C 65 84 0 ]
+[a 11C 83 76 69 69 80 0 ]
+[a 12C 67 79 78 0 ]
+[a 3C 78 65 77 69 0 ]
+[a 5C 82 79 76 69 0 ]
+[a 4C 66 65 85 68 0 ]
+[a 6C 65 68 68 82 63 0 ]
+[a 10C 82 65 68 68 63 0 ]
+[a 7C 68 73 83 67 63 0 ]
+[a 2C 65 84 43 0 ]

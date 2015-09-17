@@ -6309,16 +6309,46 @@ extern void config_serial(char baud);
 extern void enviar_string_serial(const char *string_a_enviar);
 extern void enviar_caractere_serial(char carater_a_enviar);
 
+extern void teste_comando_at(void);
+extern void enviar_comando_at(unsigned char comando,char *novo_parametro);
+
 # 6 "D:\Dropbox\Micros\2015\TC_2015\18F4550\serial.c"
 void config_serial(char baud){
+
 SYNC=0;
 BRGH=1;
+switch(baud){
+case 4:
 BRG16=1;
-SPBRG=baud;
+SPBRG =34;
+break;
+
+case 3:
+BRG16=1;
+SPBRG =69;
+break;
+
+case 2:
+BRG16=1;
+SPBRG =103;
+break;
+
+case 1:
+BRG16=1;
+SPBRG =207;
+break;
+
+case 0:
+BRG16=0;
+SPBRG =103;
+break;
+}
+BRG16=1;
+SPBRG =34;
 TX9=0;
 RX9=0;
 TXEN=1;
-RCIE=0;
+RCIE=1;
 CREN=1;
 SPEN=1;
 TXCKP = 0;
@@ -6336,6 +6366,57 @@ while(*string_a_enviar != (0)){
 TXREG = *string_a_enviar;
 while(!TRMT){}
 string_a_enviar++;}
+
+
+}
+
+void teste_comando_at(void){
+enviar_string_serial("AT");}
+
+
+
+void enviar_comando_at(unsigned char comando,char *parametro){
+enviar_string_serial("AT+");
+
+if(comando=='a') {
+enviar_string_serial("NAME");
+enviar_string_serial(parametro);
+}
+
+else if(comando=='b'){
+enviar_string_serial("BAUD");
+enviar_string_serial(parametro);
+}
+
+else if(comando=='c'){
+enviar_string_serial("ROLE");
+enviar_string_serial(parametro);
+enviar_caractere_serial('?');
+}
+
+else if(comando == 'd'){
+enviar_string_serial("ADDR?");
+}
+
+else if( comando=='e' ){
+enviar_string_serial("DISC?");}
+
+else if(comando=='f'){
+enviar_string_serial("RESET");}
+
+else if(comando=='g'){
+enviar_string_serial("START");}
+
+else if( comando == 'h' ){
+enviar_string_serial("RADD?");}
+
+else if( comando=='i' ){
+enviar_string_serial("SLEEP");}
+
+else if(comando == 'k'){
+enviar_string_serial("CON");
+enviar_string_serial(parametro);}
+
 
 
 }

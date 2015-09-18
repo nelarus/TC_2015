@@ -4,7 +4,9 @@
 
 
 void carregar_senha( char conta, char senha_a_carregar[][18]){
-					
+
+
+									
 					char i = 0;
 
 							do{
@@ -20,7 +22,7 @@ void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas){
 		char i;
 		for(i=0;i<QTD_MAX_CONTAS;i++){
 			if(eeprom_read(i*TAMANHO_SENHA) != VALOR_INICIAL) {
-					*qtd_contas++;
+					(*qtd_contas)++;
 					setar_bit(*contas_cadastradas,i);}
 				}
 }
@@ -40,3 +42,11 @@ void eeprom_config_inicial(void){
 		eeprom_write(TAMANHO_SENHA-1,255);
 		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111100);
 		}
+
+void armazenar_senha(char nova_senha[],char senha_a_armazenar[][18],char conta){
+	char i=0;
+	do{
+		senha_a_armazenar[conta][i] = nova_senha[i];
+		eeprom_write( ((conta*16) + i) , nova_senha[i] );
+		while(WR){}
+		i++;} while(nova_senha[i-1]  && i<TAMANHO_SENHA);}																																					

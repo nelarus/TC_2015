@@ -3,10 +3,10 @@
 #include "serial.h"
 
 
-void config_serial(char baud,char brg16){
+void config_serial(char baud){
+//= 34; //34=114800. 69 = 57971  103  38462 , com brg16=0 9600 
 		SYNC=0; //assincrono
 		BRGH=1;
-<<<<<<< HEAD
 		switch(baud){
 				case BAUD_115200:
 				BRG16=1;
@@ -33,12 +33,6 @@ void config_serial(char baud,char brg16){
 				SPBRG =103;
 				break;
 		}
-		BRG16=1;
-		SPBRG =34;
-=======
-		BRG16= brg16;
-		SPBRG=baud;
->>>>>>> parent of 9cfc60c... Vers√£o 1.0.7
 		TX9=0;
 		RX9=0;//tx e rx em 8 bits
 		TXEN=1; //habilita transmiss„o

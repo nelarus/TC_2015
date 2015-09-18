@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "main.h"
+#include "time.h"
 
 
 void delay_ms(unsigned int delay_total){
@@ -16,7 +17,7 @@ char dia_da_semana(unsigned int ano,char mes, char dia){
 
 	ano+=15; //O ano 0 no calendário do PIC é 2015,cujos 2 ultimos digitos são 15
 	seculo = ano/100;
-	ano-= (ano/100); //pega os 2 ultimos digitos do ano
+	ano-= (seculo*100); //pega os 2 ultimos digitos do ano
 
 	if(! ((ano+3)%4) ){
 			if (mes==1) tabela_mes[mes-1]=6;
@@ -27,8 +28,23 @@ char dia_da_semana(unsigned int ano,char mes, char dia){
 
 }
 
+void configurar_data_inicial(Data data_inicial){
+	data_inicial.ano=0;
+	data_inicial.mes= Janeiro;
+	data_inicial.dia=1;
+	data_inicial.dia_da_semana= dia_da_semana(	data_inicial.ano,	data_inicial.mes,	data_inicial.dia);
+	data_inicial.hora=0;
+	data_inicial.minuto=0;
+	data_inicial.segundo=0;}
+
+
 void resetar_timer1(char valor_h, char valor_l){
 	 TMR1ON=0;
 	 TMR1H=valor_h;
 	 TMR1L=valor_l;
 }
+
+void parar_timer0_16bits(char valor_h,char valor_l){
+	TMR0IE=0;
+	TMR0H=valor_h;
+	TMR0L=valor_l;}

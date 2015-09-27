@@ -1,6 +1,7 @@
 #include <xc.h>
 #include "main.h"
 #include "serial.h"
+#include "recebimento_dados.h"
 
 
 void config_serial(char baud){
@@ -42,6 +43,10 @@ void config_serial(char baud){
 		TXCKP = 0;
 		TXIE = 0;
 		TX9 = 0;
+
+		enviar_caractere_serial(INICIO);
+		enviar_caractere_serial(INICIALIZAR);
+		enviar_caractere_serial(FIM);
 }
 
 void enviar_caractere_serial(char carater_a_enviar){

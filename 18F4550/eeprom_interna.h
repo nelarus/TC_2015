@@ -10,6 +10,6 @@ void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas); /
 extern void eeprom_config_inicial(void); //Configuração inicial da eeprom, necessária por causa do apagamento da eeprom ao programar o 18F4550.
 									//Conta 0 inicia com senha = 0123456789, Conta 1 inicia com senha = abcdefghij
 
-void carregar_senha(char conta, char senha_a_carregar[][18]);//Carrega a senha da conta selecionada, pegando a senha na eeprom interna e armazenando na string de entrada
+void carregar_senha(char conta, char senha_a_carregar[][19]);//Carrega a senha da conta selecionada, pegando a senha na eeprom interna e armazenando na string de entrada
 
-void armazenar_senha(char nova_senha[],char senha_a_armazenar[][18],char conta);
+void armazenar_senha(char nova_senha[],char senha_a_armazenar[][19],char conta);

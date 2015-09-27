@@ -108,22 +108,27 @@ void interrupt aux(void){
 			if(TMR1IE && TMR1IF){ 
 				TMR1IF=0;
 				resetar_timer1(0xC0,0);
+				TMR1ON=1;
 
 				if(MODO_BLUETOOTH){//O dispostivo iniciou comunicação com o PIC mas ficou mais de 500ms sem terminá-la
 						qtd_caracteres_recebidos_serial=0;
 						setar_bit(FLAGS_1,ERRO_SESSAO_EXPIRADA);
 						setar_bit(FLAGS_2,ENVIAR);
+						
 						}
 
 				else if(MODO_COMANDO_AT){
 						resetar_bit(FLAGS_3,MODO_COMANDO_AT);
 						qtd_caracteres_recebidos_serial=0;}
 
-//				else if(MODO_TECLADO_MATRICIAL && ++num_interrupt_timer1==5){//Passou-se 2,5s após a primeira vez que o botão foi apertado.
-//					if(testar_bit(FLAGS_2,MODO_T9)){setar_bit(FLAGS_2,RECEBER);}
-//					lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado);
-//					printf("*");
-//					num_interrupt_timer1=0;}
+				else if(MODO_TECLADO_MATRICIAL){//Passou-se 2,5s após a primeira vez que o botão foi apertado.
+
+					if(++num_interrupt_timer1==2){
+						if(testar_bit(FLAGS_2,MODO_T9)){setar_bit(FLAGS_2,RECEBER);}
+						lcd_gotoxy(LINHA3,qtd_caracteres_recebidos_teclado);
+						printf("*");
+						num_interrupt_timer1=0;}
+					}
 							
 			}
 			
@@ -401,7 +406,7 @@ int main(void){
 		lcd_gotoxy(LINHA1,20);
 		printf("%c\r",SENSOR_ABERTURA_FECHADURA);//atualiza o status da fechadura no display e retorna o cursor para o início;
 		printf("  Seja bem-vindo");
-		printf("\nAguardando login");
+		if(!qtd_caracteres_recebidos_teclado) printf("\nAguardando login");
 		
 
 		if(testar_bit(FLAGS_2,RECEBER)){ //OBSERVAÇÃO: O PROTOCOLO SEGUIDO AO RECEBER OS DADOS PELA SERIAL E PELO TECLADO MATRICIAL SÃO DIFERENTES, VIDE PROTOCOLO.TXT EM
@@ -416,9 +421,10 @@ int main(void){
 				enviar_caractere_serial(NOVA_LINHA);
 				enviar_string_serial(buffer_serial); //Envio dos dados recebidos para debug
 				enviar_caractere_serial(NOVA_LINHA);
-
-				char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
 				
+				char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
+				if(buffer_serial[0] == 10) ptr_caractere_recebido_serial++;//Solução paliativa ao fato do aplicativo estar enviando 
+																			//um caracter com valor inicial igual a decimal 10 antes do caractere de inicio
 
 				char i=0;
 				etapa=etapa_inicial;
@@ -428,7 +434,7 @@ int main(void){
 				//Início da análise dos dados recebidos
 				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
 
-					if(!i) ptr_caractere_recebido_serial = &buffer_serial[0]; //garante que no inicio o ponteiro também esteja apontando para o inicio do buffer serial
+					//if(!i) ptr_caractere_recebido_serial = &buffer_serial[1]; //garante que no inicio o ponteiro também esteja apontando para o inicio do buffer serial
 
 					enviar_string_serial("\ni:");numero_para_ascii(i);
 					enviar_caractere_serial(*ptr_caractere_recebido_serial);
@@ -601,21 +607,22 @@ int main(void){
 
 							//comparação com senha recebida
 							//printf("\r%d",qtd_caracteres_recebidos_teclado);
-							printf("\n\n%s",buffer_teclado_matricial);
-//
-//							if(buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] != FIM){
-//
-//										if(qtd_caracteres_recebidos_teclado){			
-//											lcd_gotoxy(LINHA2,qtd_caracteres_recebidos_teclado); 
-//											printf("*%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
-//										TMR1ON=1;}
-//			
-//										else{
-//											lcd_gotoxy(LINHA2,(qtd_caracteres_recebidos_teclado+1));
-//											printf("%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
-//											TMR1ON=1;}
-//							}
+							
 
+							
+
+							if(qtd_caracteres_recebidos_teclado){			
+								lcd_gotoxy(LINHA3,qtd_caracteres_recebidos_teclado); 
+								printf("*%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+								TMR1ON=1;}
+			
+							else{
+								limpar_linha(LINHA2);
+								lcd_gotoxy(LINHA3,(qtd_caracteres_recebidos_teclado+1));
+								printf("%c",buffer_teclado_matricial[qtd_caracteres_recebidos_teclado]);
+								TMR1ON=1;}
+
+							printf("\n%s",buffer_teclado_matricial);
 
 							if(	buffer_teclado_matricial[qtd_caracteres_recebidos_teclado] == FIM || ++qtd_caracteres_recebidos_teclado==(TAMANHO_BUFFER_TECLADO_MATRICIAL-1)){
 		
@@ -782,7 +789,7 @@ int main(void){
 												else if(funcao == ABERTURA_PORTA){
 														RD2=1;
 													 //FECHADURA=1;//Alimenta-se da fechadura
-													 	delay_ms(5000);//Tempo de abertura
+													 	delay_ms(1200);//Tempo de abertura
 														RD2=0;
 													 //FECHADURA=0;//A alimentação da fechadura é interrompida
 													}
@@ -854,6 +861,8 @@ int main(void){
 							
 								lcd_gotoxy(LINHA3,qtd_caracteres_recebidos_teclado); printf(" ");
 								buffer_teclado_matricial[--qtd_caracteres_recebidos_teclado]=0;
+								limpar_linha(LINHA2);
+								printf("\n%s",buffer_teclado_matricial);
 								}
 
 							else if(caractere_recebido == LIMPAR_SENHA){//Retorna o indice do buffer em 1  põe-se um zero nele para que se "retire" o caractere que tenha ali
@@ -862,6 +871,7 @@ int main(void){
 								qtd_caracteres_recebidos_teclado=0;
 								zerar_string(buffer_teclado_matricial);
 								limpar_linha(LINHA3);
+								limpar_linha(LINHA2);
 								}						
 						
 
@@ -901,7 +911,7 @@ int main(void){
 			resetar_bit(FLAGS_2,EXIBIR);
 			if(testar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY)){
 				lcd_gotoxy(LINHA4,1);
-				printf("%02d:%02d:%02d-%02d.%02d.%02d",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
+				printf("%02d:%02d:%02d-%02d.%02d.%02d   ",data_atual.hora,data_atual.minuto,data_atual.segundo, data_atual.dia,data_atual.mes,((data_atual.ano+15)%100) );
 				resetar_bit(FLAGS_3,ATUALIZAR_HORA_DISPLAY);
 			}
 			

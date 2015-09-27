@@ -15,7 +15,7 @@
 #define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_3,MODO_TECLADO)
 #define MODO_BLUETOOTH 	testar_bit(FLAGS_3,MODO_BT)
 #define MODO_COMANDO_AT testar_bit(FLAGS_3,MODO_AT)
-#define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO);
+#define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO); resetar_bit(FLAGS_3,MODO_BT)
 #define modo_bluetooth() setar_bit(FLAGS_3,MODO_BT);resetar_bit(FLAGS_3,MODO_TECLADO)
 #define modo_comando_at() setar_bit(FLAGS_3,MODO_COMANDO_AT)
 //
@@ -23,7 +23,7 @@
 
 //CORRESPONDÊNCIA DE CARACTERES NA COMUNICAÇÃO SERIAL E RECEBIMENTO POR TECLADO MATRICIAL
 
-	#define MODO_DEBUG_ON_OFF '^'	//Se o caracter recebido for esse o programa irá ignorar o protocolo e entrar em modo de debug(a ser implementado)
+
 
 
 	//FUNÇÕES DO SISTEMA
@@ -35,7 +35,7 @@
 	#define RECONFIGURAR_MODULO '5'
 	#define MUDAR_SENHA_OUTRA_CONTA '6'
 	#define MUDAR_SENHA_PROPRIA_CONTA '7'
-
+	#define MODO_DEBUG '^'	//Ativa o modo debug no qual o PIC irá enviar ao dispositivo do programador os caracteres que o pic está recebendo e o que está ocorrendo internamente no programa
 	#define REPASSAR_MENSAGEM 'R'
 
 	//OUTROS CARACTERES

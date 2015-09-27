@@ -1,9 +1,10 @@
 #include <xc.h>
 #include "main.h"
+#include "recebimento_dados.h"
 #include "eeprom_interna.h"
 
 
-void carregar_senha( char conta, char senha_a_carregar[][18]){
+void carregar_senha( char conta, char senha_a_carregar[][TAMANHO_SENHA+3]){
 
 
 									
@@ -43,7 +44,7 @@ void eeprom_config_inicial(void){
 		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111100);
 		}
 
-void armazenar_senha(char nova_senha[],char senha_a_armazenar[][18],char conta){
+void armazenar_senha(char nova_senha[],char senha_a_armazenar[][TAMANHO_SENHA+3],char conta){
 	char i=0;
 	do{
 		senha_a_armazenar[conta][i] = nova_senha[i];

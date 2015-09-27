@@ -28,14 +28,16 @@ char dia_da_semana(unsigned int ano,char mes, char dia){
 
 }
 
-void configurar_data_inicial(Data data_inicial){
-	data_inicial.ano=0;
-	data_inicial.mes= Janeiro;
-	data_inicial.dia=1;
-	data_inicial.dia_da_semana= dia_da_semana(	data_inicial.ano,	data_inicial.mes,	data_inicial.dia);
-	data_inicial.hora=0;
-	data_inicial.minuto=0;
-	data_inicial.segundo=0;}
+void configurar_data_inicial(void){
+	
+	data_atual.ano=0;
+	data_atual.mes= Janeiro;
+	data_atual.dia=1;
+	data_atual.dia_da_semana= dia_da_semana(	data_atual.ano,	data_atual.mes,	data_atual.dia);
+	data_atual.hora=5;
+	data_atual.minuto=4;
+	data_atual.segundo=3;
+	TMR0ON=1;}
 
 
 void resetar_timer1(char valor_h, char valor_l){

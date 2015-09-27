@@ -14,10 +14,11 @@
 #define TAMANHO_MINIMO_SENHA 5
 #define conta_admin 0
 #define nivel_acesso senha[conta][TAMANHO_SENHA+1]
+#define nivel_acesso_conta_a_ser_alterada  senha[conta_a_ser_alterada][TAMANHO_SENHA+1]
 //
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
-#define FECHADURA LATCbits.LC4    //Destravamento ou não da fechadura
+#define FECHADURA LATBbits.LB0    //Destravamento ou não da fechadura
 #define SENSOR_ABERTURA_FECHADURA PORTEbits.RE2 //Sensor magnético(reed switch)
 
 #define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0

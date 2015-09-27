@@ -33,11 +33,13 @@ typedef struct{
 	unsigned char dia_da_semana;//6
 		}Data;
 
+Data data_atual;
+
 void delay_ms(unsigned int delay_total);
 
 char dia_da_semana(unsigned int ano,char mes, char dia);
 
-void configurar_data_inicial(Data data_inicial);
+void configurar_data_inicial(void);
 
 void resetar_timer1(char valor_h, char valor_l);
 

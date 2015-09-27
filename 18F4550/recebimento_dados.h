@@ -6,7 +6,7 @@
 
 //PARAMETRO PARA BUFFER TECLADO MATRICIAL
 
-#define TAMANHO_BUFFER_TECLADO_MATRICIAL 40
+#define TAMANHO_BUFFER_TECLADO_MATRICIAL 18
 
 //TAMANHO DE NOVO PARAMETRO DO MODULO BLUETOOTH(EXEMPLO:NOVO NOME)
 #define TAMANHO_PARAMETRO_BT 16
@@ -57,7 +57,8 @@
 	//TECLADO MATRICIAL
 	#define MAIUSCULA_MINUSCULA '*' //alterna entre minuscula e maiuscula no recebimento de letras pelo teclado matricial
 	#define MODO_T9_ON_OFF 'A'
-	#define VOLTAR_CARACTERE 'D' //retorna em um caractere a senha(similar ao return de um teclado normal)
+	#define VOLTAR_CARACTERE 'C' //retorna em um caractere a senha(similar ao return de um teclado normal)
+	#define LIMPAR_SENHA 'D'
 
 
 //PINOS DO TECLADO MATRICIAL(LINHAS E COLUNAS)

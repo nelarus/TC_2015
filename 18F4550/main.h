@@ -9,21 +9,17 @@
 #define QTD_MAX_CONTAS 16
 //
 
+
+
 //PARAMETROS DO BANCO DE DADOS DE SENHAS
 #define TAMANHO_SENHA 16
 #define TAMANHO_MINIMO_SENHA 5
 #define conta_admin 0
 #define nivel_acesso senha[conta][TAMANHO_SENHA+1]
 #define nivel_acesso_conta_a_ser_alterada  senha[conta_a_ser_alterada][TAMANHO_SENHA+1]
+#define NIVEL_ACESSO_MAXIMO 0xFF
 //
 
-//RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
-#define FECHADURA LATBbits.LB0    //Destravamento ou não da fechadura
-#define SENSOR_ABERTURA_FECHADURA PORTEbits.RE2 //Sensor magnético(reed switch)
-
-#define FECHADURA_TRAVADA SENSOR_ABERTURA_FECHADURA==0
-#define DESTRAVAR_FECHADURA() FECHADURA=1
-#define TRAVAR_FECHADURA() FECHADURA=0
 //
 
 // OPERAÇÕES DE BIT
@@ -33,6 +29,15 @@
 #define inverter_bit(ADDRESS,BIT) (ADDRESS ^= (1<<BIT))
 //
 
+//DEFINIÇÕES PARA SETAR E RESETAR VALORES
+#define LIGAR 1
+#define ATIVAR 1
+#define ATIVADO 1
+#define LIGADO 1
+#define DESLIGAR 0
+#define DESATIVAR 0
+#define DESATIVADO 0
+#define DESLIGADO 0
 
 
 

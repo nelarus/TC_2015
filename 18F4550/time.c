@@ -50,3 +50,15 @@ void parar_timer0_16bits(char valor_h,char valor_l){
 	TMR0IE=0;
 	TMR0H=valor_h;
 	TMR0L=valor_l;}
+
+void configurar_timer0(void){
+	T0CON = 0b00000111;
+	TMR0H=0xC2; //TMR0=34446(1 interrupção = 1s para FOSC=16MHz)
+	TMR0L= 0xF7;}
+
+void configurar_timer1(void){
+	T1CON = 0b00001110;
+	TMR1H=0XC0; //TMR1 = 49152 (1 interrupção = 0.5s para cristal de 32,768khz)
+	TMR1L=0;
+	TMR1IE=1;}
+	

@@ -45,4 +45,12 @@ void resetar_timer1(char valor_h, char valor_l);
 
 void parar_timer0_16bits(char valor_h,char valor_l);
 
+void configurar_timer0(void);
+
+void configurar_timer1(void);
+
+
+
+	
+
 

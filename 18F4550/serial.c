@@ -2,6 +2,8 @@
 #include "main.h"
 #include "serial.h"
 #include "recebimento_dados.h"
+#include "flags.h"
+#include "time.h"
 
 
 void config_serial(char baud){
@@ -11,7 +13,7 @@ void config_serial(char baud){
 		switch(baud){
 				case BAUD_115200:
 				BRG16=1;
-				SPBRG =34;
+				SPBRG =33;
 				break;
 
 				case BAUD_57600:
@@ -113,3 +115,28 @@ void enviar_comando_at(unsigned char comando,char *parametro){
 
 
 }
+
+
+void entrar_modo_at(char versao_bluetooth){
+	if(versao_bluetooth == BT_VERSAO_2){	
+		delay_ms(10);
+		MODULO_BT=DESLIGAR;	
+		delay_ms(10);
+		PINO_KEY=LIGAR;
+		MODULO_BT=LIGAR;
+	}
+
+	else{
+		teste_comando_at();
+		teste_comando_at();}
+}
+
+void sair_modo_at(char versao_bluetooth){
+
+	if(versao_bluetooth == BT_VERSAO_2){
+		delay_ms(10);
+		MODULO_BT=DESLIGAR;
+		PINO_KEY=DESLIGAR;
+		delay_ms(10);
+		MODULO_BT=LIGAR;}
+}	

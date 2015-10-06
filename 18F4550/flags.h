@@ -27,8 +27,7 @@
 #define DEBOUNCE 3
 #define MODO_T9 4
 #define MAIUSCULA 5
-#define MODO_DEBUG_ON 6
-#define EXIBIR 7
+#define EXIBIR 6
 
 //FLAGS_3 CORRESPONDENCIA DE BITS
 #define ATUALIZAR_HORA_DISPLAY 0
@@ -36,3 +35,4 @@
 #define MODO_BT 2
 #define MODO_TECLADO 3
 #define MODO_AT 4
+#define MODO_DEBUG_ON 5

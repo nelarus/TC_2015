@@ -1,0 +1,11 @@
+#include <xc.h>
+
+
+void configurar_oscilador(void){
+	OSCCON=0XF0;}
+
+void configurar_interrupcoes(void){
+	INTCON = 0b11100000;
+	INTCON2 =0b00000000;
+	PIE1=0b00100001;
+	RCONbits.IPEN = 0;}

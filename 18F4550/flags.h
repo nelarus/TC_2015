@@ -1,5 +1,9 @@
 //FLAGS
 
+extern unsigned char FLAGS_1; 
+extern unsigned char FLAGS_2; 
+extern unsigned char FLAGS_3; 
+
 //FLAGS NIVEL DE ACESSO
 #define PERMISSAO_ABRIR_PORTA 0
 #define PERMISSAO_REQUERIMENTO_HISTORICO 1
@@ -27,12 +31,12 @@
 #define DEBOUNCE 3
 #define MODO_T9 4
 #define MAIUSCULA 5
-#define EXIBIR 6
+#define ATUALIZAR_DISPLAY 6
 
 //FLAGS_3 CORRESPONDENCIA DE BITS
-#define ATUALIZAR_HORA_DISPLAY 0
-#define ATUALIZAR_SENHA_DISPLAY 1
 #define MODO_BT 2
 #define MODO_TECLADO 3
 #define MODO_AT 4
 #define MODO_DEBUG_ON 5
+#define VERSAO_MODULO 0
+#define SUCESSO_ENVIO_COMANDO_AT 1

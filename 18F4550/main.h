@@ -5,9 +5,6 @@
 #define _XTAL_FREQ 16000000
 #endif
 //
-//PARAMETRO PARA CONTAS
-#define QTD_MAX_CONTAS 16
-//
 
 
 
@@ -29,7 +26,7 @@
 #define inverter_bit(ADDRESS,BIT) (ADDRESS ^= (1<<BIT))
 //
 
-//DEFINIÇÕES PARA SETAR E RESETAR VALORES
+//DEFINIÇÕES PARA SETAR , RESETAR e ATRIBUIR VALORES
 #define LIGAR 1
 #define ATIVAR 1
 #define ATIVADO 1
@@ -38,6 +35,10 @@
 #define DESATIVAR 0
 #define DESATIVADO 0
 #define DESLIGADO 0
+#define SUCESSO 1
+
+#define DEFINIR_NOVO_VALOR '='
+
 
 
 

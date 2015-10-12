@@ -6,7 +6,7 @@ void configurar_portas(void);
 
 
 //RENOMEAÇÃO DOS PINOS DAS PORTAS E DOS LATCHES
-#define FECHADURA LATBbits.LB0    //Destravamento ou não da fechadura
+#define FECHADURA LATDbits.LD2    //Destravamento ou não da fechadura
 #define SENSOR_ABERTURA_FECHADURA PORTBbits.RB3 //Sensor magnético(reed switch)
 #define SENSOR_ABERTURA_CAIXA PORTBbits.RB2 //reed switch que indica que a caixa em que o circuito está alojado foi aberta
 

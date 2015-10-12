@@ -9,6 +9,7 @@ char linha_lcd_aux_posicao;
 char coluna_lcd;
 char qtd_max_colunas_lcd;
 char lcd_type;
+char qtd_max_linhas_lcd;
 unsigned char Linha_3;
 unsigned char Linha_4;
 
@@ -42,20 +43,24 @@ lcd_init(char definir_tipo_lcd)
 	switch(lcd_type){
 					case LCD_20X2:
 						qtd_max_colunas_lcd=20;
+						qtd_max_linhas_lcd=2;
 						break;
 
 					case LCD_16X2:
 						qtd_max_colunas_lcd=16;
+						qtd_max_linhas_lcd=2;
 						break;
 
 					case LCD_20X4:
 						qtd_max_colunas_lcd=20;
+						qtd_max_linhas_lcd=4;
 						Linha_3 = 0x94;
 						Linha_4 = 0xD4;
 						break;
 
 					case LCD_16X4:
 						qtd_max_colunas_lcd=16;
+						qtd_max_linhas_lcd=4;
 						Linha_3 = 0x90;
 						Linha_4 = 0xD0;
 						break;
@@ -158,18 +163,7 @@ lcd_putc(char c)
           break;
      case '\n'   :
 					coluna_lcd=0;
-
-				switch(lcd_type){
-					case LCD_20X4:
-					case LCD_16X4:
-						if(++linha_lcd>4) linha_lcd=1;
-					break;
-
-					case LCD_20X2:
-					case LCD_16X2:
-						if(++linha_lcd>2) linha_lcd=1;
-					break;
-				}
+						if(++linha_lcd>	qtd_max_linhas_lcd) linha_lcd=1;
 
      			lcd_gotoxy(linha_lcd,1);
      			break;

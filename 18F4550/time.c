@@ -53,7 +53,7 @@ void parar_timer0_16bits(char valor_h,char valor_l){
 
 void configurar_timer0(void){
 	T0CON = 0b00000111;
-	TMR0H=0xC2; //TMR0=34446(1 interrupção = 1s para FOSC=16MHz)
+	TMR0H=0xC2; //TMR0=49911(1 interrupção = 1s para FOSC=16MHz)
 	TMR0L= 0xF7;}
 
 void configurar_timer1(void){

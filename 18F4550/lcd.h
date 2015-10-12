@@ -58,7 +58,8 @@ void substituir_por_asterisco(void);
 extern char linha_lcd;
 extern char linha_lcd_aux_posicao;
 extern char coluna_lcd;
-extern char qtd_max_coluna_lcd;
+extern char qtd_max_colunas_lcd;
+extern char qtd_max_linhas_lcd;
 extern char lcd_type;
 
 extern unsigned char Linha_3;

@@ -18,7 +18,7 @@
 
 #define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO); resetar_bit(FLAGS_3,MODO_BT)
 #define modo_bluetooth() setar_bit(FLAGS_3,MODO_BT);resetar_bit(FLAGS_3,MODO_TECLADO)
-#define modo_comando_at() setar_bit(FLAGS_3,MODO_COMANDO_AT)
+#define modo_comando_at() setar_bit(FLAGS_3,MODO_AT)
 
 #define desativar_modo_bluetooth() resetar_bit(FLAGS_3,MODO_BT)
 #define desativar_modo_teclado_matricial() resetar_bit(FLAGS_3,MODO_TECLADO)
@@ -83,7 +83,7 @@
 
 //VALOR DECIMAL DE CADA ETAPA E ORDEM DAS ETAPAS
 #define etapa_inicial 0
-#define etapa_recebe_funcao 1
+#define etapa_identificacao 1
 #define etapa_login 2					
 #define etapa_detalha_funcao 3
 #define etapa_final 4

@@ -15,6 +15,7 @@
 #define MODO_TECLADO_MATRICIAL testar_bit(FLAGS_3,MODO_TECLADO)
 #define MODO_BLUETOOTH 	testar_bit(FLAGS_3,MODO_BT)
 #define MODO_COMANDO_AT testar_bit(FLAGS_3,MODO_AT)
+#define MODO_DEBUG testar_bit(FLAGS_3,MODO_DEBUG_ON)
 
 #define modo_teclado_matricial() setar_bit(FLAGS_3,MODO_TECLADO); resetar_bit(FLAGS_3,MODO_BT)
 #define modo_bluetooth() setar_bit(FLAGS_3,MODO_BT);resetar_bit(FLAGS_3,MODO_TECLADO)
@@ -40,7 +41,7 @@
 	#define RECONFIGURAR_MODULO '5'
 	#define MUDAR_SENHA_OUTRA_CONTA '6'
 	#define MUDAR_SENHA_PROPRIA_CONTA '7'
-	#define MODO_DEBUG '^'	//Ativa o modo debug no qual o PIC irá enviar ao dispositivo do programador os caracteres que o pic está recebendo e o que está ocorrendo internamente no programa
+	#define ATIVAR_MODO_DEBUG '^'	//Ativa o modo debug no qual o PIC irá enviar ao dispositivo do programador os caracteres que o pic está recebendo e o que está ocorrendo internamente no programa
 	#define REPASSAR_MENSAGEM 'R'
 
 	//OUTROS CARACTERES
@@ -96,6 +97,15 @@
 #define ALTERAR_HORA 3
 #define ALTERAR_MINUTO 4
 #define ALTERAR_SEGUNDO 5
+
+//PEDIDO STATUS ATUAL
+
+#define STATUS_DATA testar_bit(pedido_status_1,0)
+#define STATUS_PORTA testar_bit(pedido_status_1,1)
+#define STATUS_RECONFIGURACAO_MODULO testar_bit(pedido_status_1,2)
+#define STATUS_FLAGS testar_bit(pedido_status_1,3)
+#define STATUS_EEPROM testar_bit(pedido_status_1,4)
+
 
 
 //Fechadura

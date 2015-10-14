@@ -101,6 +101,25 @@ void zerar_string(char *string_a_zerar){
 
 }
 
+
+unsigned char ascii_para_numero_debug(char caractere3, char caractere2, char caractere1){
+
+		if(caractere3 == NULL) caractere3 = '0'; 
+		if(caractere2 == NULL) caractere2 = '0';
+		numero_para_ascii(caractere3);
+		numero_para_ascii(caractere2);
+		numero_para_ascii(caractere1);
+		unsigned char numero;
+		numero=((caractere3 - '0')*100);
+		enviar_string_serial("n1"); numero_para_ascii(numero);
+		numero+=((caractere2 - '0')*10);
+		
+		enviar_string_serial("n2"); numero_para_ascii(numero);
+		numero+=(caractere1 - '0');
+		
+		enviar_string_serial("n3"); numero_para_ascii(numero);
+		return numero;
+}
 void interrupt aux(void){
 
 			if(TMR1IE && TMR1IF){ 
@@ -313,7 +332,7 @@ int main(void){
 	unsigned char qtd_total_contas=0;	
 	unsigned char ultimo_caractere_recebido=0;
 	unsigned char novo_nivel_acesso=0;
-	unsigned char pedido_status_1=0;
+	char pedido_status_1=0;//Quais informações o PIC irá enviar ao ser pedido o status atual
 	int contas_cadastradas=0; //16bits que correspondem cada um a uma conta cadastrada ou não. Exemplo: bit 7 indica se a conta 7 existe ou ainda não tem uma senha cadastrada
 	char *ptr_data;
 
@@ -373,7 +392,7 @@ int main(void){
 			resetar_bit(FLAGS_2,RECEBER);	
 			char *ptr_caractere_recebido_serial = &buffer_serial[0]; //Ponteiro para o caractere a ser analisado no momento
 
-			if(testar_bit(FLAGS_3,MODO_DEBUG_ON)){
+			if(MODO_DEBUG){
 				enviar_string_serial("qtd:"); numero_para_ascii(qtd_caracteres_recebidos_serial);
 			}
 
@@ -390,7 +409,7 @@ int main(void){
 
 			else if(MODO_BLUETOOTH){
 
-				if(testar_bit(FLAGS_3,MODO_DEBUG_ON)){
+				if(MODO_DEBUG){
 					enviar_caractere_serial(NOVA_LINHA);
 					enviar_string_serial(buffer_serial);
 					enviar_caractere_serial(NOVA_LINHA);
@@ -407,13 +426,13 @@ int main(void){
 				//Início da análise dos dados recebidos
 				for(i=0;i<qtd_caracteres_recebidos_serial;i++){
 
-					if(testar_bit(FLAGS_3,MODO_DEBUG_ON)){
+					if(MODO_DEBUG){
 						enviar_string_serial("\ni:");numero_para_ascii(i);
 						enviar_caractere_serial(*ptr_caractere_recebido_serial);
 					}
 
 					if(FLAGS_1){
-						if(testar_bit(FLAGS_3,MODO_DEBUG_ON)){
+						if(MODO_DEBUG){
 							enviar_string_serial("\netapa_e:"); 
 							numero_para_ascii(etapa);
 							numero_para_ascii(ordem);
@@ -465,14 +484,25 @@ int main(void){
 
 					else if(etapa == etapa_detalha_funcao){
 
-						if(funcao == ABERTURA_PORTA || funcao == REQUERIMENTO_STATUS_ATUAL || funcao == MODO_DEBUG){
+						if(funcao == ABERTURA_PORTA || funcao == ATIVAR_MODO_DEBUG){
 							
 							if(*ptr_caractere_recebido_serial != ('N'+ordem)) setar_bit(FLAGS_1,ERRO_PROTOCOLO);
 
-							if(testar_bit(FLAGS_3,MODO_DEBUG_ON)) {
+							if(MODO_DEBUG) {//Se o modo debug estiver ativado, envia o caractere esperado no detalhamento da função
 								enviar_caractere_serial('N'+ordem);
 							}
 							ordem++;
+						}
+
+						else if(funcao == REQUERIMENTO_STATUS_ATUAL){
+							
+							if(MODO_DEBUG){//No modo debug a especificação de quais informações ,referentes ao status atual ,estão sendo pedidas é feita por enviar em ascii um valor entre '0'0'0' e '2''5''5'.
+											//No modo normal simplesmente se envia um char de valor entre 0 decimal e 255 decimal
+									pedido_status_1 = ascii_para_numero( *ptr_caractere_recebido_serial, *(ptr_caractere_recebido_serial+1),*(ptr_caractere_recebido_serial+2));
+									
+									ptr_caractere_recebido_serial+=2;}
+							else {
+								pedido_status_1 = *ptr_caractere_recebido_serial;}
 						}
 
 						else if(funcao >= MUDAR_SENHA_OUTRA_CONTA){ //Funções '6' e '7'. Função '7' == alterar a senha da própria conta
@@ -481,7 +511,6 @@ int main(void){
 								if(funcao == MUDAR_SENHA_PROPRIA_CONTA) conta_a_ser_alterada=conta; 
 
 								else{ conta_a_ser_alterada = ascii_para_numero(NULL,NULL,*ptr_caractere_recebido_serial++);} //converte-se para decimal o caractere recebido e avança o ponteiro para o próximo caractere
-
 							}
 
 							nova_senha[ordem] = *ptr_caractere_recebido_serial;
@@ -491,7 +520,16 @@ int main(void){
 
 						else if(funcao == RECONFIGURAR_CONTA){
 								conta_a_ser_alterada = ascii_para_numero(NULL,NULL,*ptr_caractere_recebido_serial++);
+
+
+							
+							if(MODO_DEBUG){
+									novo_nivel_acesso = ascii_para_numero( *ptr_caractere_recebido_serial, *(ptr_caractere_recebido_serial+1),*(ptr_caractere_recebido_serial+2));
+									
+									ptr_caractere_recebido_serial+=2;}
+							else {
 								novo_nivel_acesso = *ptr_caractere_recebido_serial;}
+								}
 
 						
 						else if(funcao == RECONFIGURAR_PIC){
@@ -718,36 +756,53 @@ int main(void){
 										//O que será feito depende da função,algumas enviam dados,outras só executam ações
 
 												
-												if(funcao == MODO_DEBUG){
+												if(funcao == ATIVAR_MODO_DEBUG){
 														inverter_bit(FLAGS_3,MODO_DEBUG_ON);}
 
 												else if(funcao == REQUERIMENTO_STATUS_ATUAL){
-														enviar_string_serial("\n\rano:");					numero_para_ascii(data_atual.ano);
-														enviar_string_serial("\n\rmes:");					numero_para_ascii(data_atual.mes);
-														enviar_string_serial("\n\rdia_semana:");			numero_para_ascii(data_atual.dia_da_semana);
-														enviar_string_serial("\n\rdia:");					numero_para_ascii(data_atual.dia);
-														enviar_string_serial("\n\rhora:");					numero_para_ascii(data_atual.hora);
-														enviar_string_serial("\n\rminuto:");				numero_para_ascii(data_atual.minuto);
-														enviar_string_serial("\n\rsegundo:");				numero_para_ascii(data_atual.segundo);
-														enviar_string_serial("\n\rqtd_total_contas:");		numero_para_ascii(qtd_total_contas);
-														enviar_string_serial("\n\rqtd_max_contas:");		numero_para_ascii(QTD_MAX_CONTAS);
+														numero_para_ascii(pedido_status_1);
 
-														enviar_string_serial("\nPorta");
-														if(FECHADURA_TRAVADA)enviar_string_serial(" fechada"); else enviar_string_serial(" aberta");
+														if(STATUS_DATA){
+															enviar_string_serial("\n\rano:");					numero_para_ascii(data_atual.ano);
+															enviar_string_serial("\n\rmes:");					numero_para_ascii(data_atual.mes);
+															enviar_string_serial("\n\rdia_semana:");			numero_para_ascii(data_atual.dia_da_semana);
+															enviar_string_serial("\n\rdia:");					numero_para_ascii(data_atual.dia);
+															enviar_string_serial("\n\rhora:");					numero_para_ascii(data_atual.hora);
+															enviar_string_serial("\n\rminuto:");				numero_para_ascii(data_atual.minuto);
+															enviar_string_serial("\n\rsegundo:");				numero_para_ascii(data_atual.segundo);
+															enviar_string_serial("\n\rqtd_total_contas:");		numero_para_ascii(qtd_total_contas);
+															enviar_string_serial("\n\rqtd_max_contas:");		numero_para_ascii(QTD_MAX_CONTAS);
+														}
 
-														if(testar_bit(FLAGS_3,MODO_DEBUG_ON)){
+														if(STATUS_PORTA){
+															enviar_string_serial("\nPorta");
+															if(FECHADURA_TRAVADA)enviar_string_serial(" fechada"); else enviar_string_serial(" aberta");}
+
+														if(STATUS_RECONFIGURACAO_MODULO) enviar_string_serial("\n\rModulo nao explodiu");
+
+														if(STATUS_FLAGS){
+															if(MODO_DEBUG){
 															enviar_string_serial("\n\rFLAGS_1"); numero_para_ascii(FLAGS_1);
 															enviar_string_serial("\n\rFLAGS_2"); numero_para_ascii(FLAGS_2);
 															enviar_string_serial("\n\rFLAGS_3"); numero_para_ascii(FLAGS_3);
-
-															int i;
-
-															for(i=0;i<=0xFF;i++){
-																if(!(i%16)) {enviar_string_serial("\n\n\r");}
-																numero_para_ascii(eeprom_read(i));}
 															}
-}
+														
+															else{enviar_string_serial("\n\rAtive modo debug");}
 
+															}
+
+														if(STATUS_EEPROM){
+															if(MODO_DEBUG){
+																int i;
+																for(i=0;i<=0xFF;i++){
+																	if(!(i%16)) {enviar_string_serial("\n\n\r");}
+																	numero_para_ascii(eeprom_read(i));}
+																}
+
+															else{enviar_string_serial("\n\rAtive modo debug");}
+														}	
+												}
+															
 												else if(funcao == RECONFIGURAR_PIC){
 														parar_timer0_16bits(0xC2,0xF7); //TMR0=34446(1 interrupção = 1s para FOSC=16MHz)
 														data_atual = data_recebida;
@@ -758,7 +813,11 @@ int main(void){
 												}
 
 												else if(funcao == RECONFIGURAR_CONTA){
-														nivel_acesso_conta_a_ser_alterada = novo_nivel_acesso;}
+														nivel_acesso_conta_a_ser_alterada = novo_nivel_acesso;
+
+														numero_para_ascii(novo_nivel_acesso);
+
+														armazenar_novo_nivel_de_acesso(nivel_acesso_conta_a_ser_alterada, conta_a_ser_alterada);}
 
 												else if(funcao == RECONFIGURAR_MODULO){
 														entrar_modo_at(testar_bit(FLAGS_3,VERSAO_MODULO));
@@ -771,12 +830,8 @@ int main(void){
 													
 													setar_bit(contas_cadastradas,conta_a_ser_alterada); //seta-se o bit correspondente a conta que sera alterada para marcar
 																										//que ela existe.Se já existir mantem-se em 1.
-													char i=0;
-														do{
-															senha[conta_a_ser_alterada][i] = nova_senha[i];
-															eeprom_write(((conta_a_ser_alterada*16) + i),nova_senha[i]);
-															while(WR){}
-															i++;} while(nova_senha[i-1]  && i<TAMANHO_SENHA);
+
+													armazenar_senha(nova_senha,senha,conta_a_ser_alterada);
 														}
 							
 												else if(funcao == ABERTURA_PORTA){

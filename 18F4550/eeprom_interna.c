@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "main.h"
+#include "contas.h"
 #include "recebimento_dados.h"
 #include "eeprom_interna.h"
 
@@ -44,10 +45,23 @@ void eeprom_config_inicial(void){
 		eeprom_write(((TAMANHO_SENHA*2)-1),0b11111100);
 		}
 
-void armazenar_senha(char nova_senha[],char senha_a_armazenar[][TAMANHO_SENHA+3],char conta){
-	char i=0;
-	do{
+void armazenar_senha(char nova_senha[],char senha_a_armazenar[][TAMANHO_SENHA+3],char conta){//armazena a nova senha na RAM e na eeprom
+	char i;
+
+	for(i=0;i<TAMANHO_SENHA-1;i++){//apaga a senha anterior da eeprom
+		eeprom_write( ((conta*16) + i),VALOR_INICIAL);}
+
+	i=0;
+	do{ //escreve a senha na eeprom
 		senha_a_armazenar[conta][i] = nova_senha[i];
 		eeprom_write( ((conta*16) + i) , nova_senha[i] );
 		while(WR){}
-		i++;} while(nova_senha[i-1]  && i<TAMANHO_SENHA);}																																					
+		i++;} while(nova_senha[i-1]  && i<(TAMANHO_SENHA-1));
+
+}
+
+void armazenar_novo_nivel_de_acesso(char novo_nivel_de_acesso,char conta){
+
+	eeprom_write((TAMANHO_SENHA * (conta+1))-1,novo_nivel_de_acesso);
+
+}																																	

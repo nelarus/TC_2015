@@ -13,3 +13,5 @@ extern void eeprom_config_inicial(void); //Configuração inicial da eeprom, neces
 void carregar_senha(char conta, char senha_a_carregar[][19]);//Carrega a senha da conta selecionada, pegando a senha na eeprom interna e armazenando na string de entrada
 
 void armazenar_senha(char nova_senha[],char senha_a_armazenar[][19],char conta);
+
+void armazenar_novo_nivel_de_acesso(char novo_nivel_de_acesso,char conta);

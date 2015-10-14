@@ -165,7 +165,7 @@ void entrar_modo_at(char versao_modulo){
 void sair_modo_at(char versao_modulo){
 	resetar_bit(FLAGS_3,MODO_AT);
 	if(versao_modulo == HC05){
-		config_serial(BAUD_19200);
+		config_serial(baud_de_operacao);
 		delay_ms(10);
 		MODULO_BT=DESLIGAR;
 		delay_ms(10);

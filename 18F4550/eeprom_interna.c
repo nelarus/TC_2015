@@ -1,11 +1,8 @@
 #include <xc.h>
-#include "main.h"
-#include "contas.h"
-#include "recebimento_dados.h"
 #include "eeprom_interna.h"
 
 
-void carregar_senha( char conta, char senha_a_carregar[][TAMANHO_SENHA+3]){
+void carregar_senha( char conta, char senha_a_carregar[][TAMANHO_SENHA+1]){
 
 
 									
@@ -16,8 +13,8 @@ void carregar_senha( char conta, char senha_a_carregar[][TAMANHO_SENHA+3]){
 								i++;} while( senha_a_carregar[conta][i-1] && i<(TAMANHO_SENHA-1));
 
 
-					senha_a_carregar[conta][TAMANHO_SENHA] = 0;
-					senha_a_carregar[conta][TAMANHO_SENHA+1] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
+					senha_a_carregar[conta][TAMANHO_SENHA-1] = 0;
+					senha_a_carregar[conta][TAMANHO_SENHA] = eeprom_read((TAMANHO_SENHA*(conta+1))-1);
 					}
 
 void verificar_num_contas(int *contas_cadastradas, unsigned char *qtd_contas){

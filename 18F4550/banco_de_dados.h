@@ -1,0 +1,18 @@
+//Header para estrutura do banco de dados(eeprom interna e externa)
+//PARAMETROS GERAIS
+
+	//ORDEM DOS DADOS REFERENTES AO ACESSO
+	#define CONTA 0
+	#define FUNCAO 1
+	#define DIA 2
+	#define HORA 3
+	#define MINUTO 4
+
+//PARAMETROS EEPROM_EXTERNA
+#define LEITURA_EEPROM 0b10100001
+#define ESCRITA_EEPROM 0b10100000
+
+//PARAMETROS EEPROM_INTERNA
+#define ENDERECO_INICIAL 0
+#define VALOR_INICIAL 0xFF
+#define QUANTIDADE_REGISTROS 1

@@ -41,7 +41,7 @@
 	#define RECONFIGURAR_MODULO '5'
 	#define MUDAR_SENHA_OUTRA_CONTA '6'
 	#define MUDAR_SENHA_PROPRIA_CONTA '7'
-	#define ATIVAR_MODO_DEBUG '^'	//Ativa o modo debug no qual o PIC irá enviar ao dispositivo do programador os caracteres que o pic está recebendo e o que está ocorrendo internamente no programa
+	#define ATIVAR_MODO_DEBUG '9'	//Ativa o modo debug no qual o PIC irá enviar ao dispositivo do programador os caracteres que o pic está recebendo e o que está ocorrendo internamente no programa
 	#define REPASSAR_MENSAGEM 'R'
 
 	//OUTROS CARACTERES
@@ -116,3 +116,4 @@
 //Nivel de acesso
 
 #define FUNCAO_NAO_AUTORIZADA !testar_bit(nivel_acesso, ascii_para_numero(NULL,NULL,funcao))
+
